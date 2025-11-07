@@ -34,34 +34,43 @@ format: typst
   Consider a prediction task (regression problem) with:
   - Input space $cal(X)$;
   - Output space $cal(Y)$;
-  - Training set $cal(D)={z_i}_{i=1}^n$ where $z_i=(x_i,y_i)$ for all $i=1,...,n$, \
+  - Training set $cal(D)^n={z_i}_{i=1}^n$ where $z_i=(x_i,y_i)$ for all $i=1,...,n$, \
     $X = (x_1,...,x_n)$, $Y=(y_1,...,y_n)$;
   - Parameter $theta in Theta:= RR^d$;
   - $f(theta;x)$ estimator of $cal(Y)|X$;
   - $l:cal(Y) times cal(Y) -> RR$ loss function (e.g., $l(y',y)|->||y'-y||^2$).
   
-  We aim to minimize the training error: #grayed($ L(theta;cal(D))=1/n sum _(i=1)^n l(f(theta;x_i), y_i). $)
+  We aim to minimize the training error: #grayed($ L(theta;cal(D)^n)=1/n sum _(i=1)^n l(f(theta;x_i), y_i). $)
 ]
 
 #slide(title: "Goal")[
   //#set text(size: 30pt)
   #framed[ What happens if we change the importance of a training point $z=(x,y)$ of the dataset? ]
-  Call $hat(theta)=arg min_(theta in Theta)L(theta;cal(D))$. \
-  How different is it from $ hat(theta)_(epsilon, -z)=arg min_(theta in Theta)lr((L(theta;cal(D)) - epsilon l(f(theta;x),y))) #h(.4cm) ? $ \ 
-  We can re-train the whole model on $cal(D)\\{z}$ (Leave One Out method), or...
+  Call $hat(theta)=arg min_(theta in Theta)L(theta;cal(D)^n)$. \
+  How different is it from $ hat(theta)_(epsilon, -z)=arg min_(theta in Theta)lr((L(theta;cal(D)^n) - epsilon l(f(theta;x),y))) #h(.4cm) ? $ \ 
+  We can re-train the whole model on $cal(D)^n\\{z}$ (Leave One Out method), or...
+]
+
+#slide(title: "Influence loss difference")[
+  #framed(title: "Definition")[Given $(overline(x),overline(y))=overline(z) in cal(D)^n$, the _influence loss difference_ relative to $overline(z)$ is:
+  $ cal(Q)(overline(z)) = lr(d/(d epsilon) [L(theta;cal(D)^n) - epsilon l(f(theta;overline(x)),overline(y))] bar.v) _(epsilon = 1/n) $
+  ]
+  #framed[*Interpretation:* It indicates how much the training error changes when we remove a training data $overline(z)$.]
 ]
 
 #slide(title: "Influence functions")[
-  #framed(title: "Definition")[Given $overline(z) in cal(D)$, the _influence function_ relative to $overline(z)=(overline(x),overline(y))$ is:
-  $ cal(I)(overline(z)) = lr(d/(d epsilon) [L(theta;cal(D)) - epsilon l(f(theta;overline(x)),overline(y))] bar.v) _(epsilon = 1/n) $
+  #framed(title: "Definition")[Given $(overline(x),overline(y))=overline(z) in cal(D)^n$, the _influence function_ relative to $overline(z)$ is:
+  $ cal(I)(overline(z)) = lim_(epsilon arrow.b 1/n) (hat(theta)_(epsilon,-overline(z)) - hat(theta)_(1 slash n,-overline(z)))/epsilon $
   ]
-  #framed[*Classical interpretation:* It indicates how much the training error changes when we remove a training data $overline(z)$.]
+  #framed[*Interpretation:* It represents the direction in which the optimal parameter moves when the training error is changed by removing the training data $overline(z)$.]
 ]
+
 
 #slide(title: "Problems", outlined: true)[
   #grayed([
   Assume $L$ is strongly convex. Evaluating influence functions requires heavy computations:
   $ cal(I)(z) = 1/n H_(hat(theta))^(-1) nabla l(f(hat(theta);x),y) , $
+  $ cal(Q)(z) = 1/n nabla l(f(hat(theta);x),y)^top H_(hat(theta))^(-1) nabla l(f(hat(theta);x),y) , $
   where $H_(hat(theta))$ is the Hessian of $L$, which can be difficult to compute.
   ])
 ]
@@ -86,7 +95,7 @@ format: typst
 
 #slide(title: "Response functions", outlined: true)[
   We define the response function in the general setting as:
-  $ hat(r)_z (epsilon) = arg min_(theta in Theta)lr((L(theta;cal(D)) - epsilon l(f(theta;x),y))). $
+  $ hat(r)_z (epsilon) = arg min_(theta in Theta)lr((L(theta;cal(D)^n) - epsilon l(f(theta;x),y))). $
   Note that $hat(r)_z (epsilon) = hat(theta)_(epsilon, -z)$ and $hat(r)_z (0)=hat(theta)$. Since (by IFT) $hat(r)$ is differentiable at 0, we can define the influence functions as first order approximant of $hat(r)$. In fact, expanding with Taylor near 0 we get:
   $ hat(r)_(z,"lin") (1 / n) = hat(r)_z (0) + lr((d hat(r)_z)/(d epsilon)bar.v)_(epsilon = 0)(epsilon - 0) = hat(theta) + 1/n H_(hat(theta))^(-1) nabla l(f(hat(theta);x),y) .
   $
@@ -102,7 +111,7 @@ format: typst
   where $J_(y hat(theta))$ is the Jacobian of $F(theta) = (f(theta;x_1),...,f(theta;x_n))$ in $hat(theta)$.\
   We can get the previous formula by linearizing near $0$:
 
-   #align( $ &hat(r)_(z,"damp") (epsilon) &&= arg min_(theta in Theta) L(theta;cal(D)) - epsilon l(f(theta;x),y)) +lambda/2 ||theta-hat(theta)||^2,  \
+   #align( $ &hat(r)_(z,"damp") (epsilon) &&= arg min_(theta in Theta) L(theta;cal(D)^n) - epsilon l(f(theta;x),y)) +lambda/2 ||theta-hat(theta)||^2,  \
    & hat(r)_(z,"damp","lin") (1 slash n) && approx hat(theta)+ cal(I)^dagger . 
    $
    )
@@ -111,11 +120,11 @@ format: typst
 #slide(title: "What is PBRF?")[
   In practice, $theta$ is not a minimum point for $L$.\
   However, we can consider another training error for which the early arrested parameter $theta^s$ is optimal:
-  $ cal(L)(theta;theta^s,cal(D)) = 1/n sum_(i=1)^n D_(l^((i))) (f(theta;x_i),f(theta^s;x_i)),
+  $ cal(L)(theta;theta^s,cal(D)^n) = 1/n sum_(i=1)^n D_(l^((i))) (f(theta;x_i),f(theta^s;x_i)),
   $
   where $D_(l^((i)))(y,y')= l(y,y_i)-l(y',y_i)-nabla_1 l(y',y_i)^top (y-y')$ is called Bregman difference.\
   We can then define the PBRF as:
-  $ r^b_(z,"damp")(epsilon)=arg min_(theta in Theta) cal(L) (theta; theta^s,cal(D)) - epsilon l(f(theta,x),y) + lambda/2||theta-theta^s||^2.
+  $ r^b_(z,"damp")(epsilon)=arg min_(theta in Theta) cal(L) (theta; theta^s,cal(D)^n) - epsilon l(f(theta,x),y) + lambda/2||theta-theta^s||^2.
   $
 ]
 
@@ -125,15 +134,41 @@ format: typst
   $
   ])
   Therefore, influence functions do NOT depict the retraining with LOO algorithm using $L$ as training error. \
-  Instead they estimate what happens after training from $theta^s$ using as empirical risk: $ cal(L) (theta; theta^s,cal(D)) - 1/n l(f(theta,x),y) + lambda/2||theta-theta^s||^2. $
+  Instead they estimate what happens after training from $theta^s$ using as empirical risk: $ cal(L) (theta; theta^s,cal(D)^n) - 1/n l(f(theta,x),y) + lambda/2||theta-theta^s||^2. $
 ]
 
-#slide(title: "Example")[
+#slide(title: "Error decomposition", outlined: true)[
+  We can decompose the approximation error of the influence functions in 5 categories:\
+  #v(0.3cm)
+  - *Warm-start gap*: LOO starts from a random parameter (cold start), while IF are related to $theta^s$; we can then converge to another "optimal" point;
+  - *Proximity gap*: the factor $||theta-theta^s||$ induces the warm start not to move far away from $theta^s$;
+  - *Non-convergence gap*: in practice we almost never start from a fully trained network;
+  - *Linearization error*: produced by approximating the Taylor expansion at first order;
+  - *Solver error*: algorithms used to compute iHVP are approximated.
+  #v(0.5cm)
+  #set align(center)
+  #framed(back-color: white)[The PBRF method annihilates the first three components. ]
+]
+
+#slide(title: "Error ratio")[
   #figure(
-  image("images/IFvsLOO2.png", width: 100%),
+  image("images/Err_deco.png", width: 100%),
   )
   #set align(center)
 ]
 
+#slide(title: "Summary", outlined: true)[
+  #framed([
+  Influence functions seem not to work well for NNs, as the loss function is non-linear. \
+  In reality, they are approximating the result of PBRF instead of LOO retraining.
+  ])
+  #figure(
+  image("images/IFvsLOO2.png", width: 80%),
+  )
+  #set text(size: 15pt)
+  ["If Influence Functions are the Answer, Then What is the Question?",  J. Bae, N. Ng, A. Lo, M. Ghassemi, R. Grosse, 2022]\
+  ["On the Accuracy of Influence Functions for Measuring Group Effects", Koh et al., 2019]\
+  ["Understanding Black-box Predictions via Influence Functions", Koh and Liang, 2020]
+]
 
 ```
