@@ -1,0 +1,139 @@
+---
+format: typst
+---
+```{=typst}
+
+#import "@preview/typslides:1.3.0": *
+
+#set page(numbering: none)
+
+// Project configuration
+#show: typslides.with(
+  ratio: "16-9",
+  theme: "reddy",
+  font: "Fira Sans",
+  font-size: 20pt,
+  link-style: "color",
+  show-progress: true,
+)
+
+// The front slide is the first slide of your presentation
+#front-slide(
+  title: "If Influence Functions are the Answer, Then What is the Question?",
+  subtitle: [Paper review],
+  authors: "Alex Ali Maleknia",
+  //info: [#link("https://github.com/manjavacas/typslides")],
+)
+
+#table-of-contents()
+
+#counter(page).update(1)
+
+#slide(title: "Setting", outlined: true)[
+  #v(-0.4cm)
+  Consider a prediction task (regression problem) with:
+  - Input space $cal(X)$;
+  - Output space $cal(Y)$;
+  - Training set $cal(D)={z_i}_{i=1}^n$ where $z_i=(x_i,y_i)$ for all $i=1,...,n$, \
+    $X = (x_1,...,x_n)$, $Y=(y_1,...,y_n)$;
+  - Parameter $theta in Theta:= RR^d$;
+  - $f(theta;x)$ estimator of $cal(Y)|X$;
+  - $l:cal(Y) times cal(Y) -> RR$ loss function (e.g., $l(y',y)|->||y'-y||^2$).
+  
+  We aim to minimize the training error: #grayed($ L(theta;cal(D))=1/n sum _(i=1)^n l(f(theta;x_i), y_i). $)
+]
+
+#slide(title: "Goal")[
+  //#set text(size: 30pt)
+  #framed[ What happens if we change the importance of a training point $z=(x,y)$ of the dataset? ]
+  Call $hat(theta)=arg min_(theta in Theta)L(theta;cal(D))$. \
+  How different is it from $ hat(theta)_(epsilon, -z)=arg min_(theta in Theta)lr((L(theta;cal(D)) - epsilon l(f(theta;x),y))) #h(.4cm) ? $ \ 
+  We can re-train the whole model on $cal(D)\\{z}$ (Leave One Out method), or...
+]
+
+#slide(title: "Influence functions")[
+  #framed(title: "Definition")[Given $overline(z) in cal(D)$, the _influence function_ relative to $overline(z)=(overline(x),overline(y))$ is:
+  $ cal(I)(overline(z)) = lr(d/(d epsilon) [L(theta;cal(D)) - epsilon l(f(theta;overline(x)),overline(y))] bar.v) _(epsilon = 1/n) $
+  ]
+  #framed[*Classical interpretation:* It indicates how much the training error changes when we remove a training data $overline(z)$.]
+]
+
+#slide(title: "Problems", outlined: true)[
+  #grayed([
+  Assume $L$ is strongly convex. Evaluating influence functions requires heavy computations:
+  $ cal(I)(z) = 1/n H_(hat(theta))^(-1) nabla l(f(hat(theta);x),y) , $
+  where $H_(hat(theta))$ is the Hessian of $L$, which can be difficult to compute.
+  ])
+]
+
+#slide(title: "Problems")[
+  #figure(
+  image("images/IFvsLOO.png", width: 80%),
+  )
+  #set align(center)
+  The strong convexity assumption is essential!
+]
+
+#slide(title: "Solution?")[
+  #framed([
+  *Solution 1.* #h(0.5cm) For iHVP, there are good approximations that only require $O(n d)$ flops instead of $O(n^3)$.
+  ])
+
+  #framed([
+  *Solution 2.* Change point of view: Influence functions are not approximators of LOO retraining, but instead of the proximal Bregman response function (PBRF).
+])
+]
+
+#slide(title: "Response functions", outlined: true)[
+  We define the response function in the general setting as:
+  $ hat(r)_z (epsilon) = arg min_(theta in Theta)lr((L(theta;cal(D)) - epsilon l(f(theta;x),y))). $
+  Note that $hat(r)_z (epsilon) = hat(theta)_(epsilon, -z)$ and $hat(r)_z (0)=hat(theta)$. Since (by IFT) $hat(r)$ is differentiable at 0, we can define the influence functions as first order approximant of $hat(r)$. In fact, expanding with Taylor near 0 we get:
+  $ hat(r)_(z,"lin") (1 / n) = hat(r)_z (0) + lr((d hat(r)_z)/(d epsilon)bar.v)_(epsilon = 0)(epsilon - 0) = hat(theta) + 1/n H_(hat(theta))^(-1) nabla l(f(hat(theta);x),y) .
+  $
+  #framed(back-color: white)[
+    We need $H_theta$ to be positive definite in order to invert it, so $theta$ must be a minimum point. 
+  ]
+]
+
+#slide(title: "Proximal response functions")[
+  In order for the influence functions to be computable in the MLP case, we need to address the hessian inverse. This can be done by approximating $H_hat(theta)$ with the Gauss-Newton Hessian (GNH) and adding a damping term to ensure GNH is invertible:
+  $ cal(I)^dagger (z) = 1/n (J_(y hat(theta))^top H_(hat(theta))J_(y hat(theta))+lambda bold(I))^(-1) nabla l(f(hat(theta);x),y),
+  $
+  where $J_(y hat(theta))$ is the Jacobian of $F(theta) = (f(theta;x_1),...,f(theta;x_n))$ in $hat(theta)$.\
+  We can get the previous formula by linearizing near $0$:
+
+   #align( $ &hat(r)_(z,"damp") (epsilon) &&= arg min_(theta in Theta) L(theta;cal(D)) - epsilon l(f(theta;x),y)) +lambda/2 ||theta-hat(theta)||^2,  \
+   & hat(r)_(z,"damp","lin") (1 slash n) && approx hat(theta)+ cal(I)^dagger . 
+   $
+   )
+]
+
+#slide(title: "What is PBRF?")[
+  In practice, $theta$ is not a minimum point for $L$.\
+  However, we can consider another training error for which the early arrested parameter $theta^s$ is optimal:
+  $ cal(L)(theta;theta^s,cal(D)) = 1/n sum_(i=1)^n D_(l^((i))) (f(theta;x_i),f(theta^s;x_i)),
+  $
+  where $D_(l^((i)))(y,y')= l(y,y_i)-l(y',y_i)-nabla_1 l(y',y_i)^top (y-y')$ is called Bregman difference.\
+  We can then define the PBRF as:
+  $ r^b_(z,"damp")(epsilon)=arg min_(theta in Theta) cal(L) (theta; theta^s,cal(D)) - epsilon l(f(theta,x),y) + lambda/2||theta-theta^s||^2.
+  $
+]
+
+#slide(title: "Property")[
+  #grayed([The optimal solution for the linearised PBRF is the same as the influence function estimation:
+  $ r^b_(z,"damp","lin")(1 slash n) = theta^s + cal(I)^dagger (z).
+  $
+  ])
+  Therefore, influence functions do NOT depict the retraining with LOO algorithm using $L$ as training error. \
+  Instead they estimate what happens after training from $theta^s$ using as empirical risk: $ cal(L) (theta; theta^s,cal(D)) - 1/n l(f(theta,x),y) + lambda/2||theta-theta^s||^2. $
+]
+
+#slide(title: "Example")[
+  #figure(
+  image("images/IFvsLOO2.png", width: 100%),
+  )
+  #set align(center)
+]
+
+
+```
