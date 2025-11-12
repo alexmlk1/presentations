@@ -171,8 +171,4 @@ format: typst
   ["Understanding Black-box Predictions via Influence Functions", Koh and Liang, 2020]
 ]
 
-#slide(title: "prova")[
-  Ciaos
-]
-
 ```
