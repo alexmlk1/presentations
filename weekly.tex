@@ -75,14 +75,15 @@ Consider a prediction task (regression problem) with:
 \begin{itemize}
     \item Input space $\X$;
     \item Output space $\Y$;
-    \item Training set $\mathcal{D}^n=\{z_i\}_{i=1}^n$ where $z_i=(x_i,y_i)$ for all $i=1,\dots,n$;
+    \item Training set $\mathcal{D}^n=\{z_i\}_{i=1}^n$ where $z_i=(x_i,y_i)$ for all $i=1,\dots,n$; 
+    \\ $X = (x_1,...,x_n)$, $Y=(y_1,...,y_n)$;
     \item Parameter $\theta \in \Theta := \R^d$;
     \item $f(\theta; x)$ estimator of $\Y\mid \X$;
     \item Loss function $\ell:\Y\times\Y\to\R$ (e.g., 
     $\ell(y',y)\mapsto \|y'-y\|^2$).
 \end{itemize}
 
-We aim to minimize the training error:
+We aim to minimize the training error (empirical risk):
 \[
 L(\theta;\mathcal{D}^n) 
     = \frac{1}{n}\sum_{i=1}^n \ell\!\big(f(\theta; x_i),\, y_i\big).
@@ -101,7 +102,7 @@ How different is it from
         \, ?
 \]
 
-We can re-train the whole model on $\mathcal{D}^n\setminus\{z\}$ (Leave-One-Out method), or use influence functions.
+To answer this question, we can re-train the whole model on $\mathcal{D}^n\setminus\{z\}$ (Leave-One-Out method), or use influence functions.
 
 \section*{Influence functions}
 
@@ -119,7 +120,7 @@ We can re-train the whole model on $\mathcal{D}^n\setminus\{z\}$ (Leave-One-Out 
 
 
 \textit{Interpretation:}  
-It measures how much the training error changes when the training datum $\bar{z}$ is removed.
+It measures how much the training error changes when the data point $\bar{z}$ is removed.
 
 \begin{definition*}
     Given $(\bar{x},\bar{y})=\bar{z}\in\mathcal{D}^n$, the \emph{influence function}
@@ -137,9 +138,8 @@ It measures how much the training error changes when the training datum $\bar{z}
 
 \textit{Interpretation:}  
 It represents the direction in which the optimal parameter moves when the
-training objective is perturbed by removing $\bar{z}$.
-
-Assume that $L$ is strongly convex. Then we can rewrite the previous quantities in the closed forms:
+training objective is perturbed by removing $\bar{z}$.\\
+Assuming that $L$ is strongly convex in $\theta$, we can rewrite the previous quantities in the closed forms:
 \[
 \mathcal{I}(z;\hat\theta)
     =  H_{\hat{\theta}}^{-1}\,
@@ -150,17 +150,20 @@ Assume that $L$ is strongly convex. Then we can rewrite the previous quantities 
       H_{\hat{\theta}}^{-1}
       \nabla \ell(f(\hat{\theta};x),y),
 \]
-where $H_{\hat{\theta}}$ is the Hessian of $L$ at $\hat\theta$, which is difficult to compute.
+where $H_{\hat{\theta}}$ is the Hessian of $L$ at $\hat\theta$.
 
-Unfortunately, there is some problems with these formulae.\\
-Indeed, the strong convexity assumption is essential if we want the LOO method to be well approximated by influence functions.
-Even under such assumption, the problem is not trivial because computing the inverse of the Hessian and the matrix-vector product are heavy computations.
+Unfortunately, there is some problems with these formulae:
+\begin{enumerate}
+    \item the strong convexity is essential. If at a minimum point H has any $0$-eigenvalue, we cannot invert it.
+    \item Even when $L$ is strongly convex, the problem is not trivial because computing the inverse of the Hessian and the matrix-vector product are heavy computations.
+
+\end{enumerate}
 
 \textbf{Solution 1.}  
 For iHVP, there exist efficient approximations requiring $O(nd)$ flops instead of $O(n^3)$.
 
 \textbf{Solution 2.}  
-Influence functions do not approximate LOO retraining, but the proximal Bregman response function (PBRF).
+Change point of view: Influence functions are not approximators of LOO retraining, but instead of the proximal Bregman response function (PBRF).
 
 \section*{Response functions}
 
@@ -171,13 +174,13 @@ We define the response function as:
       \left( L(\theta;\mathcal{D}^n)
       - \varepsilon\,\ell(f(\theta;x),y) \right).
 \]
-Then $\hat{r}_z(\varepsilon)=\hat{\theta}_{(\varepsilon,-z)}$ and
+Observe that $\hat{r}_z(\varepsilon)=\hat{\theta}_{\varepsilon,-z}$ and
 $\hat{r}_z(0)=\hat{\theta}$.
 
-Since $\hat{r}$ is differentiable at $0$ we can expand with Taylor at first order and we get:
+Since $\hat{r}$ is differentiable at $0$, we can expand with Taylor at first order and we get:
 \[
 \hat{r}_{z,\mathrm{lin}}(1/n)
-  = \hat{\theta}
+  \approx \hat{\theta}
     + \frac1n H_{\hat{\theta}}^{-1}\,
       \nabla\ell(f(\hat{\theta};x),y).
 \]
@@ -197,7 +200,7 @@ Gauss--Newton Hessian (GNH) and add damping:
 where $J_{y,\hat{\theta}}$ is the Jacobian of  
 $F(\theta) = (f(\theta;x_1),\ldots,f(\theta;x_n))$.\\
 Note that the damped GNH is always positive definite, as long as $H_{\hat\theta}$ is SPD.\\
-The damped response satisfies:
+We can get the previous formula by linearizing the response function of the regularized loss:
 \[
 \begin{aligned}
 \hat{r}_{z,\mathrm{damp}}(\varepsilon)
@@ -209,8 +212,8 @@ The damped response satisfies:
   &\approx \hat{\theta}+\frac1n\mathcal{I}^{\dagger}(z;\hat\theta).
 \end{aligned}
 \]
-Since, in practice, the parameter we consider is not a minimizer of $L$, we want to consider the loss
-for which the early-stopped point $\theta^s$ is optimal:
+Another issue is that, in practice, the parameter we utilise is not a minimizer of $L$. 
+Thus, we want to consider a risk for which the early-stopped point $\theta^s$ is optimal:
 \[
 \mathcal{L}(\theta;\theta^s,\mathcal{D}^n)
   = \frac1n\sum_{i=1}^n
@@ -239,7 +242,7 @@ r^b_{z,\mathrm{damp,lin}}(1/n)
   = \theta^s + \frac1n\mathcal{I}^{\dagger}(z;\theta^s).
 \]
 
-Thus influence functions do \emph{not} approximate LOO retraining under the original
+As a consequence, influence functions are \emph{not} approximating LOO retraining under the original
 loss $L$. Instead, they approximate the effect of training from $\theta^s$ under the modified objective
 \[
 \mathcal{L}(\theta;\theta^s,\mathcal{D}^n)
@@ -267,6 +270,25 @@ The approximation error of influence functions decomposes into:
     \includegraphics[width=0.9\linewidth]{Err_deco.png}
     \caption{Visual representation of the error defomposition on different datasets and models. The main focus is that the largest components are the first three.}
 \end{figure}
+
+\section*{Influence Functions vs Leverage}
+For simplicity, let's consider the Ordinary Least Squares problem.\\
+In this setting, assume the dataset is generated by $Y=f(\theta^\star;x)+e=\theta^\star\,X+e$ where $e$ is the observational error. 
+We can estimate $\theta^\star$ with $\hat\theta=(X^T X)^{-1}X^T Y$. Consequently, the predicted data with our model will be $\hat{Y} = X(X^T X)^{-1}X^T Y$ and we call $P=X(X^T X)^{-1}X^T$, as it is an orthogonal projection on $\mathrm{ran}(X)$.
+\begin{definition*}
+    The \emph{leverage score} of the $i$-th sample data is $P_{ii}=x_i(X^T X)^{-1}x_i^T$.
+\end{definition*}
+This quantity describes how much the $i$-th sample data affects the $i$-th prediction of our model. The bigger it is, the more probable it is that the $i$-th sample point is an outlier.\\
+Indeed, if we consider $X=Jf(\theta)$ as the $X$ in our case, then the influence loss difference is approximately
+\footnote{we can write $Hf=Jf^TJf+\sum\dots$ . If we omit the second term, we have the sought approximation. This is acceptable when the parameter is close to optimal, since the sum annihilates for optimal parameters.} 
+the same as the leverage. However, the interpretation of the problem would become different.\\
+In any case, an expression of interest that involves both leverage and influence functions is the following:
+\begin{equation*}
+    -\mathcal{I}(z;\hat\theta) = \hat\theta- \hat\theta_{1/n, -z} = \frac{(X^TX)^{-1}x_i\hat e_i}{1-P_{ii}},
+\end{equation*}
+where $\hat{e}_i=y_i-x_i^T\hat\theta$.\\
+Observe that the $1-P_{ii}$ at denominator means that outliers also have high influence in the training.
+  
 
 \nocite{*}
 \bibliographystyle{plain}
