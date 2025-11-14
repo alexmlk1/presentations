@@ -1,0 +1,275 @@
+\documentclass[%
+	a4paper,%							A4 paper
+	oneside,%							oneside (left and right margin are equal)  - twoside if I want to print it as a book
+	%bibliography=totoc,%	add the bibliography to the table of contents
+	%listof=totoc,%				add the list of figures and list of tables to the table of contents
+	numbers=noenddot,%		no dot at the end of heading numbers (see the comment below)
+	%headsepline,%					line after the page head
+	%footsepline,%					line before the page foot
+	%headings=small,%			smaller headings
+	12pt,%								font size
+]{scrreprt}
+
+
+% input encoding
+\usepackage[utf8]{inputenc}
+
+% mathematical symbols
+\usepackage{amsmath, amssymb, amsfonts, mathrsfs}
+
+% hyper reference for links or figures
+\usepackage{hyperref}
+
+% package to modify itemizations and enumerations
+\usepackage{enumitem}
+
+% package for better spacing
+\usepackage{xspace}
+
+% package for graphics - the formats png, pdf, jpg are permitted
+\usepackage{graphicx}
+% default path for figures
+\graphicspath{{images/}}
+
+% Theorems
+\usepackage{amsthm}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{definition*}{Definition}
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+\newtheorem*{obs}{Observation}
+\newtheorem*{ex}{Example}
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}{Proposition}[section]
+\newtheorem{corollary}{Corollary}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\renewcommand\qedsymbol{$\blacksquare$}
+
+% define useful mathematical symbols
+\def\N{\ensuremath{\mathbb{N}}}
+\def\R{\ensuremath{\mathbb{R}}}
+\def\X{\ensuremath{\mathcal{X}}}
+\def\Y{\ensuremath{\mathcal{Y}}}
+\def\G{\ensuremath{\mathcal{G}}}
+\def\C{\ensuremath{\mathbb{C}}}
+\def\P{\ensuremath{\mathbb{P}}}
+\def\Ll{\ensuremath{\mathscr{L}}}
+\newcommand{\Ss}{\mathscr{S}}
+\newcommand{\Pp}{\mathbb{P}}
+\newcommand{\Ee}{\mathbb{E}}
+\newcommand{\iid}{\mathop{\sim}\limits^{\text{i.i.d.}}}
+
+
+\begin{document}
+
+\begin{center}
+  \textbf{\LARGE Weekly meetings}
+\end{center}
+\chapter*{If Influence Functions are the Answer, Then What is the Question?}
+
+\section*{Setting}
+
+Consider a prediction task (regression problem) with:
+\begin{itemize}
+    \item Input space $\X$;
+    \item Output space $\Y$;
+    \item Training set $\mathcal{D}^n=\{z_i\}_{i=1}^n$ where $z_i=(x_i,y_i)$ for all $i=1,\dots,n$;
+    \item Parameter $\theta \in \Theta := \R^d$;
+    \item $f(\theta; x)$ estimator of $\Y\mid \X$;
+    \item Loss function $\ell:\Y\times\Y\to\R$ (e.g., 
+    $\ell(y',y)\mapsto \|y'-y\|^2$).
+\end{itemize}
+
+We aim to minimize the training error:
+\[
+L(\theta;\mathcal{D}^n) 
+    = \frac{1}{n}\sum_{i=1}^n \ell\!\big(f(\theta; x_i),\, y_i\big).
+\]
+
+Call 
+\[
+\hat{\theta} \in \arg\min_{\theta\in\Theta} L(\theta; \mathcal{D}^n).
+\]
+
+How different is it from
+\[
+\hat{\theta}_{\varepsilon, -z}
+    = \arg\min_{\theta\in\Theta}
+        \bigl( L(\theta; \mathcal{D}^n) - \varepsilon\, \ell(f(\theta; x), y)\bigr)
+        \, ?
+\]
+
+We can re-train the whole model on $\mathcal{D}^n\setminus\{z\}$ (Leave-One-Out method), or use influence functions.
+
+\section*{Influence functions}
+
+\begin{definition*}
+    Given $(\bar{x},\bar{y})=\bar{z}\in\mathcal{D}^n$, the \emph{influence loss difference}
+    relative to $\bar{z}$ is
+    \[
+    \mathcal{Q}(\bar{z};\hat\theta)
+        = \left.\frac{d}{d\varepsilon}
+            \left[L(\hat\theta;\mathcal{D}^n)
+            - \varepsilon \,\ell(f(\hat\theta;\bar{x}),\bar{y})\right]
+        \right|_{\varepsilon=1/n}.
+    \]
+\end{definition*}
+
+
+\textit{Interpretation:}  
+It measures how much the training error changes when the training datum $\bar{z}$ is removed.
+
+\begin{definition*}
+    Given $(\bar{x},\bar{y})=\bar{z}\in\mathcal{D}^n$, the \emph{influence function}
+    relative to $\bar{z}$ is
+    \[
+    \mathcal{I}(\bar{z};\hat\theta)
+    = \lim_{\varepsilon\to 0}
+        \frac{
+        \hat{\theta}_{\varepsilon+1/n,-\bar{z}}
+        - \hat{\theta}_{1/n,-\bar{z}}
+        }{\varepsilon}.
+    \]
+\end{definition*}
+
+
+\textit{Interpretation:}  
+It represents the direction in which the optimal parameter moves when the
+training objective is perturbed by removing $\bar{z}$.
+
+Assume that $L$ is strongly convex. Then we can rewrite the previous quantities in the closed forms:
+\[
+\mathcal{I}(z;\hat\theta)
+    =  H_{\hat{\theta}}^{-1}\,
+      \nabla \ell(f(\hat{\theta};x),y),
+\qquad
+\mathcal{Q}(z;\hat\theta)
+    = \nabla \ell(f(\hat{\theta};x),y)^{\top}
+      H_{\hat{\theta}}^{-1}
+      \nabla \ell(f(\hat{\theta};x),y),
+\]
+where $H_{\hat{\theta}}$ is the Hessian of $L$ at $\hat\theta$, which is difficult to compute.
+
+Unfortunately, there is some problems with these formulae.\\
+Indeed, the strong convexity assumption is essential if we want the LOO method to be well approximated by influence functions.
+Even under such assumption, the problem is not trivial because computing the inverse of the Hessian and the matrix-vector product are heavy computations.
+
+\textbf{Solution 1.}  
+For iHVP, there exist efficient approximations requiring $O(nd)$ flops instead of $O(n^3)$.
+
+\textbf{Solution 2.}  
+Influence functions do not approximate LOO retraining, but the proximal Bregman response function (PBRF).
+
+\section*{Response functions}
+
+We define the response function as:
+\[
+\hat{r}_z(\varepsilon)
+  = \arg\min_{\theta\in\Theta}
+      \left( L(\theta;\mathcal{D}^n)
+      - \varepsilon\,\ell(f(\theta;x),y) \right).
+\]
+Then $\hat{r}_z(\varepsilon)=\hat{\theta}_{(\varepsilon,-z)}$ and
+$\hat{r}_z(0)=\hat{\theta}$.
+
+Since $\hat{r}$ is differentiable at $0$ we can expand with Taylor at first order and we get:
+\[
+\hat{r}_{z,\mathrm{lin}}(1/n)
+  = \hat{\theta}
+    + \frac1n H_{\hat{\theta}}^{-1}\,
+      \nabla\ell(f(\hat{\theta};x),y).
+\]
+We require $H_{\hat\theta}$ positive definite to invert it; thus $\hat\theta$ must be a minimizer.\\
+To compute influence functions for MLPs, we can approximate $H_{\hat{\theta}}$ using the
+Gauss--Newton Hessian (GNH) and add damping:
+\[
+\mathcal{I}^{\dagger}(z;\hat\theta)
+  = \left(
+        J_{y,\hat{\theta}}^{\top}
+        H_{\hat{\theta}}
+        J_{y,\hat{\theta}}
+        + \lambda I
+    \right)^{-1}
+    \nabla\ell(f(\hat{\theta};x),y),
+\]
+where $J_{y,\hat{\theta}}$ is the Jacobian of  
+$F(\theta) = (f(\theta;x_1),\ldots,f(\theta;x_n))$.\\
+Note that the damped GNH is always positive definite, as long as $H_{\hat\theta}$ is SPD.\\
+The damped response satisfies:
+\[
+\begin{aligned}
+\hat{r}_{z,\mathrm{damp}}(\varepsilon)
+  &= \arg\min_{\theta\in\Theta}
+     \Big( L(\theta;\mathcal{D}^n)
+      - \varepsilon\,\ell(f(\theta;x),y)
+      + \tfrac{\lambda}{2}\|\theta-\hat{\theta}\|^2 \Big),\\[4pt]
+\hat{r}_{z,\mathrm{damp,lin}}(1/n)
+  &\approx \hat{\theta}+\frac1n\mathcal{I}^{\dagger}(z;\hat\theta).
+\end{aligned}
+\]
+Since, in practice, the parameter we consider is not a minimizer of $L$, we want to consider the loss
+for which the early-stopped point $\theta^s$ is optimal:
+\[
+\mathcal{L}(\theta;\theta^s,\mathcal{D}^n)
+  = \frac1n\sum_{i=1}^n
+      D_{\ell^{(i)}}\big(f(\theta;x_i), f(\theta^s;x_i)\big),
+\]
+with $D_{\ell^{(i)}}$ being the Bregman difference:
+\[
+D_{\ell^{(i)}}(y,y')
+ = \ell(y,y_i)
+   - \ell(y',y_i)
+   - \nabla_1\ell(y',y_i)^\top(y-y').
+\]
+Consequently, we can define the \emph{Proximal Bregman Response Function} (PBRF) as:
+\[
+r^b_{z,\mathrm{damp}}(\varepsilon)
+  = \arg\min_{\theta\in\Theta}
+      \Big(
+      \mathcal{L}(\theta;\theta^s,\mathcal{D}^n)
+      - \varepsilon\,\ell(f(\theta;x),y)
+      + \tfrac{\lambda}{2}\|\theta-\theta^s\|^2
+      \Big).
+\]
+The interesting property of this object is that the linearized PBRF satisfies
+\[
+r^b_{z,\mathrm{damp,lin}}(1/n)
+  = \theta^s + \frac1n\mathcal{I}^{\dagger}(z;\theta^s).
+\]
+
+Thus influence functions do \emph{not} approximate LOO retraining under the original
+loss $L$. Instead, they approximate the effect of training from $\theta^s$ under the modified objective
+\[
+\mathcal{L}(\theta;\theta^s,\mathcal{D}^n)
+  - \tfrac1n\ell(f(\theta;x),y)
+  + \tfrac{\lambda}{2}\|\theta-\theta^s\|^2.
+\]
+
+\section*{Error decomposition}
+
+The approximation error of influence functions decomposes into:
+
+\begin{itemize}
+\item \textbf{Warm-start gap:} LOO starts from a random parameter (cold start), while IF are related to $\theta^s$; we can then converge to another "optimal" point;
+\item \textbf{Proximity gap:} the factor $||theta-theta^s||$ induces the warm start not to move far away from $theta^s$;
+\item \textbf{Non-convergence gap:} in practice we almost never start from a fully trained network;
+\item \textbf{Linearization error:} produced by approximating the Taylor expansion at first order;
+\item \textbf{Solver error:} inexact iHVP computation.
+\end{itemize}
+\begin{remark}
+    The PBRF formulation eliminates the first three gaps.
+\end{remark}
+
+\begin{figure}[hbt]
+    \centering
+    \includegraphics[width=0.9\linewidth]{Err_deco.png}
+    \caption{Visual representation of the error defomposition on different datasets and models. The main focus is that the largest components are the first three.}
+\end{figure}
+
+\nocite{*}
+\bibliographystyle{plain}
+\bibliography{refs}
+
+\end{document}
