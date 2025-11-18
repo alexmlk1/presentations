@@ -157,11 +157,11 @@ where $H_{\hat{\theta}}$ is the Hessian of $L$ at $\hat\theta$.
   This part is not really clear: referring to the original reference \cite{cook_residuals_1983}, the derivation should be as follow, with our notation.\\
   Let $L_i(\theta) = (L(\hat\theta;\mathcal{D}^n) - 1/n \,\ell(f(\hat\theta;x_i),y_i))$. Assuming that $L$ is twice differentiable, we can use Taylor near $\hat\theta$:
   \begin{equation*}
-    L_i(\theta) = L_i(\hat\theta) + (\theta-\hat\theta)^T L'(\hat\theta) + \frac{1}{2}(\theta-\hat\theta)^T L'(\hat\theta) (\theta-\hat\theta) + \mathrm{O}(\|\theta-\hat\theta\|^3)
+    L_i(\theta) = L_i(\hat\theta) + (\theta-\hat\theta)^T L_i'(\hat\theta) + \frac{1}{2}(\theta-\hat\theta)^T L_i''(\hat\theta) (\theta-\hat\theta) + \mathrm{O}(\|\theta-\hat\theta\|^3)
   \end{equation*}
-  Then, by minimizing the difference $L_i(\theta) - L_i(\hat\theta)$ for $\theta\neq\theta$, we get:
+  Then, by minimizing the difference $L_i(\theta) - L_i(\hat\theta)$ for $\theta\neq\hat\theta$, we get:
   \begin{equation*}
-    \theta = \hat\theta - 2 (HL(\hat\theta))^{-1}JL(\hat\theta).
+    \theta = \hat\theta - 2 (HL_i(\hat\theta))^{-1}JL_i(\hat\theta).
   \end{equation*}
   From this expression is also clear that the Influence Function estimator represents the parameter after one step of the Newton algorithm starting from $\hat\theta$ trying to get to $\hat\theta_{1/n,-z_i}$. 
 \end{remark}
@@ -271,7 +271,7 @@ loss $L$. Instead, they approximate the effect of training from $\theta^s$ under
   + \tfrac{\lambda}{2}\|\theta-\theta^s\|^2.
 \]
 This fact makes PBRF a more suitable benchmark when testing the performances of IFs.\\
-Concrete examples of the fact that PBRF actually achieves good results in the tasks we want are given in the experiment section of the paper.
+Concrete examples show that actually PBRF achieves good results in tasks such as mislabeled example detection, making it a viable alternative to LOO retraining.
 
 \section*{Error decomposition}
 
@@ -308,10 +308,22 @@ Indeed, if we consider $X=JF(\theta)$ as the $X$ in our case, then the influence
 the same as the leverage. However, the interpretation of the problem would become different.\\
 In any case, an expression of interest that involves both leverage and influence functions is the following (cf. \cite{leverage}):
 \begin{equation*}
-    -\mathcal{I}(z;\hat\theta) = \hat\theta- \hat\theta_{1/n, -z} = \frac{(X^TX)^{-1}x_i\hat e_i}{1-P_{ii}},
+  \hat\theta- \hat\theta_{1/n, -z} = \frac{(X^TX)^{-1}x_i\hat e_i}{1-P_{ii}},
 \end{equation*}
 where $\hat{e}_i=y_i-x_i^T\hat\theta$.\\
 Observe that the $1-P_{ii}$ at denominator means that outliers also have high influence in the training.
+
+\subsection*{Example: IFs for OLS}
+Let's compute all the quantities we defined so far in the case of OLS with the euclidean loss.\\
+We have:
+\begin{itemize}
+    \item Loss function: $\ell(f(\theta;x_i),y_i)=\frac{1}{2}(y_i - x_i^T \theta)^2$;
+    \item Gradient: $\nabla \ell(f(\theta;x_i),y_i) = -x_i (y_i - x_i^T \theta)$;
+    \item Hessian: $H_{\theta} = \sum_{i=1}^n x_i x_i^T = X^T X$;
+    \item Influence function: $\mathcal{I}(z_i;\hat\theta) = (X^T X)^{-1} x_i (y_i - x_i^T \hat\theta)$;
+    \item PBRF: $\frac12\arg\min_{\theta\in\Theta} \left( \frac{1}{n} \sum_{i=1}^n (x_i^T (\theta - \hat\theta))^2 - \frac{1}{n} \|y_i - x_i^T \theta\|^2 + \lambda ||\theta - \hat\theta||^2 \right)$;
+           note that in this case $\theta^s=\hat\theta$ since we can compute it explicitly.
+\end{itemize}
   
 
 \nocite{*}
