@@ -14,6 +14,9 @@
 % input encoding
 \usepackage[utf8]{inputenc}
 
+% color in the text
+\usepackage[table,xcdraw,dvipsnames]{xcolor}
+
 % mathematical symbols
 \usepackage{amsmath, amssymb, amsfonts, mathrsfs}
 
@@ -60,6 +63,7 @@
 \newcommand{\Pp}{\mathbb{P}}
 \newcommand{\Ee}{\mathbb{E}}
 \newcommand{\iid}{\mathop{\sim}\limits^{\text{i.i.d.}}}
+\def\eps{\ensuremath{\varepsilon}}
 
 
 \begin{document}
@@ -114,8 +118,7 @@ This paper presents a new point of view: IFs do not approximate the LOO retraini
     \[
     \mathcal{Q}(\bar{z};\hat\theta)
         = \left.\frac{d}{d\varepsilon}
-            \left[L(\hat\theta;\mathcal{D}^n)
-            - \varepsilon \,\ell(f(\hat\theta;\bar{x}),\bar{y})\right]
+            \left[L(\hat\theta_{\eps,-z};\mathcal{D}^n)\right]
         \right|_{\varepsilon=1/n}.
     \]
 \end{definition*}
@@ -324,7 +327,93 @@ We have:
     \item PBRF: $\frac12\arg\min_{\theta\in\Theta} \left( \frac{1}{n} \sum_{i=1}^n (x_i^T (\theta - \hat\theta))^2 - \frac{1}{n} \|y_i - x_i^T \theta\|^2 + \lambda ||\theta - \hat\theta||^2 \right)$;
            note that in this case $\theta^s=\hat\theta$ since we can compute it explicitly.
 \end{itemize}
-  
+
+{\color{RoyalBlue} \section*{ * Reformulation of influence functions}
+\begin{remark}
+  The object similar to what we are going to discuss, which is present in the paper, is $\hat r _z(\varepsilon)$.
+\end{remark}
+Let $\mathcal{X},\,\mathcal{Y}$ be two measurable spaces and fix $D^n\subset\mathcal{X}\times\mathcal{Y}$ such that $D^n=\{z_i\}_{i=1}^n$ with $z_i=(x_i,y_i)\in\mathcal{X}\times\mathcal{Y}$.\\
+We are interested in studying the distribution of $\mathcal{Y}|\mathcal{X}$. 
+To do so, we choose a topological space $\Theta$ and a parametric function $f:\Theta\times\mathcal{X}\mapsto\mathcal{Y}$ as an estimator of such distribution.\\
+In order to evaulate the estimators, we give the following definitions:
+\begin{definition*}
+  Given $\ell\in C^2(\mathcal{Y}\times\mathcal{Y};\R)\cap L^1(\mathcal{Y}\times\mathcal{Y};\#)$ (called \emph{loss function}), we define the \emph{empirical risk} for the estimator $f(x;\theta)$ on the dataset $D^n$ as:
+  \begin{equation}
+    R(\theta):=\frac{1}{n}\sum_{i=1}^n\ell(f(\theta;x_i)-y_i).
+  \end{equation}
+\end{definition*} 
+
+Fixed $z\in D$ (WLOG $z=z_1$)\footnote{Permuting the dataset does not affect our quantities of interest.}, we define:
+\begin{eqnarray*}
+  L(\theta) &= \sum_{i=2}^n \ell(f(\theta;x_i)-y_i), \\
+  g(\theta) &= \ell(f(\theta;x_1)-y_1), \\
+  \Theta(\epsilon) &= \left\{\theta\in\Theta \mid \nabla_\theta(L(\theta)+\eps g(\theta))=0\, \wedge\, \nabla_{\theta\theta}^2(L(\theta)+\eps g(\theta))>0  \right\}.
+\end{eqnarray*}
+For simplicity, assume that $\Theta(\eps)=\{\theta(\eps)\}$ (this can be achieved, for example, by assuming that $L$ is strongly convex). 
+We are now interested in understanding how $$\theta(1)=\theta^\star=\arg\min R(\theta)$$ and $$\theta(0)=\theta^\star_{-z}=\arg\min L(\theta)$$ are different.\\
+One way to do this, is by the means of influence functions.
+\begin{definition*}
+  The \emph{influence function} of $z$ is:
+  \begin{equation}
+    I(z):= \left.\frac{d}{d\eps}\theta(\eps)\right|_{\eps=0}=\dot\theta(0).
+  \end{equation}
+\end{definition*}
+\begin{remark}
+  The previous quantity is well defined in a neighbourhood of $0$ and $1$ thanks to the Implicit function theorem.\\
+  It is not clear yet if we are more interested in $\dot\theta(0)$ or $\dot\theta(1)$.
+\end{remark}
+\begin{proposition}
+  We can write $I(z)$ explicitly as:
+  \begin{equation}
+    I(z) = -H_L^{-1} \nabla_\theta g(\theta^\star_{-z})
+  \end{equation}
+  where $H_L$ is the Hessian of $L$ in $\theta^\star_{-z}$.
+\end{proposition}
+\begin{proof}
+  By definition, $\theta(\eps)$ satisfies:
+  \begin{equation*}
+    \nabla_\theta(L(\theta(\eps))+\eps g(\theta(\eps)))=0.
+  \end{equation*}
+  Taking another derivative in $\eps$ yields:
+  \begin{eqnarray*}
+    \nabla^2_{\theta,\eps}(L(\theta(\eps))+\eps g(\theta(\eps)))& =0 \iff \\
+    \nabla^2_{\theta\theta}L(\theta(\eps))\dot\theta(\eps) + \nabla_\theta g(\theta(\eps)) + \eps \nabla^2_{\theta\theta}g(\theta(\eps))\dot\theta(\eps) &=0 \iff \\
+    \dot\theta(\eps) = -(\nabla^2_{\theta\theta}(L(\theta(\eps))+\eps g(\theta(\eps))))^{-1}\nabla_\theta g(\theta(\eps)).
+  \end{eqnarray*}
+  Evaluating in $\eps = 0$ concludes the proof:
+  \begin{equation*}
+    \dot\theta(0) = -(\nabla^2_{\theta\theta}L(\theta(0)))^{-1} \nabla_\theta g(\theta(0)).
+  \end{equation*}
+\end{proof}
+
+\begin{remark}
+  If we wanted to compute $\dot\theta(1)$, it would also have a nice form:
+  $$ \dot\theta(1) = -H_R^{-1} \nabla_\theta g(\theta^\star).
+  $$
+  where $H_R$ is the Hessian of $R$ in $\theta^\star$.
+\end{remark}
+It could also be of interest to consider:
+\begin{equation}
+  Q(z):= \left.\frac{d}{d\eps} (L(\theta(\eps))+\eps g(\theta(\eps)))\right|_{\eps=0}.
+\end{equation}
+\begin{corollary}
+  The following formulae hold:
+  \begin{equation}
+    \begin{aligned}
+    \left.\frac{d}{d\eps} (L(\theta(\eps))+\eps g(\theta(\eps)))\right|_{\eps=0} &= g(\theta^\star_{-z}), \\
+    \left.\frac{d}{d\eps} (g(\theta(\eps)))\right|_{\eps=0} &= - \nabla_\theta g(\theta^\star_{-z})^T H_L^{-1} \nabla_\theta g(\theta^\star_{-z}),
+    \end{aligned}   
+  \end{equation}
+\end{corollary}
+\begin{proof}
+  For the first equality, taking the derivative yields:
+  $$ \nabla_\theta L(\theta(\eps))\dot\theta(\eps) + g(\theta(\eps)) + \eps\nabla_\theta g(\theta(\eps))\dot\theta(\eps)
+  $$
+  and recalling that on $\theta(\eps)$ it holds $\nabla(L(\theta(\eps))+\eps g(\theta(\eps)))=0$ we can conclude.\\
+  For the second one it suffices to substitute the definition of $\dot\theta$ from the previous equation after taking the derivative.
+
+\end{proof}
+}
 
 \nocite{*}
 \bibliographystyle{plain}
