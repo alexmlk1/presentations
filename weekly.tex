@@ -118,7 +118,7 @@ This paper presents a new point of view: IFs do not approximate the LOO retraini
     \[
     \mathcal{Q}(\bar{z};\hat\theta)
         = \left.\frac{d}{d\varepsilon}
-            \left[L(\hat\theta_{\eps,-z};\mathcal{D}^n)\right]
+            \left[\ell(f(\hat\theta_{\eps,-z},\bar x),\bar y)\right]
         \right|_{\varepsilon=1/n}.
     \]
 \end{definition*}
@@ -334,10 +334,10 @@ We have:
 \end{remark}
 Let $\mathcal{X},\,\mathcal{Y}$ be two measurable spaces and fix $D^n\subset\mathcal{X}\times\mathcal{Y}$ such that $D^n=\{z_i\}_{i=1}^n$ with $z_i=(x_i,y_i)\in\mathcal{X}\times\mathcal{Y}$.\\
 We are interested in studying the distribution of $\mathcal{Y}|\mathcal{X}$. 
-To do so, we choose a topological space $\Theta$ and a parametric function $f:\Theta\times\mathcal{X}\mapsto\mathcal{Y}$ as an estimator of such distribution.\\
+To do so, we choose a Banach space $\Theta$ and a parametric function $f:\Theta\times\mathcal{X}\mapsto\mathcal{Y}$ as an estimator of such distribution.\\
 In order to evaulate the estimators, we give the following definitions:
 \begin{definition*}
-  Given $\ell\in C^2(\mathcal{Y}\times\mathcal{Y};\R)\cap L^1(\mathcal{Y}\times\mathcal{Y};\#)$ (called \emph{loss function}), we define the \emph{empirical risk} for the estimator $f(x;\theta)$ on the dataset $D^n$ as:
+  Given $\ell\in C^2(\mathcal{Y}\times\mathcal{Y};\R_+)\cap L^1(\mathcal{Y}\times\mathcal{Y};\#)$ (called \emph{loss function}), we define the \emph{empirical risk} for the estimator $f(\theta;x)$ on the dataset $D^n$ as:
   \begin{equation}
     R(\theta):=\frac{1}{n}\sum_{i=1}^n\ell(f(\theta;x_i)-y_i).
   \end{equation}
@@ -359,7 +359,7 @@ One way to do this, is by the means of influence functions.
   \end{equation}
 \end{definition*}
 \begin{remark}
-  The previous quantity is well defined in a neighbourhood of $0$ and $1$ thanks to the Implicit function theorem.\\
+  The previous quantity is well defined because $\theta(\eps)$ is $C^1$ thanks to the Implicit function theorem (applied to $\nabla\mathscr{L}(\theta,\eps)=L(\theta)+\eps g(\theta)$ we get that there exists $\theta(\eps)$ differentiable such that $\nabla\mathscr{L}(\theta(\eps),\eps)=0$ in a neighbourhood of $1$ at least, since by definition $\nabla\mathscr{L}(\theta^\star,1) =\nabla R(\theta^\star)=0$).\\
   It is not clear yet if we are more interested in $\dot\theta(0)$ or $\dot\theta(1)$.
 \end{remark}
 \begin{proposition}
