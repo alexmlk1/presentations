@@ -41,6 +41,15 @@ class SingleHiddenMLP(nn.Module):
         x = self.sigmoid(self.fc2(x))
         return x
 
+class LogisticReg(nn.Module):
+    def __init__(self, d):
+        super().__init__()
+        self.w = nn.Parameter(torch.zeros(d, 1))
+
+    def forward(self, x):
+        logits = x @ self.w
+        return logits
+
 
 def train_MLP(X,y,MAX_IT=500):
     global device
@@ -64,8 +73,18 @@ def train_MLP(X,y,MAX_IT=500):
 
 def train_LR(X,y):
     """Train Logistic Regression model"""
-    model = LogisticRegression()
-    model.fit(X, y)
+    X = torch.tensor(X)
+    y = torch.tensor(y).view(-1, 1) 
+    def loss_fn(model, x, y):
+        logits = model(x)
+        return nn.functional.binary_cross_entropy_with_logits(logits, y)
+    model = LogisticReg(d_in)
+    opt = torch.optim.SGD(model.parameters(), lr=0.1)
+    for _ in range(200):
+        opt.zero_grad()
+        loss = loss_fn(model, X, y)
+        loss.backward()
+        opt.step()
     return model
 
 
@@ -92,10 +111,11 @@ def eval_models(X,y,L):
     #X_train, X_test, y_train, y_test = train_test_split(
     #    X, y, test_size=0.3, random_state=42
     #)
-    lR,M = train_models(X,y)
+    LR,M = train_models(X,y)
 
     # Predictions
-    preds_lR = lR.predict(X)
+    with torch.no_grad():
+        preds_LR = (LR(torch.tensor(X)) > 0.5).float().squeeze()
     #print("\nPredictions:", preds_lR)
     #print("True labels:", y)
 
@@ -104,7 +124,7 @@ def eval_models(X,y,L):
     #print("\nPredictions:", preds_M.numpy())
     #print("True labels:", y_test)
 
-    L.append([criterion(list(zip(preds_lR, y))).item(), criterion(list(zip(preds_M, y))).item()])
+    L.append([criterion(list(zip(preds_LR, y))).item(), criterion(list(zip(preds_M, y))).item()])
     return L
 
 
@@ -123,6 +143,46 @@ def L_IF_lR(i, X, y):
     g = X[i]*(y[i]-(X[i].transpose())
     @((np.linalg.inv(H))@ X.transpose())@y.transpose()).item()
     return g.transpose() @ np.linalg.solve(H,g)
+
+
+def L_IF_LR(i,X,y):
+    model = train_LR(X,y)
+    print(model(X))
+    x_test = X[i]
+    y_test = y[i]
+    # gradient on test point
+    def loss_fn(model,x,y):
+        preds = model(x)
+        return criterion(list(zip(preds,y)))
+    def grad_z(model, x, y):
+        loss = loss_fn(model, x, y)
+        grads = torch.autograd.grad(loss, model.parameters(), create_graph=True)
+        return torch.cat([g.reshape(-1) for g in grads])
+    g_test = grad_z(model, x_test, y_test)
+
+    def hvp(model, x_train, y_train, v):
+        loss = loss_fn(model, x_train, y_train)
+        grads = torch.autograd.grad(loss, model.parameters(), create_graph=True)
+        flat_grad = torch.cat([g.reshape(-1) for g in grads])
+
+        hvp = torch.autograd.grad(flat_grad, model.parameters(), grad_outputs=v)
+        hvp = torch.cat([g.reshape(-1) for g in hvp])
+        return hvp
+
+    def lissa(model, x_train, y_train, v, damping=0.01, scale=10, num_iter=500):
+        """
+        Computes H^{-1} v using a recursive approximation.
+        """
+        h_est = v.clone()
+        for i in range(num_iter):
+            hv = hvp(model, x_train, y_train, h_est)
+            h_est = v + (1 - damping) * h_est - hv / scale
+        return h_est
+
+    # inverse-Hv term (vector)
+    Hinv_g_test = lissa(model, x_test, y_test, g_test)
+
+    return - torch.dot(Hinv_g_test, g_test).item()
 
 
 def L_IF_MLP(i, X, y):
@@ -162,7 +222,7 @@ def L_IF_MLP(i, X, y):
     # ---- loss as a function of theta ----
     def loss_fn(theta):
         preds = functional_forward(theta)
-        return criterion([a,b for (preds, y)])
+        return criterion(list(zip(preds,y)))
 
     # Compute Hessian
     H = torch.autograd.functional.hessian(loss_fn, theta0).detach().numpy()
@@ -193,5 +253,6 @@ def visualize_result(title, IFL, LOOL):
 if __name__ == '__main__':
     Z = eval_LOO(X,y)
 
-    #visualize_result('IF vs LOO (Linear Regression)', [Z[i][0] for i in range(len(X))], [L_IF_lR(i,X,y) for i in range(len(X))])
-    visualize_result('IF vs LOO (MLP)', [Z[i][1] for i in range(len(X))], [L_IF_MLP(i,X,y) for i in range(len(X))])
+    #L_IF_LR(1,X,y)
+    visualize_result('IF vs LOO (Logistic Regression)', [Z[i][0] for i in range(len(X))], [L_IF_lR(i,X,y) for i in range(len(X))])
+    #visualize_result('IF vs LOO (MLP)', [Z[i][1] for i in range(len(X))], [L_IF_MLP(i,X,y) for i in range(len(X))])
