@@ -164,7 +164,7 @@ where $H_{\hat{\theta}}$ is the Hessian of $L$ at $\hat\theta$.
   \end{equation*}
   Then, by minimizing the difference $L_i(\theta) - L_i(\hat\theta)$ for $\theta\neq\hat\theta$, we get:
   \begin{equation*}
-    \theta = \hat\theta - 2 (HL_i(\hat\theta))^{-1}JL_i(\hat\theta).
+    \theta = \hat\theta - (HL_i(\hat\theta))^{-1}JL_i(\hat\theta).
   \end{equation*}
   From this expression is also clear that the Influence Function estimator represents the parameter after one step of the Newton algorithm starting from $\hat\theta$ trying to get to $\hat\theta_{1/n,-z_i}$. 
 \end{remark}
@@ -328,30 +328,41 @@ We have:
            note that in this case $\theta^s=\hat\theta$ since we can compute it explicitly.
 \end{itemize}
 
-{\color{RoyalBlue} \section*{ * Reformulation of influence functions}
+\section*{Reformulation of influence functions}
 \begin{remark}
   The object similar to what we are going to discuss, which is present in the paper, is $\hat r _z(\varepsilon)$.
 \end{remark}
-Let $\mathcal{X},\,\mathcal{Y}$ be two measurable spaces and fix $D^n\subset\mathcal{X}\times\mathcal{Y}$ such that $D^n=\{z_i\}_{i=1}^n$ with $z_i=(x_i,y_i)\in\mathcal{X}\times\mathcal{Y}$.\\
-We are interested in studying the distribution of $\mathcal{Y}|\mathcal{X}$. 
+Let $\mathcal{X},\,\mathcal{Y}$ be two measurable spaces and fix $D_n\subset(\mathcal{X}\times\mathcal{Y})^n$ such that $D_n=\left(z_i\right)_{i=1}^n$ with $z_i=(x_i,y_i)\in\mathcal{X}\times\mathcal{Y}$.\\
+Given two random variables $X$ and $Y$ respectively on $\X$ and $\Y$, we are interested in studying the distribution of $Y|X$. 
 To do so, we choose a Banach space $\Theta$ and a parametric function $f:\Theta\times\mathcal{X}\mapsto\mathcal{Y}$ as an estimator of such distribution.\\
 In order to evaulate the estimators, we give the following definitions:
 \begin{definition*}
-  Given $\ell\in C^2(\mathcal{Y}\times\mathcal{Y};\R_+)\cap L^1(\mathcal{Y}\times\mathcal{Y};\#)$ (called \emph{loss function}), we define the \emph{empirical risk} for the estimator $f(\theta;x)$ on the dataset $D^n$ as:
+  Given $\ell\in C^2(\mathcal{Y}\times\mathcal{Y};\R_+)$ (called \emph{loss function}), we define the \emph{empirical risk} for the estimator $f(\theta;x)$ on the dataset $D_n$ as:
   \begin{equation}
-    R(\theta):=\frac{1}{n}\sum_{i=1}^n\ell(f(\theta;x_i)-y_i).
+    R(\theta) := \sum_{i=1}^n\ell(f(\theta;x_i);y_i).
   \end{equation}
-\end{definition*} 
-
-Fixed $z\in D$ (WLOG $z=z_1$)\footnote{Permuting the dataset does not affect our quantities of interest.}, we define:
-\begin{eqnarray*}
-  L(\theta) &= \sum_{i=2}^n \ell(f(\theta;x_i)-y_i), \\
-  g(\theta) &= \ell(f(\theta;x_1)-y_1), \\
-  \Theta(\epsilon) &= \left\{\theta\in\Theta \mid \nabla_\theta(L(\theta)+\eps g(\theta))=0\, \wedge\, \nabla_{\theta\theta}^2(L(\theta)+\eps g(\theta))>0  \right\}.
-\end{eqnarray*}
-For simplicity, assume that $\Theta(\eps)=\{\theta(\eps)\}$ (this can be achieved, for example, by assuming that $L$ is strongly convex). 
-We are now interested in understanding how $$\theta(1)=\theta^\star=\arg\min R(\theta)$$ and $$\theta(0)=\theta^\star_{-z}=\arg\min L(\theta)$$ are different.\\
-One way to do this, is by the means of influence functions.
+\end{definition*}
+{\color{RoyalBlue}
+Given $\eps\in[0,1]$ and $j\in [n]$, we are interested in solving the minimization problem:
+\begin{equation*}
+  \min_{\theta\in\Theta} \sum_{i=1}^n \ell(f(\theta;x_i);y_i)+(\eps-1) \ell(f(\theta;x_j);y_j).
+\end{equation*}
+For simplicity, assume that for any $\eps$ the objective function has a unique minimum. We call $\theta(\eps)$ such minimum.
+Let us introduce the notation:
+\begin{equation*}
+  \begin{aligned}
+  \ell_j(\theta) &= \ell(f(\theta;x_j);y_j), \\
+  R_j(\theta) &= \sum\limits_{\substack{i\in [n] \\i\neq j}}^n \ell_i(\theta).
+  %\Theta(\epsilon) &= \left\{\theta\in\Theta \mid \nabla_\theta(L(\theta)+\eps g(\theta))=0\, \wedge\, \nabla_{\theta\theta}^2(L(\theta)+\eps g(\theta))>0  \right\}.
+  \end{aligned}
+\end{equation*}
+Thus, we can rewrite:
+$$ \theta(\eps) = \arg\min_{\theta\in\Theta} R_j(\theta)+\eps\ell_j(\theta).
+$$
+Notice that $\theta(\eps)$ symbolizes the parameter for which our model best fits the data while we change the weight of one data point in the training. 
+It is particularly of interest to understand how $$\theta(1)=\theta^\star=\arg\min R(\theta)$$ and $$\theta(0)=\theta^\star_{-j}=\arg\min R_j(\theta)$$ are different, since they represent respectively the optimal parameter obtained while training on the whole data and on the dataset minus one particular point.\\
+}
+One way to analyze this, is by the means of influence functions.
 \begin{definition*}
   The \emph{influence function} of $z$ is:
   \begin{equation}
@@ -359,60 +370,62 @@ One way to do this, is by the means of influence functions.
   \end{equation}
 \end{definition*}
 \begin{remark}
-  The previous quantity is well defined because $\theta(\eps)$ is $C^1$ thanks to the Implicit function theorem (applied to $\nabla\mathscr{L}(\theta,\eps)=L(\theta)+\eps g(\theta)$ we get that there exists $\theta(\eps)$ differentiable such that $\nabla\mathscr{L}(\theta(\eps),\eps)=0$ in a neighbourhood of $1$ at least, since by definition $\nabla\mathscr{L}(\theta^\star,1) =\nabla R(\theta^\star)=0$).\\
+  The previous quantity is well defined because $\theta(\eps)$ is $C^1$ thanks to the Implicit function theorem (applied to $\nabla\mathscr{L}(\theta,\eps)=L(\theta)+\eps \ell_j(\theta)$ we get that there exists $\theta(\eps)$ differentiable such that $\nabla\mathscr{L}(\theta(\eps),\eps)=0$ in a neighbourhood of $1$ at least, since by definition $\nabla\mathscr{L}(\theta^\star,1) =\nabla R(\theta^\star)=0$).\\
   It is not clear yet if we are more interested in $\dot\theta(0)$ or $\dot\theta(1)$.
 \end{remark}
 \begin{proposition}
   We can write $I(z)$ explicitly as:
   \begin{equation}
-    I(z) = -H_L^{-1} \nabla_\theta g(\theta^\star_{-z})
+    I(z) = -H_{R_j}^{-1} \nabla_\theta \ell_j(\theta^\star_{-j})
   \end{equation}
-  where $H_L$ is the Hessian of $L$ in $\theta^\star_{-z}$.
+  where $H_{R_j}$ is the Hessian of $R_j$ in $\theta^\star_{-j}$.
 \end{proposition}
 \begin{proof}
   By definition, $\theta(\eps)$ satisfies:
   \begin{equation*}
-    \nabla_\theta(L(\theta(\eps))+\eps g(\theta(\eps)))=0.
+    \nabla_\theta(R_j(\theta(\eps))+\eps \ell_j(\theta(\eps)))=0.
   \end{equation*}
   Taking another derivative in $\eps$ yields:
   \begin{eqnarray*}
-    \nabla^2_{\theta,\eps}(L(\theta(\eps))+\eps g(\theta(\eps)))& =0 \iff \\
-    \nabla^2_{\theta\theta}L(\theta(\eps))\dot\theta(\eps) + \nabla_\theta g(\theta(\eps)) + \eps \nabla^2_{\theta\theta}g(\theta(\eps))\dot\theta(\eps) &=0 \iff \\
-    \dot\theta(\eps) = -(\nabla^2_{\theta\theta}(L(\theta(\eps))+\eps g(\theta(\eps))))^{-1}\nabla_\theta g(\theta(\eps)).
+    \nabla^2_{\theta,\eps}(R_j(\theta(\eps))+\eps \ell_j(\theta(\eps)))& =0 \iff \\
+    \nabla^2_{\theta\theta}R_j(\theta(\eps))\dot\theta(\eps) + \nabla_\theta \ell_j(\theta(\eps)) + \eps \nabla^2_{\theta\theta}\ell_j(\theta(\eps))\dot\theta(\eps) &=0 \iff \\
+    \dot\theta(\eps) = -(\nabla^2_{\theta\theta}(R_j(\theta(\eps))+\eps \ell_j(\theta(\eps))))^{-1}\nabla_\theta \ell_j(\theta(\eps)).
   \end{eqnarray*}
   Evaluating in $\eps = 0$ concludes the proof:
   \begin{equation*}
-    \dot\theta(0) = -(\nabla^2_{\theta\theta}L(\theta(0)))^{-1} \nabla_\theta g(\theta(0)).
+    \dot\theta(0) = -(\nabla^2_{\theta\theta}R_j(\theta(0)))^{-1} \nabla_\theta \ell_j(\theta(0)).
   \end{equation*}
 \end{proof}
 
 \begin{remark}
   If we wanted to compute $\dot\theta(1)$, it would also have a nice form:
-  $$ \dot\theta(1) = -H_R^{-1} \nabla_\theta g(\theta^\star).
+  $$ \dot\theta(1) = -H_R^{-1} \nabla_\theta \ell_j(\theta^\star).
   $$
-  where $H_R$ is the Hessian of $R$ in $\theta^\star$.
+  where $H_R$ is the Hessian of $R$ in $\theta^\star$. {\color{RoyalBlue} Indeed, if our goal is to \emph{unlearn} a data point, this formulation does not require us to retrain the model, as we have already access to $\theta^\star$ (but not to $\theta^\star_{-j}$). }
 \end{remark}
 It could also be of interest to consider:
 \begin{equation}
-  Q(z):= \left.\frac{d}{d\eps} (L(\theta(\eps))+\eps g(\theta(\eps)))\right|_{\eps=0}.
+  Q(z):= \left.\frac{d}{d\eps} (R_j(\theta(\eps))+\eps \ell_j(\theta(\eps)))\right|_{\eps=0}.
 \end{equation}
 \begin{corollary}
   The following formulae hold:
   \begin{equation}
     \begin{aligned}
-    \left.\frac{d}{d\eps} (L(\theta(\eps))+\eps g(\theta(\eps)))\right|_{\eps=0} &= g(\theta^\star_{-z}), \\
-    \left.\frac{d}{d\eps} (g(\theta(\eps)))\right|_{\eps=0} &= - \nabla_\theta g(\theta^\star_{-z})^\top H_L^{-1} \nabla_\theta g(\theta^\star_{-z}),
+    \left.\frac{d}{d\eps} (R_j(\theta(\eps))+\eps \ell_j(\theta(\eps)))\right|_{\eps=0} &= \ell_j(\theta^\star_{-j}), \\
+    \left.\frac{d}{d\eps} (\ell_j(\theta(\eps)))\right|_{\eps=0} &= - \nabla_\theta \ell_j(\theta^\star_{-j})^\top H_{R_j}^{-1} \nabla_\theta \ell_j(\theta^\star_{-j}),
     \end{aligned}   
   \end{equation}
 \end{corollary}
 \begin{proof}
   For the first equality, taking the derivative yields:
-  $$ \nabla_\theta L(\theta(\eps))\dot\theta(\eps) + g(\theta(\eps)) + \eps\nabla_\theta g(\theta(\eps))\dot\theta(\eps)
+  $$ \nabla_\theta R_j(\theta(\eps))\dot\theta(\eps) + \ell_j(\theta(\eps)) + \eps\nabla_\theta \ell_j(\theta(\eps))\dot\theta(\eps)
   $$
-  and recalling that on $\theta(\eps)$ it holds $\nabla(L(\theta(\eps))+\eps g(\theta(\eps)))=0$ we can conclude.\\
+  and recalling that on $\theta(\eps)$ it holds $\nabla(R_j(\theta(\eps))+\eps \ell_j(\theta(\eps)))=0$ we can conclude.\\
   For the second one it suffices to substitute the definition of $\dot\theta$ from the previous equation after taking the derivative.
 
 \end{proof}
+
+{\color{RoyalBlue} 
 }
 
 \nocite{*}
