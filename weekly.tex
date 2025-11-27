@@ -364,9 +364,9 @@ It is particularly of interest to understand how $$\theta(1)=\theta^\star=\arg\m
 }
 One way to analyze this, is by the means of influence functions.
 \begin{definition*}
-  The \emph{influence function} of $z$ is:
+  The \emph{influence function} of $z_j$ is:
   \begin{equation}
-    I(z):= \left.\frac{d}{d\eps}\theta(\eps)\right|_{\eps=0}=\dot\theta(0).
+    I(j):= \left.\frac{d}{d\eps}\theta(\eps)\right|_{\eps=0}=\dot\theta(0).
   \end{equation}
 \end{definition*}
 \begin{remark}
@@ -374,9 +374,9 @@ One way to analyze this, is by the means of influence functions.
   It is not clear yet if we are more interested in $\dot\theta(0)$ or $\dot\theta(1)$.
 \end{remark}
 \begin{proposition}
-  We can write $I(z)$ explicitly as:
+  We can write $I(j)$ explicitly as:
   \begin{equation}
-    I(z) = -H_{R_j}^{-1} \nabla_\theta \ell_j(\theta^\star_{-j})
+    I(j) = -H_{R_j}^{-1} \nabla_\theta \ell_j(\theta^\star_{-j})
   \end{equation}
   where $H_{R_j}$ is the Hessian of $R_j$ in $\theta^\star_{-j}$.
 \end{proposition}
@@ -425,7 +425,24 @@ It could also be of interest to consider:
 
 \end{proof}
 
+
+
 {\color{RoyalBlue} 
+\begin{remark}
+  As discussed in \cite{koh_accuracy_2019}, it is also possible to consider $\boldsymbol{\epsilon}=(\eps_1,\dots,\eps_n)\in[0,1]^n$ and $R_{\boldsymbol{\epsilon}}(\theta)=\sum_{i=1}^n \eps_i \ell_i(\theta)$.
+  Note also that in this case, their notation figures ``$\theta(0)$'', but indeed in our notation it would be $\theta(1)$ (which makes sense since we are considering a group of points).\\
+  In such work, they provide formal statements about when the influence function approximations are accurate, taking into account also the difference between the influence function estimation and the \emph{Newton estimation}.
+\end{remark}
+
+\begin{definition*}
+  We call Newton estimation the quantity:
+
+  $$ I_{Nt}(j) = -(HR_j(\theta(1)))^{-1}\nabla R_j(\theta(1))$$.
+\end{definition*}
+The name for this stems from the fact that this formula estimates the parameter after one step of Newton method while minimizing $\nabla R_j$ (equivalently, we are considering the second order Taylor expansion of $R_j$ in $\theta(1)$):
+$$ \theta_{Nt} = \theta(1) - (HR_j(\theta(1)))^{-1}\nabla R_j(\theta(1)).$$ 
+Unfortunately, $I(j)$ and $I_{nt}(j)$ are close when the smallest eigenvalue of the hessian is big, which is not always the case.
+One way to ensure this difference is small, is to add the regularization term $\lambda\|\theta\|$ in the risk. This way, we can decrease the aforementioned error by choosing a large $\lambda$.
 }
 
 \nocite{*}
