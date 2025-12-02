@@ -26,6 +26,8 @@
 % package to modify itemizations and enumerations
 \usepackage{enumitem}
 
+\usepackage{tikz}
+
 % package for better spacing
 \usepackage{xspace}
 
@@ -443,6 +445,47 @@ The name for this stems from the fact that this formula estimates the parameter 
 $$ \theta_{Nt} = \theta(1) - (HR_j(\theta(1)))^{-1}\nabla R_j(\theta(1)).$$ 
 Unfortunately, $I(j)$ and $I_{nt}(j)$ are close when the smallest eigenvalue of the hessian is big, which is not always the case.
 One way to ensure this difference is small, is to add the regularization term $\lambda\|\theta\|$ in the risk. This way, we can decrease the aforementioned error by choosing a large $\lambda$.
+
+\section{Gradient Descent case}
+Let us specialize the analysis to the instance where we are using the gradient descent algorithm to pursue the minimization task.
+Furthermore, consider the gradient flow dynamics:
+\begin{equation}\tag{GF}\label{eq:GF}
+  \begin{cases}
+    \frac{d}{d\,t} \theta(t,\eps) = - \nabla R_j(\theta(t,\eps)) - \eps \nabla \ell_j(\theta(t,\eps))\\
+    \theta(0,\eps) = \theta_0 & \text{for every }\eps\in[0,1]
+  \end{cases},
+\end{equation}
+where we consider fixed $j\in[n]$ and $\theta_0\in\Theta$.
+
+Let us call $\xi(t,\eps;\theta_0)$ a solution of \eqref{eq:GF}. 
+By the differential equation theory, since we are assuming $\ell\in C^2$, we know that at least $\xi\in C_t^2\times C_\eps^0$ (even Lipschitz in $\eps$).
+
+\begin{figure}[hbt]
+\centering
+\begin{tikzpicture}[scale=2]
+
+% Square vertices
+\coordinate (A) at (0,0);   % bottom-left
+\coordinate (B) at (0,1);   % top-left
+\coordinate (C) at (1,1);   % top-right
+\coordinate (D) at (1,0);   % bottom-right
+
+% Draw square
+\draw (A) -- (B) -- (C) -- (D) -- cycle;
+
+% Corner labels
+\node[left]  at (A) {$0$};
+\node[left]  at (B) {$1$};
+\node[right] at (C) {$\theta^\star_{-z}$};
+\node[right] at (D) {$\theta^\star$};
+
+% Side labels
+\draw (A) -- node[left,pos=0.5] {$\theta_0$} (B);
+\node[right, below]  at (D) {$\infty$};
+
+\end{tikzpicture}
+\caption{Visual representation of the homotopy $\theta(\eps,t)$ where on the horizontal axis we have evolution in time and on vertical axis the change of parameter $\eps$.}
+\end{figure}
 }
 
 \nocite{*}
