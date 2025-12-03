@@ -443,8 +443,14 @@ It could also be of interest to consider:
 \end{definition*}
 The name for this stems from the fact that this formula estimates the parameter after one step of Newton method while minimizing $\nabla R_j$ (equivalently, we are considering the second order Taylor expansion of $R_j$ in $\theta(1)$):
 $$ \theta_{Nt} = \theta(1) - (HR_j(\theta(1)))^{-1}\nabla R_j(\theta(1)).$$ 
-Unfortunately, $I(j)$ and $I_{nt}(j)$ are close when the smallest eigenvalue of the hessian is big, which is not always the case.
+Unfortunately, $I(j)$ and $I_{Nt}(j)$ are close when the smallest eigenvalue of the hessian is big, which is not always the case.
 One way to ensure this difference is small, is to add the regularization term $\lambda\|\theta\|$ in the risk. This way, we can decrease the aforementioned error by choosing a large $\lambda$.
+
+When working with more than one index, it makes sense to define the following quantity:
+\begin{equation*}
+  \theta^j(\eps) = \theta\underbrace{(1,\dots,\eps,\dots,1)}_{\text{$j$-th place}}.
+\end{equation*}
+\textbf{Question:} Is there a link between $\dot{\theta^j}$ and $J\theta$?
 
 \section{Gradient Descent case}
 Let us specialize the analysis to the instance where we are using the gradient descent algorithm to pursue the minimization task.
@@ -452,13 +458,14 @@ Furthermore, consider the gradient flow dynamics:
 \begin{equation}\tag{GF}\label{eq:GF}
   \begin{cases}
     \frac{d}{d\,t} \theta(t,\eps) = - \nabla R_j(\theta(t,\eps)) - \eps \nabla \ell_j(\theta(t,\eps))\\
-    \theta(0,\eps) = \theta_0 & \text{for every }\eps\in[0,1]
+    \theta(0,\eps) = \theta_0 \qquad \forall\eps\in[0,1]
   \end{cases},
 \end{equation}
 where we consider fixed $j\in[n]$ and $\theta_0\in\Theta$.
 
-Let us call $\xi(t,\eps;\theta_0)$ a solution of \eqref{eq:GF}. 
+Let us call $\xi(t_0,t_1,\eps;\theta_0)$ the flux of \eqref{eq:GF},i.e., $\theta(t,\eps)=\xi(0,t,\eps;\theta_0)$. 
 By the differential equation theory, since we are assuming $\ell\in C^2$, we know that at least $\xi\in C_t^2\times C_\eps^0$ (even Lipschitz in $\eps$).
+Therefore, $\theta:[0,+\infty]\times[0,1]\to\Theta$ can be seen as a homotopy between the learning trajectories in the parameters' space (taking as definition $\theta(+\infty, \eps):=\theta(\eps)$).
 
 \begin{figure}[hbt]
 \centering
@@ -466,9 +473,9 @@ By the differential equation theory, since we are assuming $\ell\in C^2$, we kno
 
 % Square vertices
 \coordinate (A) at (0,0);   % bottom-left
-\coordinate (B) at (0,1);   % top-left
-\coordinate (C) at (1,1);   % top-right
-\coordinate (D) at (1,0);   % bottom-right
+\coordinate (B) at (0,2);   % top-left
+\coordinate (C) at (2,2);   % top-right
+\coordinate (D) at (2,0);   % bottom-right
 
 % Draw square
 \draw (A) -- (B) -- (C) -- (D) -- cycle;
@@ -476,7 +483,7 @@ By the differential equation theory, since we are assuming $\ell\in C^2$, we kno
 % Corner labels
 \node[left]  at (A) {$0$};
 \node[left]  at (B) {$1$};
-\node[right] at (C) {$\theta^\star_{-z}$};
+\node[right] at (C) {$\theta^\star_{-j}$};
 \node[right] at (D) {$\theta^\star$};
 
 % Side labels
@@ -484,8 +491,18 @@ By the differential equation theory, since we are assuming $\ell\in C^2$, we kno
 \node[right, below]  at (D) {$\infty$};
 
 \end{tikzpicture}
-\caption{Visual representation of the homotopy $\theta(\eps,t)$ where on the horizontal axis we have evolution in time and on vertical axis the change of parameter $\eps$.}
+\caption{Visual representation of the homotopy $\theta(t,\eps)$ where on the horizontal axis we have evolution in time and on vertical axis the change of parameter $\eps$.}
 \end{figure}
+\textbf{Question:} Consider now the map $\theta(t,s):[0,+\infty]\times[0,T]$, with $T\in(0,+\infty]$ fixed a priori, such that:
+\begin{equation*}
+  \begin{cases}
+    \theta(t,s) = \xi(0,t,1;\theta_0) & t\in[0,s]\\
+    \theta(t,s) = \xi(s,t,0;\xi(0,s,1;\theta_0)) & t\in[s,T]
+  \end{cases}.
+\end{equation*}
+What can we say about $\theta(T,s)$?
+
+If $T=\infty$, then for any $s<\infty$ it holds that $\theta(\infty,s)=\theta^\star_{-j}$, but for finite $T$ the answer is not clear.
 }
 
 \nocite{*}
