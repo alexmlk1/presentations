@@ -65,6 +65,7 @@
 \newcommand{\Pp}{\mathbb{P}}
 \newcommand{\Ee}{\mathbb{E}}
 \newcommand{\iid}{\mathop{\sim}\limits^{\text{i.i.d.}}}
+\newcommand{\qst}{\noindent\textbf{\color{Red} Question:}}
 \def\eps{\ensuremath{\varepsilon}}
 
 
@@ -388,11 +389,11 @@ One way to analyze this, is by the means of influence functions.
     \nabla_\theta(R_j(\theta(\eps))+\eps \ell_j(\theta(\eps)))=0.
   \end{equation*}
   Taking another derivative in $\eps$ yields:
-  \begin{eqnarray*}
+  \begin{eqnarray}
     \nabla^2_{\theta,\eps}(R_j(\theta(\eps))+\eps \ell_j(\theta(\eps)))& =0 \iff \\
     \nabla^2_{\theta\theta}R_j(\theta(\eps))\dot\theta(\eps) + \nabla_\theta \ell_j(\theta(\eps)) + \eps \nabla^2_{\theta\theta}\ell_j(\theta(\eps))\dot\theta(\eps) &=0 \iff \\
     \dot\theta(\eps) = -(\nabla^2_{\theta\theta}(R_j(\theta(\eps))+\eps \ell_j(\theta(\eps))))^{-1}\nabla_\theta \ell_j(\theta(\eps)).
-  \end{eqnarray*}
+  \end{eqnarray}
   Evaluating in $\eps = 0$ concludes the proof:
   \begin{equation*}
     \dot\theta(0) = -(\nabla^2_{\theta\theta}R_j(\theta(0)))^{-1} \nabla_\theta \ell_j(\theta(0)).
@@ -433,7 +434,7 @@ It could also be of interest to consider:
 \begin{remark}
   As discussed in \cite{koh_accuracy_2019}, it is also possible to consider $\boldsymbol{\epsilon}=(\eps_1,\dots,\eps_n)\in[0,1]^n$ and $R_{\boldsymbol{\epsilon}}(\theta)=\sum_{i=1}^n \eps_i \ell_i(\theta)$.
   Note also that in this case, their notation figures ``$\theta(0)$'', but indeed in our notation it would be $\theta(1)$ (which makes sense since we are considering a group of points).\\
-  In such work, they provide formal statements about when the influence function approximations are accurate, taking into account also the difference between the influence function estimation and the \emph{Newton estimation}.
+  In such work, they provide formal statements about when the influence function ap\-proxima\-tions are accurate, taking into account also the difference between the influence function estimation and the \emph{Newton estimation}.
 \end{remark}
 
 \begin{definition*}
@@ -450,7 +451,8 @@ When working with more than one index, it makes sense to define the following qu
 \begin{equation*}
   \theta^j(\eps) = \theta\underbrace{(1,\dots,\eps,\dots,1)}_{\text{$j$-th place}}.
 \end{equation*}
-\textbf{Question:} Is there a link between $\dot{\theta^j}$ and $J\theta$?
+
+\qst Is there a link between $\dot{\theta^j}$ and $J\theta$?
 
 \section{Gradient Descent case}
 Let us specialize the analysis to the instance where we are using the gradient descent algorithm to pursue the minimization task.
@@ -493,7 +495,15 @@ Therefore, $\theta:[0,+\infty]\times[0,1]\to\Theta$ can be seen as a homotopy be
 \end{tikzpicture}
 \caption{Visual representation of the homotopy $\theta(t,\eps)$ where on the horizontal axis we have evolution in time and on vertical axis the change of parameter $\eps$.}
 \end{figure}
-\textbf{Question:} Consider now the map $\theta(t,s):[0,+\infty]\times[0,T]$, with $T\in(0,+\infty]$ fixed a priori, such that:
+
+\qst How different really is $\dot \theta(1)$ from $\dot \theta(0)$? 
+
+Assuming $\theta(\eps)$ is $C^2$, we can give the bound:
+$$ \dot\theta(1)-\dot\theta(0) = \int_0^1 \ddot\theta(\eps)d\,\eps \le \|\ddot\theta\|_{\infty,[0,1]},$$
+but its computation requires a third derivative of $R_j$...\\
+I would like to do some experiments in a simple setting for visualizing $\theta(\eps)$. This may give insights.
+
+\qst Consider now the map $\theta(t,s):[0,+\infty]\times[0,T]$, with $T\in(0,+\infty]$ fixed a priori, such that:
 \begin{equation*}
   \begin{cases}
     \theta(t,s) = \xi(0,t,1;\theta_0) & t\in[0,s]\\
@@ -503,6 +513,23 @@ Therefore, $\theta:[0,+\infty]\times[0,1]\to\Theta$ can be seen as a homotopy be
 What can we say about $\theta(T,s)$?
 
 If $T=\infty$, then for any $s<\infty$ it holds that $\theta(\infty,s)=\theta^\star_{-j}$, but for finite $T$ the answer is not clear.
+
+\section*{Algorithm implementations: D2D vs R2D}
+An application for which we may want to use influence functions is unlearning a data point (for example for privacy reasons).
+However, as we have seen, IFs may not work well in the MLP and Deep Learning setting. 
+Therefore, in the literature some algorithms have been developed to unlearn training points without using the highly inefficient LOO retraining.
+For example, in \cite{mu_rewind--delete_2025}, the authors take inspiration from the \emph{Descend-to-Delete} algorithm and create a more efficient version called \emph{Rewind-to-Delete}.
+
+The former algorithm is very intuitive and consists on simply continuing the training of the model but on the updated dataset where we deleted the target data point.
+By continuing for enough iteration, there have been proven some theoretical guarantees that the final parameter distribution is in some sense undistinguishable from the one of LOO method.\\
+The problem with this algorithm is that such guarantees only hold in the convex case and cannot be extended to the more general setting (e.g. ReLU and tanh functions are not convex, so this result does not hold).
+
+On the other hand, the R2D algorithm saves a check-point parameter during the training (let's say after the K-th iteration) and then keeps going until iteration T.
+The idea is that when we receive the request of unlearning the target point, we will continue the training on the updated dataset starting from $\theta(K)$, instead of $\theta(T)$.\\
+The authors of the paper show that also this method yields indistinguishalbility, but in this case the result holds also for non-convex functions and the iterations required are much less than the total training time $T$ (required by LOO).
+
+In \cite{mu_SGD_2025}, the same researchers extend the previous results also to the (projected) SGD case.
+In particular, in addition to all previous observations, they highlight that D2D provides tighter bounds for the undistinguishability due to its reliance on the convergence to a unique global minimum, while R2D has more loose estimates as it only counts on the underlying contractivity of gradient systems.
 }
 
 \nocite{*}
