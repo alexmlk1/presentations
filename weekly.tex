@@ -518,7 +518,7 @@ If $T=\infty$, then for any $s<\infty$ it holds that $\theta(\infty,s)=\theta^\s
 An application for which we may want to use influence functions is unlearning a data point (for example for privacy reasons).
 However, as we have seen, IFs may not work well in the MLP and Deep Learning setting. 
 Therefore, in the literature some algorithms have been developed to unlearn training points without using the highly inefficient LOO retraining.
-For example, in \cite{mu_rewind--delete_2025}, the authors take inspiration from the \emph{Descend-to-Delete} algorithm and create a more efficient version called \emph{Rewind-to-Delete}.
+For example, in \cite{mu_rewind--delete_2025}, the authors take inspiration from the \emph{Descend-to-Delete} algorithm (D2D) and create a more efficient version called \emph{Rewind-to-Delete} (R2D).
 
 The former algorithm is very intuitive and consists on simply continuing the training of the model but on the updated dataset where we deleted the target data point.
 By continuing for enough iteration, there have been proven some theoretical guarantees that the final parameter distribution is in some sense undistinguishable from the one of LOO method.\\
@@ -530,6 +530,16 @@ The authors of the paper show that also this method yields indistinguishalbility
 
 In \cite{mu_SGD_2025}, the same researchers extend the previous results also to the (projected) SGD case.
 In particular, in addition to all previous observations, they highlight that D2D provides tighter bounds for the undistinguishability due to its reliance on the convergence to a unique global minimum, while R2D has more loose estimates as it only counts on the underlying contractivity of gradient systems.
+
+\section{Other interesting things we might want to explore}
+\begin{itemize}
+  \item If our goal is to gain a better understanding of what data points are the most informative during the training, instead of trying to unlearn certain data, the results in \cite{ghorbani_data_2019} might be interesting.
+  In their paper, the authors prove that their Shapley values-based method performs better on this task rather than influence function methods. 
+  \item It may be of interest to study Bayesian Influence Functions (BIFs) as well as frequentistic ones. 
+  In \cite{kreer_bayesian_2025}, the researchers present an unlearning method that uses BIFs instead of IFs. The reason for this is we don't need to compute the iHVP to evaluate BIFs, therefore this method works better with more singular loss landscapes.
+  As another consequence, we don't need to evaluate these quantities on local minima (we dont need the hessian to be invertible), which is one of the less realistic hypotheses for IFs.\\
+  On the other hand, computations are not always faster than IFs (here, the leading cost is estimating the covariance between two elements) and achieving good results requires more hyperparameter tuning than classical methods.
+\end{itemize}
 }
 
 \nocite{*}
