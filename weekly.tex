@@ -18,7 +18,7 @@
 \usepackage[table,xcdraw,dvipsnames]{xcolor}
 
 % mathematical symbols
-\usepackage{amsmath, amssymb, amsfonts, mathrsfs}
+\usepackage{amsmath, amssymb, amsfonts, mathrsfs, bbm}
 
 % hyper reference for links or figures
 \usepackage{hyperref}
@@ -346,7 +346,6 @@ In order to evaulate the estimators, we give the following definitions:
     R(\theta) := \sum_{i=1}^n\ell(f(\theta;x_i);y_i).
   \end{equation}
 \end{definition*}
-{\color{RoyalBlue}
 Given $\eps\in[0,1]$ and $j\in [n]$, we are interested in solving the minimization problem:
 \begin{equation*}
   \min_{\theta\in\Theta} \sum_{i=1}^n \ell(f(\theta;x_i);y_i)+(\eps-1) \ell(f(\theta;x_j);y_j).
@@ -365,7 +364,6 @@ $$ \theta(\eps) = \arg\min_{\theta\in\Theta} R_j(\theta)+\eps\ell_j(\theta).
 $$
 Notice that $\theta(\eps)$ symbolizes the parameter for which our model best fits the data while we change the weight of one data point in the training. 
 It is particularly of interest to understand how $$\theta(1)=\theta^\star=\arg\min R(\theta)$$ and $$\theta(0)=\theta^\star_{-j}=\arg\min R_j(\theta)$$ are different, since they represent respectively the optimal parameter obtained while training on the whole data and on the dataset minus one particular point.\\
-}
 One way to analyze this, is by the means of influence functions.
 \begin{definition*}
   The \emph{influence function} of $z_j$ is:
@@ -405,7 +403,7 @@ One way to analyze this, is by the means of influence functions.
   If we wanted to compute $\dot\theta(1)$, it would also have a nice form:
   $$ \dot\theta(1) = -H_R^{-1} \nabla_\theta \ell_j(\theta^\star).
   $$
-  where $H_R$ is the Hessian of $R$ in $\theta^\star$. {\color{RoyalBlue} Indeed, if our goal is to \emph{unlearn} a data point, this formulation does not require us to retrain the model, as we have already access to $\theta^\star$ (but not to $\theta^\star_{-j}$). }
+  where $H_R$ is the Hessian of $R$ in $\theta^\star$. Indeed, if our goal is to \emph{unlearn} a data point, this formulation does not require us to retrain the model, as we have already access to $\theta^\star$ (but not to $\theta^\star_{-j}$).
 \end{remark}
 It could also be of interest to consider:
 \begin{equation}
@@ -429,9 +427,6 @@ It could also be of interest to consider:
 
 \end{proof}
 
-
-
-{\color{RoyalBlue} 
 \begin{remark}
   As discussed in \cite{koh_accuracy_2019}, it is also possible to consider $\boldsymbol{\epsilon}=(\eps_1,\dots,\eps_n)\in[0,1]^n$ and $R_{\boldsymbol{\epsilon}}(\theta)=\sum_{i=1}^n \eps_i \ell_i(\theta)$.
   Note also that in this case, their notation figures ``$\theta(0)$'', but indeed in our notation it would be $\theta(1)$ (which makes sense since we are considering a group of points).\\
@@ -455,7 +450,7 @@ When working with more than one index, it makes sense to define the following qu
 
 \qst Is there a link between $\dot{\theta^j}$ and $J\theta$?
 
-\section{Gradient Descent case}
+\section*{Gradient Descent case}
 Let us specialize the analysis to the instance where we are using the gradient descent algorithm to pursue the minimization task.
 Furthermore, consider the gradient flow dynamics:
 \begin{equation}\tag{GF}\label{eq:GF}
@@ -547,6 +542,87 @@ What can we say about $\theta(T,s)$?
 
 If $T=\infty$, then for any $s<\infty$ it holds that $\theta(\infty,s)=\theta^\star_{-j}$, but for finite $T$ the answer is not clear.
 
+{\color{RoyalBlue}
+\section*{Epsilon dynamic}
+Note that we can rewrite $\theta(t.s)$ by transforming $\eps$ itself in a variable of time:
+\begin{equation*}
+  \theta(t,s)=\xi(0,t,\eps_s;\theta(0))~~ \text{ where }~~ 
+  \eps_s(t)= \mathbbm{1}_{[0,s]}(t)\ .
+\end{equation*}
+From this formula, a natural question arises: is a step function really the best choice for $\eps(t)$?
+
+To reply, we first need to analyse the dynamics in the very simple case of linear regression with squared loss to see if we can get any insight.\\
+With this goal in mind, let's rewrite explicitly \ref{eq:GF} in this specific case (I will use the same notation as the IF vs Leverage part):
+\begin{equation}\label{eq:LRGF}\tag{LRGF}
+  \begin{cases}
+    \frac{d}{d\,t}\theta(t,1) = -\nabla \frac12(X\theta-y)^2=-X^\top X\theta+X^\top y \\
+    \theta(0)=\theta_0
+  \end{cases}.
+\end{equation}
+This is a linear ODE, so we can find an explicit solution, which reads:
+\begin{equation*}
+  \theta(t,1)=\theta_0 e^{-H t}+(\mathrm{Id}_d-e^{-H t})\hat\theta .
+\end{equation*}
+In order to extend this to the case of every other $\eps\in(0,1)$ 
+\footnote{for $\eps=0$ consider for simplicity $X',y'$ obtained by removing the target datapoint, otherwise we can integrate that case in the general one using the Moore-Penrose pseudoinverse}, 
+consider \\$y^j_\eps = (y_1,\dots,\eps y_j,\dots,y_n)$ and similarly $X^j_\eps$ and $H^j_\eps=(X^j_\eps)^\top X^j_\eps$.
+Solving \eqref{eq:LRGF} with the above quantities defines:
+\begin{equation*}
+  \theta(t,\eps)=\theta_0 e^{-H^j_\eps t}+(\mathrm{Id}_d-e^{-H^j_\eps t})\hat\theta_{-j}(\eps) .
+\end{equation*}
+With $s,T$ fixed, what we want to study is what is the "fastest route" to $\hat\theta_{-j}(\eps)$ when we change $\eps_s(t)$.
+In other words, we are trying to solve:
+\begin{equation*}
+  \min_{\eps\in E_s}\|\theta(T,\eps)-\theta^\star_{-j}\|_\Theta
+\end{equation*}
+for $E_s=\{f\in[0,1]^{[0,+\infty]} \mid f(t)=1~\forall t\leq s \wedge f(t)=0 ~\forall t\geq T\}$.\\
+For our baseline (i.e., $\eps_s(t)=\mathbbm{1}_{[0,s]}(t)$), this quantity is:
+\begin{equation*}
+  \|(\theta_0 e^{-H s}+(\mathrm{Id}_d-e^{-H s})\theta^\star-\theta^\star_{-j})e^{-H_{-j}(T-s)} \|.
+\end{equation*}
+Can we do any better?
+
+\begin{obs}
+  By the properties of $\eps\in E_s$, we can state the problem we are trying to solve as:
+  \begin{equation*}
+    \min_{\eps\in E_s}\|\theta(T,\eps)-\theta(\infty,\eps)\|_\Theta = \min_{\eps\in E_s}\left\|\int_{T}^\infty \partial_t\theta(t,\eps(t))\,dt\right\|_\Theta ,
+  \end{equation*}
+  since $d\theta=\partial_t\theta\,dt + \partial_\eps \theta\,d\eps$, but $\eps(T)=\eps(\infty)=0$.
+\end{obs}
+
+Unfortunately, as soon as we add the time dependancy of $\eps$ in the equation:
+\begin{equation*}
+  \begin{cases}
+    \dot \theta(t,\eps(t)) = -\sum_{i\neq j} x_i(x_i^\top\theta-y_i) - \eps(t)x_j(x_j^\top\theta-y_j) \\
+    \theta(0) = \theta_0
+  \end{cases} ,
+\end{equation*}
+we cannot obtain a closed form solution anymore. In fact, even if we rewrite the first line as:
+\begin{equation*}
+  \begin{aligned}
+    \dot \theta(t,\eps(t)) &= a(t)\theta(t) + b(t), \text{ where } \\
+    a(t) &= -\sum_{i\neq j}x_ix_i^\top - \eps(t)x_jx_j^\top \\
+    b(t) &= \sum_{i\neq j}x_iy_i + \eps(t)x_jy_j
+  \end{aligned}
+\end{equation*}
+and use the method of the Wronskian with the variation of constants, that does not yield a closed-form solution\footnote{This method requires $\eps\in C^1$ because to apply the Wronskian we need to take another derivative in the homogeneous equation and consider $\ddot\theta-\dot\theta a(t) - \theta \dot a(t)$.}.\\
+Another method that may produce some more interesting results is the application of optimal control theory.
+Namely, we can apply the Pontryagin Maximum Principle for linear equations with variable coefficients (cf. \cite{pontryagin_max_princ} Theorem 15 p.184):
+\begin{theorem}[PMP]
+  Consider a system of differential equations of the form:
+  \begin{equation*}
+    \frac{d\,x^i}{d\,t} = \sum_{\nu=1}^{n}a_\nu^i (t) x^\nu + \sum_{\rho=1}^{r} b_\rho(t) u^\rho + f^i(t) \quad i=1,\dots,n~.
+  \end{equation*}
+  Call $A=(a_\nu^i)_{\nu,i=1}^n \in \R^{n \times n}$, $B = (b_\rho)_{\rho=1}^r \in \R^{n \times r}$. 
+  If $A^{\otimes i} B$ are linearly independent for every $i$ and if $A(t),B(t)$ are at least $n$ times differentiable, then
+  there exists a unique solution $u(t)=(u^1,\dots,u^r)\in U$ such that the flow $x(t)$ gets from $x(t_0)=x_0$ to $x(t_1)=x_1$ in minimum time.
+  Moreover, $u$ is piecewise constant and its values are vertices or the polyhedron $U$.
+\end{theorem}
+We can apply this to our case for $x^i=\theta_i$, $u^j=\eps$; it follows that the optimal $\eps$ is piecewise constant and can only take on values $0$ or $1$.\\
+In particular, I think it shouldn't be too difficult to prove that it is constantly $0$, but direct computations may be heavy.\\
+In addition, note that we do not make any assumptions (except sufficient regularity) on $a(t),b(t),f(t)$. Therefore, this theorem is applicable also for the general case with $C^\infty$ activation functions.
+}
+
 \section*{Algorithm implementations: D2D vs R2D}
 An application for which we may want to use influence functions is unlearning a data point (for example for privacy reasons).
 However, as we have seen, IFs may not work well in the MLP and Deep Learning setting. 
@@ -564,7 +640,7 @@ The authors of the paper show that also this method yields indistinguishalbility
 In \cite{mu_SGD_2025}, the same researchers extend the previous results also to the (projected) SGD case.
 In particular, in addition to all previous observations, they highlight that D2D provides tighter bounds for the undistinguishability due to its reliance on the convergence to a unique global minimum, while R2D has more loose estimates as it only counts on the underlying contractivity of gradient systems.
 
-\section{Other interesting things we might want to explore}
+\section*{Other interesting things we might want to explore}
 \begin{itemize}
   \item If our goal is to gain a better understanding of what data points are the most informative during the training, instead of trying to unlearn certain data, the results in \cite{ghorbani_data_2019} might be interesting.
   In their paper, the authors prove that their Shapley values-based method performs better on this task rather than influence function methods. 
@@ -572,8 +648,13 @@ In particular, in addition to all previous observations, they highlight that D2D
   In \cite{kreer_bayesian_2025}, the researchers present an unlearning method that uses BIFs instead of IFs. The reason for this is we don't need to compute the iHVP to evaluate BIFs, therefore this method works better with more singular loss landscapes.
   As another consequence, we don't need to evaluate these quantities on local minima (we dont need the hessian to be invertible), which is one of the less realistic hypotheses for IFs.\\
   On the other hand, computations are not always faster than IFs (here, the leading cost is estimating the covariance between two elements) and achieving good results requires more hyperparameter tuning than classical methods.
+  {\color{RoyalBlue}
+  \item Paper about machine unlearning with $\eps\neq0$ \cite{qiao_soft_2025} (not for privacy issues, but, for example, to not take into account data with wrong labels);
+  \item Something I had not seen yet in machine unlearning, but I have seen for example in plateau explanation \cite{Berthier_2024}: it can make more sense to consider influence functions in certain epochs of the training, not only at the end \cite{lee_timescales_2025}. 
+  Indeed, the importance of a certain data point may change throughout the training.
+  }
 \end{itemize}
-}
+
 
 \nocite{*}
 \bibliographystyle{plain}
