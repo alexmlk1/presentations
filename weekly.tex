@@ -532,19 +532,19 @@ In fact, in the figure you can see that the first considered point is close to t
   \end{figure}
 
 \qst Consider now the map $\theta(t,s):[0,+\infty]\times[0,T]$, with $T\in(0,+\infty]$ fixed a priori, such that:
-\begin{equation*}
+\begin{equation}\label{eq:theta_ts}
   \begin{cases}
     \theta(t,s) = \xi(0,t,1;\theta_0) & t\in[0,s]\\
     \theta(t,s) = \xi(s,t,0;\xi(0,s,1;\theta_0)) & t\in[s,T]
   \end{cases}.
-\end{equation*}
+\end{equation}
 What can we say about $\theta(T,s)$?
 
 If $T=\infty$, then for any $s<\infty$ it holds that $\theta(\infty,s)=\theta^\star_{-j}$, but for finite $T$ the answer is not clear.
 
-{\color{RoyalBlue}
+
 \section*{Epsilon dynamic}
-Note that we can rewrite $\theta(t.s)$ by transforming $\eps$ itself in a variable of time:
+Note that we can rewrite $\theta(t,s)$ from \ref{eq:theta_ts} by transforming $\eps$ itself in a variable of time:
 \begin{equation*}
   \theta(t,s)=\xi(0,t,\eps_s;\theta(0))~~ \text{ where }~~ 
   \eps_s(t)= \mathbbm{1}_{[0,s]}(t)\ .
@@ -559,44 +559,40 @@ With this goal in mind, let's rewrite explicitly \ref{eq:GF} in this specific ca
     \theta(0)=\theta_0
   \end{cases}.
 \end{equation}
+{\color{RoyalBlue}
 This is a linear ODE, so we can find an explicit solution, which reads:
 \begin{equation*}
-  \theta(t,1)=\theta_0 e^{-H t}+(\mathrm{Id}_d-e^{-H t})\hat\theta .
+  \theta(t,1)=e^{-H t} \theta_0 +(\mathrm{Id}_d-e^{-H t})\hat\theta .
 \end{equation*}
 In order to extend this to the case of every other $\eps\in(0,1)$ 
 \footnote{for $\eps=0$ consider for simplicity $X',y'$ obtained by removing the target datapoint, otherwise we can integrate that case in the general one using the Moore-Penrose pseudoinverse}, 
 consider \\$y^j_\eps = (y_1,\dots,\eps y_j,\dots,y_n)$ and similarly $X^j_\eps$ and $H^j_\eps=(X^j_\eps)^\top X^j_\eps$.
 Solving \eqref{eq:LRGF} with the above quantities defines:
 \begin{equation*}
-  \theta(t,\eps)=\theta_0 e^{-H^j_\eps t}+(\mathrm{Id}_d-e^{-H^j_\eps t})\hat\theta_{-j}(\eps) .
+  \theta(t,\eps)= e^{-H^j_\eps t} \theta_0 +(\mathrm{Id}_d-e^{-H^j_\eps t})\hat\theta_{-j}(\eps) .
 \end{equation*}
 With $s,T$ fixed, what we want to study is what is the "fastest route" to $\hat\theta_{-j}(\eps)$ when we change $\eps_s(t)$.
 In other words, we are trying to solve:
-\begin{equation*}
-  \min_{\eps\in E_s}\|\theta(T,\eps)-\theta^\star_{-j}\|_\Theta
-\end{equation*}
+\begin{equation}\label{eq:obs_meas}
+  \min_{\eps\in E_s}\|\xi(0,T,\eps;\theta(0))-\theta^\star_{-j}\|_\Theta
+\end{equation}
 for $E_s=\{f\in[0,1]^{[0,+\infty]} \mid f(t)=1~\forall t\leq s \wedge f(t)=0 ~\forall t\geq T\}$.\\
 For our baseline (i.e., $\eps_s(t)=\mathbbm{1}_{[0,s]}(t)$), this quantity is:
 \begin{equation*}
-  \|(\theta_0 e^{-H s}+(\mathrm{Id}_d-e^{-H s})\theta^\star-\theta^\star_{-j})e^{-H_{-j}(T-s)} \|.
+  \|e^{-H_{-j}(T-s)} (e^{-H s} \theta_0 +(\mathrm{Id}_d-e^{-H s})\theta^\star-\theta^\star_{-j}) \|.
 \end{equation*}
-Can we do any better?
 
-\begin{obs}
-  By the properties of $\eps\in E_s$, we can state the problem we are trying to solve as:
-  \begin{equation*}
-    \min_{\eps\in E_s}\|\theta(T,\eps)-\theta(\infty,\eps)\|_\Theta = \min_{\eps\in E_s}\left\|\int_{T}^\infty \partial_t\theta(t,\eps(t))\,dt\right\|_\Theta ,
-  \end{equation*}
-  since $d\theta=\partial_t\theta\,dt + \partial_\eps \theta\,d\eps$, but $\eps(T)=\eps(\infty)=0$.
-\end{obs}
+\begin{center}
+  \textbf{Can we do any better?}
+\end{center} 
 
 Unfortunately, as soon as we add the time dependancy of $\eps$ in the equation:
-\begin{equation*}
+\begin{equation}\label{eq:eps_t}
   \begin{cases}
     \dot \theta(t,\eps(t)) = -\sum_{i\neq j} x_i(x_i^\top\theta-y_i) - \eps(t)x_j(x_j^\top\theta-y_j) \\
     \theta(0) = \theta_0
   \end{cases} ,
-\end{equation*}
+\end{equation}
 we cannot obtain a closed form solution anymore. In fact, even if we rewrite the first line as:
 \begin{equation*}
   \begin{aligned}
@@ -605,22 +601,57 @@ we cannot obtain a closed form solution anymore. In fact, even if we rewrite the
     b(t) &= \sum_{i\neq j}x_iy_i + \eps(t)x_jy_j
   \end{aligned}
 \end{equation*}
-and use the method of the Wronskian with the variation of constants, that does not yield a closed-form solution\footnote{This method requires $\eps\in C^1$ because to apply the Wronskian we need to take another derivative in the homogeneous equation and consider $\ddot\theta-\dot\theta a(t) - \theta \dot a(t)$.}.\\
-Another method that may produce some more interesting results is the application of optimal control theory.
-Namely, we can apply the Pontryagin Maximum Principle for linear equations with variable coefficients (cf. \cite{pontryagin_max_princ} Theorem 15 p.184):
-\begin{theorem}[PMP]
-  Consider a system of differential equations of the form:
-  \begin{equation*}
-    \frac{d\,x^i}{d\,t} = \sum_{\nu=1}^{n}a_\nu^i (t) x^\nu + \sum_{\rho=1}^{r} b_\rho(t) u^\rho + f^i(t) \quad i=1,\dots,n~.
-  \end{equation*}
-  Call $A=(a_\nu^i)_{\nu,i=1}^n \in \R^{n \times n}$, $B = (b_\rho)_{\rho=1}^r \in \R^{n \times r}$. 
-  If $A^{\otimes i} B$ are linearly independent for every $i$ and if $A(t),B(t)$ are at least $n$ times differentiable, then
-  there exists a unique solution $u(t)=(u^1,\dots,u^r)\in U$ such that the flow $x(t)$ gets from $x(t_0)=x_0$ to $x(t_1)=x_1$ in minimum time.
-  Moreover, $u$ is piecewise constant and its values are vertices or the polyhedron $U$.
-\end{theorem}
-We can apply this to our case for $x^i=\theta_i$, $u^j=\eps$; it follows that the optimal $\eps$ is piecewise constant and can only take on values $0$ or $1$.\\
-In particular, I think it shouldn't be too difficult to prove that it is constantly $0$, but direct computations may be heavy.\\
-In addition, note that we do not make any assumptions (except sufficient regularity) on $a(t),b(t),f(t)$. Therefore, this theorem is applicable also for the general case with $C^\infty$ activation functions.
+and use the method of the Wronskian with the variation of constants, that does not yield a closed-form solution in the general case\footnote{This method requires $\eps\in C^1$ because to apply the Wronskian we need to take another derivative in the homogeneous equation and consider $\ddot\theta-\dot\theta a(t) - \theta \dot a(t)$.}.\\
+Let's see what happens instead for simpler cases doing computations by hand. In the following, consider $s>0$ fixed.
+
+\paragraph{Step functions} Is $\mathbbm{1}_{[0,s]}$ the best step function we can choose in $E_s$?\\
+Consider $\eps_\tau = \mathbbm{1}_{[0,\tau]}$. We computed above that for step functions, the quantity we want to minimize has the form:
+$$\mathcal{E}(\eps_\tau) = \|e^{-H_{-j}(T-\tau)} (e^{-H \tau} \theta_0 +(\mathrm{Id}_d-e^{-H \tau})\theta^\star-\theta^\star_{-j}) \|.$$
+To find the optimal $\tau\in [s,T)$, let's compute the derivative in $\tau$ of the previous quantity and impose it to be equal to $0$.
+Moreover, let's assume for simplicity that $H=\mathrm{Id}_d$.
+$$\frac{d}{d\,\tau}\mathcal{E}(\eps_\tau) = \tau e^{-(T-\tau)}\| (e^{-\tau} \theta_0 +(1-e^{-\tau})\theta^\star-\theta^\star_{-j}) \| -\tau e^{-T}\|\theta_0-\theta^\star\|=0.$$
+The equality is true for $\tau = 0$ or $\|\theta_0+(e^\tau - 1)\theta^\star - e^\tau \theta^\star_{-j}\|=\|\theta_0-\theta^\star\|$. 
+It is not clear to me that the second equality must not hold in general, but for example if $\theta_0=\theta^\star$, then clearly we have no solution.\\
+Assuming that also in the general case the second condition cannot hold, this means that $\tau\mapsto\mathcal{E}(\eps_\tau)$ is monotone in $[0,+\infty)$ and therefore the minimum on $E_s$ is achieved with $\eps_s$. 
+
+\paragraph{Linear functions} Consider the class of functions $\eps_{\mathrm{lin}, t_1}(t)$ such that:
+\begin{equation*}
+  \eps_{\mathrm{lin}, t_1}(t)= \mathbbm{1}_{[0,s]}(t)+\mathbbm{1}_{[s,t_1]}(t)\left(1-\frac{(s-t)}{(s-t_1)}\right).
+\end{equation*}
+The main problem is that now in \ref{eq:eps_t} from $s$ to $t_1$ we have the following non-autonomous equation:
+\begin{equation*}
+  \begin{cases}
+    \dot \theta(t,\eps(t)) = -\sum_{i\neq j} x_i(x_i^\top\theta-y_i) - \left(1-\frac{(s-t)}{(s-t_1)}\right)x_j(x_j^\top\theta-y_j) \\
+    \theta(0) = \xi(0,s,1;\theta_0)
+  \end{cases} .
+\end{equation*}
+To try solve this, let's define $r(t)=t$, thus $\dot r = 1$. Then, we can the previous equation as a dynamical system:
+\begin{equation}
+  \begin{cases}
+    \dot \theta(t) = \left(-\sum_{i\neq j} x_i x_i^\top \right)\theta(t) + \frac{x_j x_j^\top}{s-t_1} \theta(t) r(t) + \left(\sum_{i\neq j}x_i y_i + (1-\frac{s}{(s-t_1)})x_j y_j\right) \\
+    \dot r(t) = 1
+  \end{cases}.
+\end{equation}
+Note that this system is an inhomogeneous Lotka-Volterra system.
+% Another method that may produce some more interesting results is the application of optimal control theory.
+% Namely, we can apply the Pontryagin Maximum Principle for linear equations with variable coefficients (cf. \cite{pontryagin_max_princ} Theorem 15 p.184):
+% \begin{theorem}[PMP]
+%   Consider a system of differential equations of the form:
+%   \begin{equation*}
+%     \frac{d\,x^i}{d\,t} = \sum_{\nu=1}^{n}a_\nu^i (t) x^\nu + \sum_{\rho=1}^{r} b_\rho(t) u^\rho + f^i(t) \quad i=1,\dots,n~.
+%   \end{equation*}
+%   Call $A=(a_\nu^i)_{\nu,i=1}^n \in \R^{n \times n}$, $B = (b_\rho)_{\rho=1}^r \in \R^{n \times r}$. 
+%   If $A^{\otimes i} B$ are linearly independent for every $i$ and if $A(t),B(t)$ are at least $n$ times differentiable, then
+%   there exists a unique solution $u(t)=(u^1,\dots,u^r)\in U$ such that the flow $x(t)$ gets from $x(t_0)=x_0$ to $x(t_1)=x_1$ in minimum time.
+%   Moreover, $u$ is piecewise constant and its values are vertices or the polyhedron $U$.
+% \end{theorem}
+% We can apply this to our case for $x^i=\theta_i$, $u^j=\eps$; it follows that the optimal $\eps$ is piecewise constant and can only take on values $0$ or $1$.\\
+% In particular, I think it shouldn't be too difficult to prove that it is constantly $0$, but direct computations may be heavy.\\
+% In addition, note that we do not make any assumptions (except sufficient regularity) on $a(t),b(t),f(t)$. Therefore, this theorem is applicable also for the general case with $C^\infty$ activation functions.
+
+% On the negative side, however, this theorem does not solve our problem! In fact, we are not seeking a time-optimal solution (as the time required to get to the optimal point will always be infinite).\\
+% We can circumvent this issue by considering a point which is not critical but it's close enough to $\hat\theta$ as an endpoint. 
+% At this point, we don't need to consider the problem as in \ref{eq:obs_meas}; instead, we can treat it as a time-minimal problem.
 }
 
 \section*{Algorithm implementations: D2D vs R2D}
@@ -649,7 +680,9 @@ In particular, in addition to all previous observations, they highlight that D2D
   As another consequence, we don't need to evaluate these quantities on local minima (we dont need the hessian to be invertible), which is one of the less realistic hypotheses for IFs.\\
   On the other hand, computations are not always faster than IFs (here, the leading cost is estimating the covariance between two elements) and achieving good results requires more hyperparameter tuning than classical methods.
   {\color{RoyalBlue}
-  \item Paper about machine unlearning with $\eps\neq0$ \cite{qiao_soft_2025} (not for privacy issues, but, for example, to not take into account data with wrong labels);
+  \item Paper about machine unlearning with $\eps\neq0$ \cite{qiao_soft_2025}: they introduce a soft-weigthed framework for unlearning data with the aim of improving robustness or fairness.
+  The main point is that if we are not in a privacy-related field, there is no need to completely forget a datapoint; instead, it would be more beneficial to consider it with a lower weight.
+  Moreover, instead of training from scratch the model with the updated weights, the authors propose to correct the result of the usual training with influence functions.
   \item Something I had not seen yet in machine unlearning, but I have seen for example in plateau explanation \cite{Berthier_2024}: it can make more sense to consider influence functions in certain epochs of the training, not only at the end \cite{lee_timescales_2025}. 
   Indeed, the importance of a certain data point may change throughout the training.
   }
