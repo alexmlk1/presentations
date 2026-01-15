@@ -563,6 +563,14 @@ This is a linear ODE, so we can find an explicit solution, which reads:
 \begin{equation*}
   \theta(t,1)=e^{-H t} \theta_0 +(\mathrm{Id}_d-e^{-H t})\theta^\star .
 \end{equation*}
+{\color{RoyalBlue} 
+\begin{remark}
+  If $X$ is not full rank (overparametrized case), the parameter that minimizes the error is no loger well defined, as we have a manifold of feasible parameters.\\
+  However, by \cite{hastie_2022} (Proposition 1), we know that \ref{eq:LRGF} always converges to the solution with minimum norm in the space spanned by columns of $X$.
+  Therefore, starting from a random $\theta_0$, since the dynamics happens only on span$X$, we can redefine $\theta^\star$ as:
+  $$\theta^\star:=(X^\top X)^{-1} X^\top y+\pi_{\mathrm{span}X ^\bot}\theta_0 = (X^\top X)^{-1} X^\top y + (\mathrm{Id}-X(X^\top X)^{-1} X^\top) \theta_0 .$$
+\end{remark}
+}
 In order to extend this to the case of every other $\eps\in(0,1)$ 
 \footnote{for $\eps=0$ consider for simplicity $X',y'$ obtained by removing the target datapoint, otherwise we can integrate that case in the general one using the Moore-Penrose pseudoinverse}, 
 consider \\$y^j_\eps = (y_1,\dots,\eps y_j,\dots,y_n)$ and similarly $X^j_\eps$ and $H^j_\eps=(X^j_\eps)^\top X^j_\eps$.
@@ -630,11 +638,14 @@ Substituting, we get:
     & = \langle \tau e^{-(T-\tau)}(e^{-\tau} \theta_0 +(1-e^{-\tau})\theta^\star-\theta^\star_{-j}) + \\
     & -\tau e^{-T}(\theta_0-\theta^\star),
      e^{-(T-\tau)} (e^{-\tau} \theta_0 +(\mathrm{Id}_d-e^{-\tau})\theta^\star-\theta^\star_{-j}) \rangle = \\
-    & = e^{-2T} \langle continue \rangle
+    & = e^{-2(T-\tau)} \langle \tau((e^{-\tau} \theta_0 +(1-e^{-\tau})\theta^\star-\theta^\star_{-j})+\theta_0+\\
+    & - \theta^\star), e^{-\tau} \theta_0 +(1-e^{-\tau})\theta^\star-\theta^\star_{-j} \rangle = \\
+    & = \tau e^{-2(T-\tau)} (\|e^{-\tau} \theta_0 +(1-e^{-\tau})\theta^\star-\theta^\star_{-j}\|^2 + \langle\theta_0-\theta^\star, e^{-\tau} \theta_0 +(1-e^{-\tau})\theta^\star-\theta^\star_{-j}\rangle)
   \end{aligned}
 \end{equation*}
 %$$\frac{d}{d\,\tau}\mathcal{E}(\eps_\tau) = \tau e^{-(T-\tau)}\| (e^{-\tau} \theta_0 +(1-e^{-\tau})\theta^\star-\theta^\star_{-j}) \| -\tau e^{-T}\|\theta_0-\theta^\star\|=0.$$
-The equality is true for $\tau = 0$ or $\|\theta_0+(e^\tau - 1)\theta^\star - e^\tau \theta^\star_{-j}\|=\|\theta_0-\theta^\star\|$. 
+The above quantity is $0$ for $\tau = 0$ or when
+$$\|\theta_0+(e^\tau - 1)\theta^\star - e^\tau \theta^\star_{-j}\| = -\langle\theta_0-\theta^\star, e^{-\tau} \theta_0 +(1-e^{-\tau})\theta^\star-\theta^\star_{-j}\rangle .$$%\|\theta_0-\theta^\star\|$. 
 It is not clear to me that the second equality must not hold in general, but for example if $\theta_0=\theta^\star$, then clearly we have no solution.\\
 Assuming that also in the general case the second condition cannot hold, this means that $\tau\mapsto\mathcal{E}(\eps_\tau)$ is monotone in $[0,+\infty)$ and therefore the minimum on $E_s$ is achieved with $\eps_s$. 
 
