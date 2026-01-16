@@ -559,16 +559,20 @@ With this goal in mind, let's rewrite explicitly \ref{eq:GF} in this specific ca
     \theta(0)=\theta_0
   \end{cases}.
 \end{equation}
+{\color{RoyalBlue} 
 This is a linear ODE, so we can find an explicit solution, which reads:
 \begin{equation*}
-  \theta(t,1)=e^{-H t} \theta_0 +(\mathrm{Id}_d-e^{-H t})\theta^\star .
+  \theta(t,1)=e^{-H t} \theta_0 +(\mathrm{Id}_d-e^{-H t})H^{-1}X^\top y .
 \end{equation*}
-{\color{RoyalBlue} 
 \begin{remark}
-  If $X$ is not full rank (overparametrized case), the parameter that minimizes the error is no loger well defined, as we have a manifold of feasible parameters.\\
-  However, by \cite{hastie_2022} (Proposition 1), we know that \ref{eq:LRGF} always converges to the solution with minimum norm in the space spanned by columns of $X$.
-  Therefore, starting from a random $\theta_0$, since the dynamics happens only on span$X$, we can redefine $\theta^\star$ as:
-  $$\theta^\star:=(X^\top X)^{-1} X^\top y+\pi_{\mathrm{span}X ^\bot}\theta_0 = (X^\top X)^{-1} X^\top y + (\mathrm{Id}-X(X^\top X)^{-1} X^\top) \theta_0 .$$
+  In this case, $\theta^\star=\lim_{t\to\infty}\theta(t)=(X^\top X)^{-1} X^\top y = \hat \theta$.
+\end{remark}
+\begin{remark}
+  If $H$ is not full rank, we should take the Moore-Penrose pseudoinverse instead.
+%  If $X$ is not full rank (overparametrized case), the parameter that minimizes the error is no loger well defined, as we have a manifold of feasible parameters.\\
+%  However, by \cite{hastie_2022} (Proposition 1), we know that \ref{eq:LRGF} always converges to the solution with minimum norm in the space spanned by columns of $X$.
+%  Therefore, starting from a random $\theta_0$, since the dynamics happens only on span$X$, we can redefine $\theta^\star$ as:
+%  $$\theta^\star:=(X^\top X)^{-1} X^\top y+\pi_{\mathrm{span}X ^\bot}\theta_0 = (X^\top X)^{-1} X^\top y + (\mathrm{Id}-X(X^\top X)^{-1} X^\top) \theta_0 .$$
 \end{remark}
 }
 In order to extend this to the case of every other $\eps\in(0,1)$ 
@@ -645,10 +649,23 @@ Substituting, we get:
 \end{equation*}
 %$$\frac{d}{d\,\tau}\mathcal{E}(\eps_\tau) = \tau e^{-(T-\tau)}\| (e^{-\tau} \theta_0 +(1-e^{-\tau})\theta^\star-\theta^\star_{-j}) \| -\tau e^{-T}\|\theta_0-\theta^\star\|=0.$$
 The above quantity is $0$ for $\tau = 0$ or when
-$$\|\theta_0+(e^\tau - 1)\theta^\star - e^\tau \theta^\star_{-j}\| = -\langle\theta_0-\theta^\star, e^{-\tau} \theta_0 +(1-e^{-\tau})\theta^\star-\theta^\star_{-j}\rangle .$$%\|\theta_0-\theta^\star\|$. 
-It is not clear to me that the second equality must not hold in general, but for example if $\theta_0=\theta^\star$, then clearly we have no solution.\\
-Assuming that also in the general case the second condition cannot hold, this means that $\tau\mapsto\mathcal{E}(\eps_\tau)$ is monotone in $[0,+\infty)$ and therefore the minimum on $E_s$ is achieved with $\eps_s$. 
+$$\|e^{-\tau} \theta_0 +(1-e^{-\tau})\theta^\star-\theta^\star_{-j}\|^2 = -\langle\theta_0-\theta^\star, e^{-\tau} \theta_0 +(1-e^{-\tau})\theta^\star-\theta^\star_{-j}\rangle .$$%\|\theta_0-\theta^\star\|$. 
+It is not clear to me when this equality holds in general, but for example if $\theta_0=\theta^\star$, then clearly we have no solution.
+If we have no solution, then $\tau\mapsto\mathcal{E}(\eps_\tau)$ is monotone in $[0,+\infty)$ and therefore the minimum on $E_s$ is achieved with $\eps_s$.
 
+\textbf{Example:} Let's consider the simple case of $X=\mathrm{Id}_d$ (the number of data points and parameters is the same) and $y=\boldsymbol{1}=(1,\dots,1)$.
+Then, we have that $\theta^\star=y$ and $\theta^\star_{-j}=\boldsymbol{1}-\hat e_j=(1,\dots,1,0,1,\dots,1)$ with $0$ at the $j$-th entry.
+Let us also pick $\theta_0=\boldsymbol{0}$. Now, we are trying to find $0<s \le \tau \le T$ that satisfies:
+
+$$ \|(1-e^{-\tau})\boldsymbol{1}-(\boldsymbol{1}-\hat e_j)\|^2 = -\langle -\boldsymbol{1}, (1-e^{-\tau})\boldsymbol{1}-(\boldsymbol{1}-\hat e_j) \rangle$$
+\noindent
+Recalling that $\|x\|^2=\langle x,x \rangle$, we can rewrite the above as:
+
+$$ \langle \hat e_j - (1+e^{-\tau})\boldsymbol{1}, (1-e^{-\tau})\boldsymbol{1}-(\boldsymbol{1}-\hat e_j)\rangle = 0 $$
+if and only if
+$$ 1-e^{-\tau} - d + d e^{-2\tau} + d + d e^{-\tau} - 1 - e^{-\tau} = 0,$$
+i.e., $d(e^{-\tau}+1)=2$. Therefore, in this case we have that $\tau = - \log (2/d-1)$ minimizes the sought quantity.
+However, note that, since $d\in\N$, the only time when this solution exists is for $d=1$ and indeed yields $\tau=0$.
 \paragraph{Linear functions} Consider the class of functions $\eps_{\mathrm{lin}, t_1}(t)$ such that:
 \begin{equation*}
   \eps_{\mathrm{lin}, t_1}(t)= \mathbbm{1}_{[0,s]}(t)+\mathbbm{1}_{[s,t_1]}(t)\left(1-\frac{(s-t)}{(s-t_1)}\right).
