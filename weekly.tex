@@ -1,3 +1,4 @@
+% !TeX TXS-program:compile = txs:///pdflatex/[--shell-escape]
 \documentclass[%
 	a4paper,%							A4 paper
 	oneside,%							oneside (left and right margin are equal)  - twoside if I want to print it as a book
@@ -36,6 +37,9 @@
 \usepackage{subcaption}
 % default path for figures
 \graphicspath{{images/}}
+% include SVG figures (also need the first line of this document
+% as well as having Inkscape installed
+\usepackage[inkscapearea=page]{svg}
 
 % Theorems
 \usepackage{amsthm}
@@ -722,51 +726,51 @@ If we choose $\eps = 0$, then $\hat\theta_{-j}(\eps) = \theta^\star_{-j}$. Thus 
   2\|\theta^\star_{-j}-\theta(0)\| + \frac{\langle \theta(0), \theta^\star_{-j}-\theta(0)\rangle}{\|\theta^\star_{-j}-\theta(0)\|}.
 \end{equation*}
 
-This quantity is indeed the maximum we can get, as the euclidean product is maximised when the two vectors are aligned.
-Therefore, $\eps=0$ is optimal.\\
-This means that at each time we should choose $\eps=0$, but, for $\eps(t)$ to be in $E_s$, we can only change it after $t=s$, meaning that $\mathbbm{1}_{[0,s]}$ is the solution to our minimization problem. 
+However, this may not be the maximum we can get!
+Indeed, if $\theta^\star_{-j}-\theta(0)$ is for example a line parallel to $\theta^\star_{-j}-\theta(0)$, choosing a bigger $\eps$ may be better.
+
+\vspace{0.2cm}\noindent
+\textbf{Example:} consider $X=(1,1)^\top$, $y=(y_1,y_2)^\top$, $j=1$. In this case, the system \ref{eq:eps_t} becomes:
+\begin{equation*}
+  \begin{cases}
+    \dot \theta = \eps(y_1-\theta)+(y_2-\theta) \\
+    \theta(0) = \theta_0 \in \R
+  \end{cases}.
+\end{equation*}
+Here, $\theta^\star_{-1}-\theta(0)$ is aligned with $\theta^\star_{-1}-\theta(0)$ and if we choose $\theta_0=0$, $y_1=2$, $y_2=1$, then the biggest step is actually achieved by $\eps = 1$.
+Indeed, $\hat\theta=y_1+y_2$ and $\hat\theta_{-1}=y_2$, since the general solution is $\theta(t)=e^{-(1+\eps)t}+(1-e^{-(1+\eps)t})(\eps y_1+y_2)$.
 
 \paragraph{Numerical experiments}
 Let's see if we can get some more insights with numerical experiments:
 \begin{figure}[ht]
 \centering
-\begin{subfigure}{0.3\textwidth}
+\begin{subfigure}{0.30\textwidth}
 \centering
-\includegraphics[width=\linewidth]{plot-452.png}
+\includegraphics[width=\linewidth]{1.pdf}
 \caption*{(a)}
 \end{subfigure}
-\begin{subfigure}{0.3\textwidth}
+\begin{subfigure}{0.30\textwidth}
 \centering
-\includegraphics[width=\linewidth]{plot-453.png}
+\includegraphics[width=\linewidth]{2.pdf}
 \caption*{(b)}
-\end{subfigure}
-\begin{subfigure}{0.3\textwidth}
-\centering
-\includegraphics[width=\linewidth]{plot-457.png}
-\caption*{(c)}
 \end{subfigure}
 
 \vspace{0.5em}
 
-\begin{subfigure}{0.3\textwidth}
+\begin{subfigure}{0.30\textwidth}
 \centering
-\includegraphics[width=\linewidth]{plot-460.png}
+\includegraphics[width=\linewidth]{3.pdf}
+\caption*{(c)}
+\end{subfigure}
+\begin{subfigure}{0.30\textwidth}
+\centering
+\includegraphics[width=\linewidth]{4.pdf}
 \caption*{(d)}
-\end{subfigure}
-\begin{subfigure}{0.3\textwidth}
-\centering
-\includegraphics[width=\linewidth]{plot-469.png}
-\caption*{(e)}
-\end{subfigure}
-\begin{subfigure}{0.3\textwidth}
-\centering
-\includegraphics[width=\linewidth]{plot-462.png}
-\caption*{(f)}
 \end{subfigure}
 
 \caption{Phase portrait of the numerical integration of the IVP \ref{eq:eps_t} for different $\eps(t)$ and initial conditions $\theta_0$ when $X\in\R^{20\times2}$.
-In (a) we can see that linear decay is slower than stepwise decay, comparing it with (b),(c),(d). In (b) we have $\eps=\mathbbm{1}_{[0,0.5]}$, whereas in (c) $\eps=\mathbbm{1}_{[0,1]}$. Apparently (c) is better than (b) in this case. 
-However, choosing another initial condition, as shown in (e) and (f), can yield the opposite result. Figure (d) shows that if, with the former $\theta_0$, we delay the deletion too much, the results depletes.
+In (a) we can see that changing $\eps$ too late in the training results in way worse results compared to $(b)$, where, if chosen carefully, $\eps>0$ can be faster than LOO. 
+However, choosing a different initial condition, as shown in (c), can lead to every $\eps>0$ to be suboptimal. Figure (d) shows that linear decay is slower than stepwise decay.
 }
 \label{fig:exp_2}
 \end{figure}
@@ -819,17 +823,14 @@ In particular, in addition to all previous observations, they highlight that D2D
   In \cite{kreer_bayesian_2025}, the researchers present an unlearning method that uses BIFs instead of IFs. The reason for this is we don't need to compute the iHVP to evaluate BIFs, therefore this method works better with more singular loss landscapes.
   As another consequence, we don't need to evaluate these quantities on local minima (we dont need the hessian to be invertible), which is one of the less realistic hypotheses for IFs.\\
   On the other hand, computations are not always faster than IFs (here, the leading cost is estimating the covariance between two elements) and achieving good results requires more hyperparameter tuning than classical methods.
-  {\color{RoyalBlue}
   \item Paper about machine unlearning with $\eps\neq0$ \cite{qiao_soft_2025}: they introduce a soft-weigthed framework for unlearning data with the aim of improving robustness or fairness.
   The main point is that if we are not in a privacy-related field, there is no need to completely forget a datapoint; instead, it would be more beneficial to consider it with a lower weight.
   Moreover, instead of training from scratch the model with the updated weights, the authors propose to correct the result of the usual training with influence functions.
   \item Something I had not seen yet in machine unlearning, but I have seen for example in plateau explanation \cite{Berthier_2024}: it can make more sense to consider influence functions in certain epochs of the training, not only at the end \cite{lee_timescales_2025}. 
   Indeed, the importance of a certain data point may change throughout the training.
-  }
 \end{itemize}
 
-
-\nocite{*}
+%\nocite{*}
 \bibliographystyle{plain}
 \bibliography{refs}
 
