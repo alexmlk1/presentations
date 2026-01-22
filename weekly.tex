@@ -564,20 +564,35 @@ With this goal in mind, let's rewrite explicitly \ref{eq:GF} in this specific ca
   \end{cases}.
 \end{equation}
 {\color{RoyalBlue} 
-This is a linear ODE, so we can find an explicit solution, which reads:
-\begin{equation*}
+This is a linear ODE, so, when $H$ is invertible, we can find an explicit solution, which reads:
+\begin{equation}\label{eq:sol_theta}
   \theta(t,1)=e^{-H t} \theta_0 +(\mathrm{Id}_d-e^{-H t})H^{-1}X^\top y .
-\end{equation*}
-\begin{remark}
-  In this case, $\theta^\star=\lim_{t\to\infty}\theta(t)=(X^\top X)^{-1} X^\top y = \hat \theta$.
-\end{remark}
-\begin{remark}
-  If $H$ is not full rank, we should take the Moore-Penrose pseudoinverse instead.
-%  If $X$ is not full rank (overparametrized case), the parameter that minimizes the error is no loger well defined, as we have a manifold of feasible parameters.\\
-%  However, by \cite{hastie_2022} (Proposition 1), we know that \ref{eq:LRGF} always converges to the solution with minimum norm in the space spanned by columns of $X$.
-%  Therefore, starting from a random $\theta_0$, since the dynamics happens only on span$X$, we can redefine $\theta^\star$ as:
-%  $$\theta^\star:=(X^\top X)^{-1} X^\top y+\pi_{\mathrm{span}X ^\bot}\theta_0 = (X^\top X)^{-1} X^\top y + (\mathrm{Id}-X(X^\top X)^{-1} X^\top) \theta_0 .$$
-\end{remark}
+\end{equation}
+
+\begin{lemma}
+  The system \ref{eq:LRGF} has a unique asymptotically stable equilibrium point:
+  \begin{equation*}
+    \theta^\star=(X^\top X)^\dagger X^\top y + (\mathrm{Id}_d - X^\top (X X^\top)^\dagger X)\theta_0 ,
+  \end{equation*}
+  where $A^\dagger$ denotes the Moore-Penrose pseudo-inverse.
+  In particular, when $X^\top X$ is invertible, we get:
+  $$\theta^\star=\lim_{t\to\infty}\theta(t,1)=(X^\top X)^{-1} X^\top y =\hat\theta_{\mathrm{LS}}.$$
+\end{lemma}
+
+\begin{proof}
+  The case of $H$ invertible can be proven by looking at the explicit solution stated above: for $t\to\infty$, it yelds: $\theta^\star=H^{-1}X^\top y=:\hat\theta_{\mathrm{LS}}$.
+  When $\mathrm{rnk} H=\mu<d$, let us begin by observing that since $H=X^\top X$, $H$ is diagonalizable, i.e., there exists $Q$ orthogonal matrix such that $H=Q^\top D Q$.
+  Therefore, up to permutation matrices, we can rewrite $D$ as diag$(d_1,\dots,d_\mu,0,\dots,0)$ where $d_1,\dots,d_\mu\neq0$ and we have $d-\mu$ zero entries.
+  By the definition of the matrix exponential, it holds true that $e^{-Ht}=Q^\top e^{-Dt} Q$ and $e^{Dt}=\mathrm{diag}(e^{d_1 t},\dots,e^{d_\mu t},1,\dots,1)$.
+  For this reason, we can consider the two invariant subspaces $\mathrm{ran}H\oplus\mathrm{ker}H$ and study the dynamic in these two sets.
+  \begin{itemize}
+    \item In $\mathrm{ker}H$, applying the formula \ref{eq:sol_theta} we get $\theta(t,1)=\pi_{\mathrm{ker}H}\theta_0$;
+    \item In $\mathrm{ran}H$, the same formula, if we call $\tilde H=H\vert_{\mathrm{ran}H}$, yields $\theta(t,1)=e^{-\tilde H t} \pi_{\mathrm{ran}H}\theta_0 +(\mathrm{Id}_d-e^{-\tilde H t})\tilde H^{-1}\tilde X^\top \pi_{\mathrm{ran}H}y$.
+  \end{itemize}
+  To conclude, observe that $\mathrm{ker}H=\mathrm{ker}X$ and $\mathrm{ran}H=\mathrm{ran}X^\top$.
+  Therefore, $\pi_{\mathrm{ker}H} = \pi_{(\mathrm{ran}X^\top)^\bot} = I-X^\top (X X^\top)^\dagger X$ (note that here the M-P pseudoinverse pops up naturally from the request of $\pi^2=\pi$) and the projections in the second case are not needed.
+  The thesis is achieved by glueing together the results in the two subspaces.
+\end{proof}
 }
 In order to extend this to the case of every other $\eps\in(0,1)$ 
 \footnote{for $\eps=0$ consider for simplicity $X',y'$ obtained by removing the target datapoint, otherwise we can integrate that case in the general one using the Moore-Penrose pseudoinverse}, 
@@ -587,7 +602,6 @@ Solving \eqref{eq:LRGF} with the above quantities defines:
   \theta(t,\eps)= e^{-H^j_\eps t} \theta_0 +(\mathrm{Id}_d-e^{-H^j_\eps t})\hat\theta_{-j}(\eps) .
 \end{equation}
 With $s,T$ fixed, what we want to study is what is the "fastest route" to $\theta^\star_{-j}$ when we change $\eps_s(t)$.
-{\color{RoyalBlue}
 In other words, we are trying to solve:
 \begin{equation}\label{eq:obs_meas}
   \min_{\eps\in E_s}\mathcal{E}(\eps)\quad \text{where}\quad \mathcal{E}(\eps)=\frac12\|\xi(0,T,\eps;\theta(0))-\theta^\star_{-j}\|_\Theta^2
@@ -628,27 +642,38 @@ we cannot obtain a closed form solution anymore. In fact, even if we rewrite the
 and use the method of the Wronskian with the variation of constants, that does not yield a closed-form solution in the general case\footnote{This method requires $\eps\in C^1$ because to apply the Wronskian we need to take another derivative in the homogeneous equation and consider $\ddot\theta-\dot\theta a(t) - \theta \dot a(t)$.}.\\
 Let's see what happens instead for simpler cases doing computations by hand. In the following, consider $s>0$ fixed.
 
-\paragraph{Step functions} Is $\mathbbm{1}_{[0,s]}$ the best step function we can choose in $E_s$?\\
-Consider $\eps_\tau = \mathbbm{1}_{[0,\tau]}$. We computed above that for step functions, the quantity we want to minimize has the form:
+{\color{RoyalBlue}
+\paragraph{Step functions} Is $\mathbbm{1}_{[0,s]}$ the best step function we can choose in $E_s$?
+
+\begin{lemma}
+  Given $0\le s < T$, the $\tau$ that minimizes $\mathcal{E}(\eps_\tau)$ in $\{\eps_\tau=\mathbbm{1}_{[0,\tau]} \mid \tau\in[s,T]\}$ is either $\tau = s$ or the solution of:
+  \begin{equation*}
+    \|e^{-\tau} \theta_0 +(1-e^{-\tau})\theta^\star-\theta^\star_{-j}\|^2 = -\langle\theta_0-\theta^\star, e^{-\tau} \theta_0 +(1-e^{-\tau})\theta^\star-\theta^\star_{-j}\rangle
+  \end{equation*}.
+\end{lemma}
+
+\begin{proof}
+We computed above that for step functions, the quantity we want to minimize has the form:
 $$\mathcal{E}(\eps_\tau) = \frac12\|e^{-H_{-j}(T-\tau)} (e^{-H \tau} \theta_0 +(\mathrm{Id}_d-e^{-H \tau})\theta^\star-\theta^\star_{-j}) \|^2.$$
-Assuming for simplicity that $H=\mathrm{Id}_d$, we can rewrite the above quantity as:
-$$ \mathcal{E}(\eps_\tau) = \frac12\|e^{-(T-\tau)} (e^{-\tau} \theta_0 +(\mathrm{Id}_d-e^{-\tau})\theta^\star-\theta^\star_{-j}) \|^2. $$
+Assuming for simplicity that $H=\mathrm{Id}_d$ and $j=d$, we can easily compute that $H_{-j}=\mathrm{diag}(1,\dots,1,0)$.
+We can then rewrite the above quantity as:
+$$ \mathcal{E}(\eps_\tau) = \frac12\|e^{-(T-\tau)H_{-j}} (e^{-\tau} \theta_0 +(\mathrm{Id}_d-e^{-\tau})\theta^\star-\theta^\star_{-j}) \|^2. $$
 To find the optimal $\tau\in [s,T)$, let's compute the derivative in $\tau$ of the previous quantity and study when it is equal to $0$.\\
 Recall that $\|x\|^2=\langle x,x \rangle$. 
-Therefore, if we call $g(\tau)=e^{-(T-\tau)} (e^{-\tau} \theta_0 +(\mathrm{Id}_d-e^{-\tau})\theta^\star-\theta^\star_{-j})$, we get that $\frac{d}{d\,t}\mathcal{E}(\eps_\tau)= \langle g(\tau), g'(\tau) \rangle$.
+Therefore, if we call $g(\tau)=e^{-(T-\tau)H_{-j}} (e^{-\tau} \theta_0 +(\mathrm{Id}_d-e^{-\tau})\theta^\star-\theta^\star_{-j})$, we get that $\frac{d}{d\,t}\mathcal{E}(\eps_\tau)= \langle g(\tau), g'(\tau) \rangle$.
 First, let's compute $g'(\tau)$:
-$$\frac{d}{d\,\tau}g(\tau) = \tau e^{-(T-\tau)}(e^{-\tau} \theta_0 +(1-e^{-\tau})\theta^\star-\theta^\star_{-j}) -\tau e^{-T}(\theta_0-\theta^\star).$$
+$$\frac{d}{d\,\tau}g(\tau) = \tau e^{-(T-\tau)H_{-j}}(e^{-\tau} \theta_0 +(1-e^{-\tau})\theta^\star-\theta^\star_{-j}) -\tau e^{-T}(\theta_0-\theta^\star).$$
 
 Substituting, we get:
 \begin{equation*}
   \begin{aligned}
-    \frac{d}{d\,\tau}\mathcal{E}(\eps_\tau) & = \langle g(\tau), g'(\tau) \rangle = \\
-    & = \langle \tau e^{-(T-\tau)}(e^{-\tau} \theta_0 +(1-e^{-\tau})\theta^\star-\theta^\star_{-j}) + \\
-    & -\tau e^{-T}(\theta_0-\theta^\star),
-     e^{-(T-\tau)} (e^{-\tau} \theta_0 +(\mathrm{Id}_d-e^{-\tau})\theta^\star-\theta^\star_{-j}) \rangle = \\
-    & = e^{-2(T-\tau)} \langle \tau((e^{-\tau} \theta_0 +(1-e^{-\tau})\theta^\star-\theta^\star_{-j})+\theta_0+\\
+    \frac{d}{d\,\tau}\mathcal{E}(\eps_\tau) & = \langle g'(\tau), g(\tau) \rangle = \\
+    & = \langle \tau e^{-(T-\tau)H_{-j}}(e^{-\tau} \theta_0 +(1-e^{-\tau})\theta^\star-\theta^\star_{-j}) + \\
+    & -\tau e^{-TH_{-j}}(\theta_0-\theta^\star),
+     e^{-(T-\tau)H_{-j}} (e^{-\tau} \theta_0 +(\mathrm{Id}_d-e^{-\tau})\theta^\star-\theta^\star_{-j}) \rangle = \\
+    & = e^{-2(T-\tau)H_{-j}} \langle \tau((e^{-\tau} \theta_0 +(1-e^{-\tau})\theta^\star-\theta^\star_{-j})+\theta_0+\\
     & - \theta^\star), e^{-\tau} \theta_0 +(1-e^{-\tau})\theta^\star-\theta^\star_{-j} \rangle = \\
-    & = \tau e^{-2(T-\tau)} (\|e^{-\tau} \theta_0 +(1-e^{-\tau})\theta^\star-\theta^\star_{-j}\|^2 + \langle\theta_0-\theta^\star, e^{-\tau} \theta_0 +(1-e^{-\tau})\theta^\star-\theta^\star_{-j}\rangle)
+    & = \tau e^{-2(T-\tau)H_{-j}} (\|e^{-\tau} \theta_0 +(1-e^{-\tau})\theta^\star-\theta^\star_{-j}\|^2 + \langle\theta_0-\theta^\star, e^{-\tau} \theta_0 +(1-e^{-\tau})\theta^\star-\theta^\star_{-j}\rangle)
   \end{aligned}
 \end{equation*}
 %$$\frac{d}{d\,\tau}\mathcal{E}(\eps_\tau) = \tau e^{-(T-\tau)}\| (e^{-\tau} \theta_0 +(1-e^{-\tau})\theta^\star-\theta^\star_{-j}) \| -\tau e^{-T}\|\theta_0-\theta^\star\|=0.$$
@@ -656,6 +681,7 @@ The above quantity is $0$ for $\tau = 0$ or when
 $$\|e^{-\tau} \theta_0 +(1-e^{-\tau})\theta^\star-\theta^\star_{-j}\|^2 = -\langle\theta_0-\theta^\star, e^{-\tau} \theta_0 +(1-e^{-\tau})\theta^\star-\theta^\star_{-j}\rangle .$$%\|\theta_0-\theta^\star\|$. 
 It is not clear to me when this equality holds in general, but for example if $\theta_0=\theta^\star$, then clearly we have no solution.
 If we have no solution, then $\tau\mapsto\mathcal{E}(\eps_\tau)$ is monotone in $[0,+\infty)$ and therefore the minimum on $E_s$ is achieved with $\eps_s$.
+\end{proof}
 
 \textbf{Example:} Let's consider the simple case of $X=\mathrm{Id}_d$ (the number of data points and parameters is the same) and $y=\boldsymbol{1}=(1,\dots,1)$.
 Then, we have that $\theta^\star=y$ and $\theta^\star_{-j}=\boldsymbol{1}-\hat e_j=(1,\dots,1,0,1,\dots,1)$ with $0$ at the $j$-th entry.
@@ -663,13 +689,30 @@ Let us also pick $\theta_0=\boldsymbol{0}$. Now, we are trying to find $0<s \le 
 
 $$ \|(1-e^{-\tau})\boldsymbol{1}-(\boldsymbol{1}-\hat e_j)\|^2 = -\langle -\boldsymbol{1}, (1-e^{-\tau})\boldsymbol{1}-(\boldsymbol{1}-\hat e_j) \rangle$$
 \noindent
-Recalling that $\|x\|^2=\langle x,x \rangle$, we can rewrite the above as:
+Direct computations yield:
 
-$$ \langle \hat e_j - (1+e^{-\tau})\boldsymbol{1}, (1-e^{-\tau})\boldsymbol{1}-(\boldsymbol{1}-\hat e_j)\rangle = 0 $$
+$$ (d-1)(-e^{-\tau})^2 + (1-e^{-\tau})^2 = -(d-1) e^{-\tau} + 1 - e^{-\tau} $$
 if and only if
-$$ 1-e^{-\tau} - d + d e^{-2\tau} + d + d e^{-\tau} - 1 - e^{-\tau} = 0,$$
-i.e., $d(e^{-\tau}+1)=2$. Therefore, in this case we have that $\tau = - \log (2/d-1)$ minimizes the sought quantity.
+$$ d e^{-2\tau} -2 e^{-\tau} = -d e^{-\tau},$$
+i.e., $e^{-\tau}=\frac{2}{d}-1$. Therefore, in this case we have that $\tau = - \log (2/d-1)$ minimizes the sought quantity.
 However, note that, since $d\in\N$, the only time when this solution exists is for $d=1$ and indeed yields $\tau=0$.
+
+Aiming at a more exhaustive study, let us also examine the more general case where $y$ is a generic vector and $\theta_0=\boldsymbol{0}$ (I think it's equivalent to study the problem fixing $\theta_0$ or $y$).
+
+\begin{corollary}
+  If $\theta_0=(0,\dots,0)$, the optimal switch time $\tau^*$ is greater than $s$ if and only if $1 < \|y\|_2^2 < \frac{2}{1+e^{-T}}$.
+\end{corollary}
+
+\begin{proof}
+  Substituting back in the previous equations, we can express that must hold the equality:
+  $$ \langle \hat e_j - (1+e^{-\tau})y, (1-e^{-\tau})y-(y-\hat e_j)\rangle = 0, $$
+  i.e.,
+  $$ (1-e^{-\tau})y_j  + (e^{-2\tau} - 1)\|y\|_2^2 + (1 + e^{-\tau})\|y\|_2^2 - (1 + e^{-\tau})y_j = 0.$$
+
+  Thus, in this case holds that $\tau=-\log(2/\|y\|_2^2-1)$, meaning that for $1 < \|y\|_2^2 < \frac{2}{1+e^{-T}}$, the optimal $\eps(t)$ may not be $\eps_s(t)$.
+
+\end{proof}
+
 \paragraph{Linear functions} Consider the class of functions $\eps_{\mathrm{lin}, t_1}(t)$ such that:
 \begin{equation*}
   \eps_{\mathrm{lin}, t_1}(t)= \mathbbm{1}_{[0,s]}(t)+\mathbbm{1}_{[s,t_1]}(t)\left(1-\frac{(s-t)}{(s-t_1)}\right).
@@ -774,9 +817,8 @@ However, choosing a different initial condition, as shown in (c), can lead to ev
 }
 \label{fig:exp_2}
 \end{figure}
-From the results in Figure \ref{fig:exp_2}, the function $\mathbbm{1}_{[0,s]}$ appears not to be the minimizer for every instance of the problem. 
-Since the proof in the previous paragraph looks correct, I'm assuming this error stems from the assumption $H=Id$, as we assumed the same to prove the general statement.
-What seems to hold, however, is that step functions are better than polynomial decay.
+From the results in Figure \ref{fig:exp_2}, the function $\mathbbm{1}_{[0,s]}$ appears not to be the minimizer for every instance of the problem, as proven in the stepfunction paragraph. 
+Moreover, it seems to hold that step functions are better than polynomial decay.
 % Another method that may produce some more interesting results is the application of optimal control theory.
 % Namely, we can apply the Pontryagin Maximum Principle for linear equations with variable coefficients (cf. \cite{pontryagin_max_princ} Theorem 15 p.184):
 % \begin{theorem}[PMP]
