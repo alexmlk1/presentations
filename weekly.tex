@@ -581,9 +581,9 @@ This is a linear ODE, so, when $H$ is invertible, we can find an explicit soluti
 
 \begin{proof}
   The case of $H$ invertible can be proven by looking at the explicit solution stated above: for $t\to\infty$, it yelds: $\theta^\star=H^{-1}X^\top y=:\hat\theta_{\mathrm{LS}}$.
-  When $\mathrm{rnk} H=\mu<d$, let us begin by observing that since $H=X^\top X$, $H$ is diagonalizable, i.e., there exists $Q$ orthogonal matrix such that $H=Q^\top D Q$.
-  Therefore, up to permutation matrices, we can rewrite $D$ as diag$(d_1,\dots,d_\mu,0,\dots,0)$ where $d_1,\dots,d_\mu\neq0$ and we have $d-\mu$ zero entries.
-  By the definition of the matrix exponential, it holds true that $e^{-Ht}=Q^\top e^{-Dt} Q$ and $e^{Dt}=\mathrm{diag}(e^{d_1 t},\dots,e^{d_\mu t},1,\dots,1)$.
+  When $\mathrm{rnk} H=r<d$, let us begin by observing that since $H=X^\top X$, $H$ is diagonalizable, i.e., there exists $Q$ orthogonal matrix such that $H=Q^\top D Q$.
+  Therefore, up to permutation matrices, we can rewrite $D$ as diag$(d_1,\dots,d_r,0,\dots,0)$ where $d_1,\dots,d_r\neq0$ and we have $d-r$ zero entries.
+  By the definition of the matrix exponential, it holds true that $e^{-Ht}=Q^\top e^{-Dt} Q$ and $e^{Dt}=\mathrm{diag}(e^{d_1 t},\dots,e^{d_r t},1,\dots,1)$.
   For this reason, we can consider the two invariant subspaces $\mathrm{ran}H\oplus\mathrm{ker}H$ and study the dynamic in these two sets.
   \begin{itemize}
     \item In $\mathrm{ker}H$, applying the formula \ref{eq:sol_theta} we get $\theta(t,1)=\pi_{\mathrm{ker}H}\theta_0$;
@@ -648,7 +648,7 @@ Let's see what happens instead for simpler cases doing computations by hand. In 
 {\color{RoyalBlue}
 \paragraph{Step functions} Is $\mathbbm{1}_{[0,s]}$ the best step function we can choose in $E_s$?
 
-\begin{lemma}
+\begin{lemma}\label{le:step_eps}
   Assume $H=\mathrm{Id_d}$. 
   Given $0\le s < T$, the $\tau$ that minimizes $\mathcal{E}(\eps_\tau)$ in $\{\eps_\tau=\mathbbm{1}_{[0,\tau]} \mid \tau\in[s,T]\}$ is $\eps_s$.
 \end{lemma}
@@ -656,10 +656,20 @@ Let's see what happens instead for simpler cases doing computations by hand. In 
 \begin{proof}
 We computed above that for step functions, the quantity we want to minimize has the form:
 $$\mathcal{E}(\eps_\tau) = \frac12\|e^{-H_{-j}(T-\tau)} (e^{-H \tau} \theta_0 +(\mathrm{Id}_d-e^{-H \tau})\theta^\star-\theta^\star_{-j}) \|^2.$$
-Assuming for simplicity that $H=\mathrm{Id}_d$ and $j=d$, we can easily compute that $H_{-j}=\mathrm{diag}(1,\dots,1,0)$.
-Moreover, note that both $H_{-j}$ and $(H_{-j}-\mathrm{Id}_d)$ are projections, i.e., they have the property that $P^2=P$ and therefore $e^{a P}=\mathrm{Id_d}+(e^a-1)P$.
-We can then rewrite the above quantity as:
+Assuming for simplicity that $H=\mathrm{Id}_d$, we can prove that both $H_{-j}$ and $(H_{-j}-\mathrm{Id}_d)$ are projections, i.e., they have the property that $P^2=P$.
+In fact, $H=\mathrm{Id}_d$ iff $X$ is orthogonal. Thus (call $X_{-j}=(I-\hat e_j)X$):
+\begin{equation*}
+  H_{-j} = X_{-j}^\top X_{-j} = X^\top(I-\hat e_j)^\top(I-\hat e_j)X ,
+\end{equation*}
+and, since $X^\top X = \mathrm{Id}_d$ and $(I-\hat e_j)$ is a projection:
+\begin{equation*}
+  H_{-j}^2 = X^\top(I-\hat e_j)^\top(I-\hat e_j)X X^\top(I-\hat e_j)^\top(I-\hat e_j)X = X^\top (I-\hat e_j) X = H_{-j} .
+\end{equation*}
+Moreover, it holds that $H_{-j}=\mathrm{Id}_d-v^\top v$ where $v=X^\top e_j$.
+Using the fact that for a projection $P$ holds $e^{a P}=\mathrm{Id_d}+(e^a-1)P$, we can then rewrite $\mathcal{E}(\eps_\tau)$ as:
+
 $$ \mathcal{E}(\eps_\tau) = \frac12\|e^{-(T-\tau)H_{-j}} (e^{-\tau} \theta_0 +(\mathrm{Id}_d-e^{-\tau})\theta^\star-\theta^\star_{-j}) \|^2. $$
+
 To find the optimal $\tau\in [s,T)$, let's compute the derivative in $\tau$ of the previous quantity and study when it is equal to $0$.\\
 Recall that $\|x\|^2=\langle x,x \rangle$. 
 Thus, if we call 
@@ -708,9 +718,17 @@ Differentiating $\mathcal{E}$, we get:
   \end{aligned}
 \end{equation*}
 
-The above derivative is non-negative and it is $0$ only when the two norms are zero, which is not possible by definition of $\theta^\star$ and $\theta^\star_{-j}$ and the assumption of $H=\mathrm{Id_d}$ (implying $X$ full rank). \\
-Therefore, the function $\mathcal{E}(\tau)$ attains its minimum on the interval $[s,T]$ on $s$, making $\eps_s$ the best candidate among the step functions.
+The above derivative is always positive unless both norms annihilate, which is a probability zero event if we randomly initialise the starting point.
+In such case, $\mathcal{E}(\tau)$ is constant because removing the $j$-th datapoint does not change the learning trajectory.\\
+We can thus conclude that the function $\mathcal{E}(\tau)$ attains its minimum on the interval $[s,T]$ on $s$, making $\eps_s$ the best candidate among the step functions.
 \end{proof}
+
+\begin{remark}
+  If we do not assume $H=\mathrm{I}$, the derivative of $g(\tau)$ has the following form:
+  $$\frac{d}{d\,t} g(\tau) = e^{-(T-\tau) H_{-j}}\left( [H_{-j}-H]e^{-\tau H}(\theta_0-\theta^\star) + H_{-j}(\theta^\star - \theta^\star_{-j}) \right),$$
+  and, when taking the scalar product, we cannot infer anything if we can't remove matrix exponentials.\\
+  Therefore, so far the best thing we can do is solve the case where $X^\top X$ and $X_{-j}^\top X_{-j}$ are projections.
+\end{remark}
 
 % \textbf{Example:} Let's consider the simple case of $X=\mathrm{Id}_d$ (the number of data points and parameters is the same) and $y=\boldsymbol{1}=(1,\dots,1)$.
 % Then, we have that $\theta^\star=y$ and $\theta^\star_{-j}=\boldsymbol{1}-\hat e_j=(1,\dots,1,0,1,\dots,1)$ with $0$ at the $j$-th entry.
@@ -746,7 +764,7 @@ Therefore, the function $\mathcal{E}(\tau)$ attains its minimum on the interval 
 \begin{figure}[hbt]
   \centering
   \includegraphics[width=0.6\linewidth]{5.pdf}
-  \caption{Plot representing the training trajectories for $X=\mathrm{Id_2}$, $y=(1,1)$ and $\theta_0=(0,0)$.}
+  \caption{Plot representing the training trajectories for $X=\mathrm{Id_2}$, $y=(1,1)$, $\theta_0=(0,0)$ and $j=2$.}
 \end{figure}
 
 \paragraph{Linear functions} Consider the class of functions $\eps_{\mathrm{lin}, t_1}(t)$ such that:
@@ -874,6 +892,30 @@ Moreover, it seems to hold that step functions are better than polynomial decay.
 % On the negative side, however, this theorem does not solve our problem! In fact, we are not seeking a time-optimal solution (as the time required to get to the optimal point will always be infinite).\\
 % We can circumvent this issue by considering a point which is not critical but it's close enough to $\hat\theta$ as an endpoint. 
 % At this point, we don't need to consider the problem as in \ref{eq:obs_meas}; instead, we can treat it as a time-minimal problem.
+
+\subsection*{Choice of distance measure}
+
+In the definition of our minimization problem in \ref{eq:obs_meas}, the choice of $\mathcal{E}(\eps)$ was arbitrary.
+What is important, is that $\mathcal{E}(\eps)=d(\eps,0)$ for some $d:E_s\times [0,1]^{[0,+\infty]} \to \R$ distance in the metric space of functions from $\R_+$ to $[0,1]$.
+Let's discuss more in detail some choices for $d(\eps)=d(\eps,0)$ and what does it mean to implement them.
+\begin{itemize}
+  \item $d(\eps) = \frac12 \|\xi(0,T,\eps;\theta(0))-\xi(0,+\infty,0;\theta(0))\|^2_\Theta$ : 
+  minimizing this quantity is equi\-valent to minimize $\|\frac{1}{2}\|\xi(0,T,\eps;\theta(0))-\theta^\star_{-j}\|_\Theta$, which is the distance in the space of parameters between the optimal
+  parameter for the LOO retraining and the parameter obtained at time $T$ of training with the weight switch $\eps\in E_s$.
+  In simpler words: "we take the most out of your data before completely forgetting about it".
+  
+  \item $d(\eps) = \frac12 \|\xi(0,T,\eps;\theta(0))-\xi(0,T,0;\theta(0))\|^2_\Theta$ : 
+  in this case, we are comparing the trajectory for the LOO with the one obtained changing weights with $\eps(t)$ at the same final time $T$.
+  Simply said: "at the moment of removing your data, we learnt the same as if we hadn't been using your data from the start".
+  
+  \item $d(\eps) = \frac12 \min_{t>0}\|\xi(0,T,\eps;\theta(0))-\xi(0,t,0;\theta(0))\|^2_\Theta$ : 
+  this choice is more difficult to implement, as it is a double minimization problem. 
+  In fact, we are trying to find the final point of trajectory obtained by training with $\eps(t)$ which is closest to the orbit of parameters trained with LOO.
+  The advantage compared to the first option is that we are more likely to be close the LOO trajectory; in relation with the second distance, this one ensures a better usage of the informations, as we can end up farther. 
+  In other words: "We used your data to speed up the training we would have achieved without your information".  
+\end{itemize} 
+As far as proofs are concerned, in the stepwise case, Lemma \ref{le:step_eps} works for all 3 of the above cases, since we never utilize any property of $\theta^\star_{-j}$.
+
 }
 
 \section*{Algorithm implementations: D2D vs R2D}
