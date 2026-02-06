@@ -1,4 +1,4 @@
-weekly.aux
+*.aux
 weekly.bbl
 weekly.fdb_latexmk
 weekly.fls
