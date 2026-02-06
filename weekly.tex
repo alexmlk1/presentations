@@ -654,30 +654,30 @@ Let's see what happens instead for simpler cases doing computations by hand. In 
 \end{lemma}
 
 \begin{proof}
-We computed above that for step functions, the quantity we want to minimize has the form:
-$$\mathcal{E}(\eps_\tau) = \frac12\|e^{-H_{-j}(T-\tau)} (e^{-H \tau} \theta_0 +(\mathrm{Id}_d-e^{-H \tau})\theta^\star-\theta^\star_{-j}) \|^2.$$
-Assuming for simplicity that $H=\mathrm{Id}_d$, we can prove that both $H_{-j}$ and $(H_{-j}-\mathrm{Id}_d)$ are projections, i.e., they have the property that $P^2=P$.
-In fact, $H=\mathrm{Id}_d$ iff $X$ is orthogonal. Thus (call $X_{-j}=(I-\hat e_j)X$):
+Starting from the assumption that $H=\mathrm{Id}_d$, we can prove that both $H_{-j}$ and $(H_{-j}-\mathrm{Id}_d)$ are projections, i.e., they have the property that $P^2=P$.
+In fact, $H=\mathrm{Id}_d$ iff $X$ is orthogonal. Thus (call $X_{-j}=(I-\hat e_j \hat e_j^\top)X$):
 \begin{equation*}
-  H_{-j} = X_{-j}^\top X_{-j} = X^\top(I-\hat e_j)^\top(I-\hat e_j)X ,
+  H_{-j} = X_{-j}^\top X_{-j} = X^\top(I-\hat e_j \hat e_j^\top)^\top(I-\hat e_j \hat e_j^\top)X ,
 \end{equation*}
-and, since $X^\top X = \mathrm{Id}_d$ and $(I-\hat e_j)$ is a projection:
+and, since $X X^\top = \mathrm{Id}_d$ and $(I-\hat e_j  \hat e_j^\top)$ is a projection:
 \begin{equation*}
-  H_{-j}^2 = X^\top(I-\hat e_j)^\top(I-\hat e_j)X X^\top(I-\hat e_j)^\top(I-\hat e_j)X = X^\top (I-\hat e_j) X = H_{-j} .
+  H_{-j}^2 = X^\top(I-\hat e_j \hat e_j^\top)^\top(I-\hat e_j \hat e_j^\top)X X^\top(I-\hat e_j \hat e_j^\top)^\top(I-\hat e_j \hat e_j^\top)X = X^\top (I-\hat e_j \hat e_j^\top) X = H_{-j} .
 \end{equation*}
-Moreover, it holds that $H_{-j}=\mathrm{Id}_d-v^\top v$ where $v=X^\top e_j$.
+Moreover, it holds that $H_{-j}=\mathrm{Id}_d- v v^\top$ where $v=X^\top e_j = x_j$.
 Using the fact that for a projection $P$ holds $e^{a P}=\mathrm{Id_d}+(e^a-1)P$, we can then rewrite $\mathcal{E}(\eps_\tau)$ as:
 
-$$ \mathcal{E}(\eps_\tau) = \frac12\|e^{-(T-\tau)H_{-j}} (e^{-\tau} \theta_0 +(\mathrm{Id}_d-e^{-\tau})\theta^\star-\theta^\star_{-j}) \|^2. $$
+\begin{equation*}
+  \begin{aligned}
+    \mathcal{E}(\eps_\tau) &= \frac12\|e^{-(T-\tau)H_{-j}} (e^{-\tau} \theta_0 +(\mathrm{Id}_d-e^{-\tau})\theta^\star-\theta^\star_{-j}) \|^2 \\
+    &= \frac12 \|\left(\mathrm{Id}_d + (e^{-(T-\tau)}-1) H_{-j} \right) (e^{-\tau} \theta_0 +(\mathrm{Id}_d-e^{-\tau})\theta^\star-\theta^\star_{-j})\|^2 .
+  \end{aligned}
+\end{equation*}
 
 To find the optimal $\tau\in [s,T)$, let's compute the derivative in $\tau$ of the previous quantity and study when it is equal to $0$.\\
 Recall that $\|x\|^2=\langle x,x \rangle$. 
 Thus, if we call 
 \begin{equation*}
-  \begin{aligned}
-    g(\tau) &= e^{-(T-\tau)H_{-j}} (e^{-\tau} \theta_0 +(\mathrm{Id}_d-e^{-\tau})\theta^\star-\theta^\star_{-j}) = \\
-    &= \left(\mathrm{Id}_d + (e^{-(T-\tau)}-1) H_{-j} \right) (e^{-\tau} \theta_0 +(\mathrm{Id}_d-e^{-\tau})\theta^\star-\theta^\star_{-j}),
-  \end{aligned}
+  g(\tau) = \left(\mathrm{Id}_d + (e^{-(T-\tau)}-1) H_{-j} \right) (e^{-\tau} \theta_0 +(\mathrm{Id}_d-e^{-\tau})\theta^\star-\theta^\star_{-j}),
 \end{equation*}
 we get that $\frac{d}{d\,t}\mathcal{E}(\eps_\tau)= \langle g(\tau), g'(\tau) \rangle$.
 First, let's compute $g'(\tau)$:
@@ -688,7 +688,7 @@ First, let's compute $g'(\tau)$:
     & = e^{-(T-\tau)} H_{-j}(\theta^\star -\theta^\star_{-j}) +\left(\mathrm{Id}_d - H_{-j} \right)(-e^{-\tau} \theta_0 +e^{-\tau}\theta^\star).
     \end{aligned}
 \end{equation*}
-Differentiating $\mathcal{E}$, we get:
+Consequently, differentiating $\mathcal{E}$, yields:
 \begin{equation*}
   \begin{aligned}
     \frac{d}{d\,\tau}\mathcal{E}(\eps_\tau)
@@ -778,11 +778,11 @@ The main problem is that now in \ref{eq:eps_t} from $s$ to $t_1$ we have the fol
     \theta(0) = \xi(0,s,1;\theta_0)
   \end{cases} .
 \end{equation*}
-To try solve this, let's define $r(t)=t$, thus $\dot r = 1$. Then, we can the previous equation as a dynamical system:
+To try solve this, let's define $\psi(t)=t$, thus $\dot \psi = 1$. Then, we can the previous equation as a dynamical system:
 \begin{equation}
   \begin{cases}
-    \dot \theta(t) = \left(-\sum_{i\neq j} x_i x_i^\top \right)\theta(t) + \frac{x_j x_j^\top}{s-t_1} \theta(t) r(t) + \left(\sum_{i\neq j}x_i y_i + (1-\frac{s}{(s-t_1)})x_j y_j\right) \\
-    \dot r(t) = 1
+    \dot \theta(t) = \left(-\sum_{i\neq j} x_i x_i^\top \right)\theta(t) + \frac{x_j x_j^\top}{s-t_1} \theta(t) \psi(t) + \left(\sum_{i\neq j}x_i y_i + (1-\frac{s}{(s-t_1)})x_j y_j\right) \\
+    \dot \psi(t) = 1
   \end{cases}.
 \end{equation}
 Note that this system is a special case of an inhomogeneous Lotka-Volterra system and it has no closed form solution.
