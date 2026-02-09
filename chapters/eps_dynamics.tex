@@ -184,6 +184,10 @@ We can thus conclude that the function $\mathcal{E}(\tau)$ attains its minimum o
     & \big\langle H_{-j}(\theta^\star - \theta^\star_{-j}), \theta^\star - \theta^\star_{-j} \big\rangle_{e^{-(T-\tau) H_{-j}}} .
   \end{aligned}
   \end{equation*}
+  In general, we have to be careful also because $H$ and $H_{-j}$ do not commute. 
+  In fact, we can rewrite $H=\sum_{i=1}^n x_j x_j^\top$ and $H_{-j}=H-x_j x_j^\top$ and observe that the commutator is:
+  $$[x_i x_i^\top, x_j x_j^\top]= (x_i^\top x_j) (x_i x_j^\top - x_j x_i^\top).$$
+  Thus, $H$ and $H_{-j}$ commute only when $x_i \bot x_j$ or $x_i=x_j$ for each $i \neq j$.
 \end{remark}
 Note that usually in practice $n>d$ and both $H$ and $H_{-j}$ are full rank. \\
 It can also happen that $H_{-j} = H$, for example when $x_j$ is a linear combination of the other $x_i$'s, but in that case, $\theta^\star_{-j}=\theta^\star$ and the derivative is $0$.
@@ -360,21 +364,28 @@ In the literature, I could find two different definitions for this concept, whic
   \item Same distribution \cite{papernot_unlearning_2020}: let $\mathbb{D}_\mathcal{M}$ denote the distribution of models learned using mechanism $\mathcal{M}$ on D trying to unlearn the $j$-th data point.
    Let $\mathbb{D}_\text{real}$ be the distribution of models learned using $\mathcal{A}$ on $D\setminus\{(x_j,y_j)\}$.
    $\mathcal{M}$ is a good unlearning algorithm if $\mathbb{D}_\mathcal{M}=\mathbb{D}_\text{real}$.
-   I think that this definition is equivalent to $0$-CR.
+   This definition is equivalent to $0$-CR.
 \end{itemize}
 However, I don't think either of these definitions is what I am looking for.
 In fact, I am convinced that as long as $\mathcal{M}(\mathcal{A}(D),j)$ ends in a point that can be reached by $\mathcal{A}(D\setminus\{(x_j,y_j)\})$, then we can say that $\mathcal{M}$ is a good unlearning algorithm.
-The advantage of this is that if $\mathcal{M}$ was the oracle algorithm is considered a good unlearning algorithm, while for the previous definitions it is not.
+The reason for this is that the gradients only depend on the spatial position of $\theta$ and not on time. 
+Thus, I'm expecting that there is no way to extract information about the forgotten data point from a gradient that can be computed without using such data. \\
+The main advantage of this definition is that if $\mathcal{M}$ was the oracle algorithm, it would be considered a good unlearning algorithm, whereas for the previous definitions it is not.
+
 Written more formally, I would like to say that $\mathcal{M}$ is a good unlearning algorithm if $\P(\mathcal{M}(\mathcal{A}(D),j)\in B_\beta(\mathcal{A}(D\setminus\{(x_j,y_j)\})))=1$ for any $\beta>0$,
 where $B_\beta(\mathcal{A}(D\setminus\{(x_j,y_j)\}))$ is the ball of radius $\beta$ around $\mathcal{A}(D\setminus\{(x_j,y_j)\})$.
 Note that if the algorithm $\mathcal{A}$ starts from a random initial condition, then $\mathcal{A}(D)$ is a random variable.\\
 For the sake of clarity, I will rewrite this condition in the notation we have been adopting so far.
 \begin{definition*}
-    We say that $\eps(t)$ induces a good unlearning algorithm if for each $\theta_0\in\Theta_0\subseteq\Theta$, 
+    We say that $\eps(t)$ induces a good unlearning algorithm $\mathcal{M}$ if, for each $\theta_0\in\Theta_0\subseteq\Theta$, 
     for each $\beta>0$ there exist (at least) a feasible initial condition $\theta\in\Theta_0$ and $t<T$ such that:
     $$ \P[\xi(0,T,\eps(t);\theta_0)\in B_\beta (\xi(0,t,0;\theta))]=1 .$$
 \end{definition*}
-This definition makes sense because for the continuous dependency from initial conditions theorem, the flux of those two differential equations will stay arbitrarily close from $T$ on.
+This definition makes sense because by the ``continuous dependency from initial condi\-tions'' theorem, the flux of those two differential equations will stay arbitrarily close from $T$ on.
+\begin{remark}
+  If we can approximate exactly $\theta^\star_{-j}$, then all the definitions are satisfied.
+  Name\-ly, in the case of Linear Regression with the squared loss, the Newton method (IF estimation) is exact and therefore it's a good unlearning algorithm.
+\end{remark}
 
 Some applications of the influence functions I would eventually like to investigate include:
 \begin{itemize}
