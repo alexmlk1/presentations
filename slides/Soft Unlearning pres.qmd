@@ -23,12 +23,12 @@ format: typst
     Soft Weighted \
     Machine Unlearning
   ],
-  subtitle: [Paper review by A.A.M.],
+  //subtitle: [Paper review by A.A.M.],
   authors: "Xinbao Qiao, Ningning Ding, Yushi Cheng, Meng Zhang",
   info: [#link("https://arxiv.org/abs/2505.18783")],
 )
 
-#table-of-contents()
+//#table-of-contents()
 
 #counter(page).update(1)
 
@@ -46,16 +46,93 @@ format: typst
   We seek the empirical risk minimizer: #grayed($ hat(theta) = arg min_(theta in Theta) 1/n sum _(i=1)^n ell(z_i,theta). $)
 ]
 
-#slide(title: "Influence Functions", outlined: true)[
-  Given $z_j in cal(D)^n$, the _influence function_ relative to $z_j$ is:
-  $ cal(I)(z_j) = lr(d/(d epsilon_j) [1/n sum _(i=1)^n ell(z_i,hat(theta)) + epsilon_j ell(z_j,hat(theta))] bar.v) _(epsilon_j = -1) $
-
-  #framed[*Interpretation:* It indicates how much the training error changes when we remove a training data $z_j$.]
-
-  #framed(title: "Remark")[
-    We can rewrite:
-    $ cal(I)(z_j) = -H_(hat(theta))^(-1) nabla_theta ell(z_j, hat(theta)) $ where $H$ is the Hessian matrix of the empirical risk at $hat(theta)$. \
+#slide(title: "Goal")[
+  For some problems (data poisoning, fairness, robustness, etc.), it is desirable to unlearn the contribution of certain training data. \
+  \
+  *Challenges:* 
+  - Retraining the model from scratch is computationally expensive;
+  - The removal may decrement the performance of the model on the remaining data.
+  #set align(center)
+  
+  #framed[
+  #emph(text(red)[*Solution:*]) Use influence functions with soft weights.
   ]
+]
+
+#slide(title: "Method")[
+  #figure(
+  image("images/soft vs hard.png", width: 90%)
+  )
+  #set align(center)
+]
+
+#slide(title: "Influence Functions", outlined: true)[
+  Given $z_j in cal(D)^n$ and $epsilon_j in RR$, we can define:
+
+  $ hat(theta)(z_j, epsilon_j) =  arg min_(theta in Theta) 1/n sum _(i=1)^n ell(z_i,theta) + epsilon_j ell(z_j,theta). $ 
+  
+  
+  The _influence function_ relative to $z_j$ is:
+  $ cal(I)(z_j) = lr(d/(d epsilon_j) hat(theta)(z_j, epsilon_j) bar.v) _(epsilon_j = -1) $
+
+  #framed[*Interpretation:* It indicates how the training error would change if we removed the training data $z_j$.]
+]
+
+#slide(title: "Influence Functions: Remarks")[
+  1. If $ell$ is at least $C^2$, we can write the influence function in a closed form:
+  $ cal(I)(z_j,-1) = -lr(1/n) H_(hat(theta))^(-1) nabla_theta ell(z_j, hat(theta)) $ 
+  where $H$ is the Hessian matrix of the empirical risk at $hat(theta)$. \
+  
+  2. The influence function is a _first-order approximation_ of the change in the estimator when we remove $z_j$ from the training set. \
+  In fact, if we do the _Taylor expansion_ of $hat(theta)$ at $epsilon_j=-1$, we have:
+  $ hat(theta) = hat(theta)(z_j, -1) + cal(I)(z_j) + O(epsilon_j^2). $
+]
+
+#slide(title: "Metrics", outlined: true)[
+  We will consider the influence on these 3 metrics (negative influence is better):
+  #v(0.4cm)
+  - *Utility:* $cal(I)_("util")(z_j,-1) = sum_(z in cal(T)) nabla_theta ell(z, hat(theta))^top H_(hat(theta))^(-1) nabla_theta ell(z, hat(theta))$, where $cal(T)$ is the validation set; 
+  - *Fairness:* $cal(I)_("fair")(z_j,-1) = nabla_theta f_("fair")(cal(T), hat(theta))^top H_(hat(theta))^(-1) nabla_theta ell(z, hat(theta))$, with $f_("fair")$ a fairness metric (e.g., demographic parity);
+  - *Robustness:* $cal(I)_("robust")(z_j,-1) = sum_(tilde(z) in cal(tilde(T))) nabla_theta ell(tilde(z), hat(theta))^top H_(hat(theta))^(-1) nabla_theta ell(z, hat(theta))$, for a perturbed dataset $cal(tilde(T))$.
+]
+
+#slide(title: "Algorithm")[
+  #figure(
+  image("images/pscode_soft.png", width: 55%)
+  )
+]
+
+#slide(title: "Soft weights", outlined:true)[
+  Instead of a binary decision (keep or remove), we want to assign a customized weight to each training data. \
+  Namely, we want to find $bold(epsilon)^star=(epsilon_1, dots, epsilon_n)$ and use it for the one-shot updating rule:
+  $ hat(theta)(cal(D), bold(epsilon)^star) = hat(theta) + bold(epsilon)^star H_theta^(-1) (nabla_theta ell(z_1, hat(theta)), dots nabla_theta ell(z_n, hat(theta)))^top. $
+  I.e., we update each training data ...
+]
+
+#slide(title: "Weight computations")[
+
+]
+
+#slide(title: "Computational issues")[
+
+]
+
+#slide(title: "Generalization")[
+  
+]
+
+#slide(title: "Numerical Evidence", outlined: true)[
+  #figure(
+  image("images/soft experiments.png", width: 70%)
+  )
+  #set align(center)
+]
+
+#slide(title: "Conclusions")[
+  #framed(title: "Take-away")[ciao]
+  
+  #set text(size: 15pt)
+  ["Soft Weighted Machine Unlearning",  X. Qiao, N. Ding, Y. Cheng, M. Zhang, 2025]\
 ]
 
 ```
