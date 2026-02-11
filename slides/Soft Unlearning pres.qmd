@@ -1,0 +1,61 @@
+---
+format: typst
+---
+```{=typst}
+
+#import "@preview/typslides:1.3.0": *
+
+#set page(numbering: none)
+
+// Project configuration
+#show: typslides.with(
+  ratio: "16-9",
+  theme: "reddy",
+  font: "IBM Plex Serif",
+  font-size: 20pt,
+  link-style: "color",
+  show-progress: true,
+)
+
+// The front slide is the first slide of your presentation
+#front-slide(
+  title: block(breakable: false)[
+    Soft Weighted \
+    Machine Unlearning
+  ],
+  subtitle: [Paper review by A.A.M.],
+  authors: "Xinbao Qiao, Ningning Ding, Yushi Cheng, Meng Zhang",
+  info: [#link("https://arxiv.org/abs/2505.18783")],
+)
+
+#table-of-contents()
+
+#counter(page).update(1)
+
+#slide(title: "Setting", outlined: true)[
+  #v(-0.4cm)
+  Consider a prediction task (regression problem) with:
+  - Input space $cal(X)$;
+  - Output space $cal(Y)$;
+  - Training set $cal(D)^n={z_i=(bold(x_i),y_i)}_{i=1}^n subset cal(Z)=cal(X) times cal(Y)$;
+  //$X = (bold(x_1),...,bold(x_n))$, $Y=(y_1,...,y_n)$;
+  - Parameter $theta in Theta:= RR^d$;
+  - $f(theta;x)$ estimator of $y|bold(x)$;
+  - $ell:cal(Z) times Theta -> RR$ loss function (e.g., $ell(z,theta)|->||y-f(theta;bold(x))||^2$).
+  
+  We seek the empirical risk minimizer: #grayed($ hat(theta) = arg min_(theta in Theta) 1/n sum _(i=1)^n ell(z_i,theta). $)
+]
+
+#slide(title: "Influence Functions", outlined: true)[
+  Given $z_j in cal(D)^n$, the _influence function_ relative to $z_j$ is:
+  $ cal(I)(z_j) = lr(d/(d epsilon_j) [1/n sum _(i=1)^n ell(z_i,hat(theta)) + epsilon_j ell(z_j,hat(theta))] bar.v) _(epsilon_j = -1) $
+
+  #framed[*Interpretation:* It indicates how much the training error changes when we remove a training data $z_j$.]
+
+  #framed(title: "Remark")[
+    We can rewrite:
+    $ cal(I)(z_j) = -H_(hat(theta))^(-1) nabla_theta ell(z_j, hat(theta)) $ where $H$ is the Hessian matrix of the empirical risk at $hat(theta)$. \
+  ]
+]
+
+```
