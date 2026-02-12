@@ -105,31 +105,62 @@ format: typst
 #slide(title: "Soft weights", outlined:true)[
   Instead of a binary decision (keep or remove), we want to assign a customized weight to each training data. \
   Namely, we want to find $bold(epsilon)^star=(epsilon_1, dots, epsilon_n)$ and use it for the one-shot updating rule:
-  $ hat(theta)(cal(D), bold(epsilon)^star) = hat(theta) + bold(epsilon)^star H_theta^(-1) (nabla_theta ell(z_1, hat(theta)), dots nabla_theta ell(z_n, hat(theta)))^top. $
-  I.e., we update each training data ...
+  $ hat(theta)(cal(D), bold(epsilon)^star) approx hat(theta) + bold(epsilon)^star H_theta^(-1) (nabla_theta ell(z_1, hat(theta)), dots nabla_theta ell(z_n, hat(theta)))^top. $
+  I.e., we update each training data with a re-scaled loss function $ epsilon_i cal(I)(z_i,-1) = cal(I)(z_i, epsilon_i). $
 ]
 
 #slide(title: "Weight computations")[
+  #grayed[
+  We need weights to be easy to retrieve, since they must be computed for each training data.]
+
+  They are defined as the solution of the following optimization problem: $ min_(bold(epsilon) in RR^n) sum_(i=1)^n cal(I)_("fair")(z_i, epsilon_i) + lambda ||bold(epsilon)||_2^2 $ 
+  (quadratic problem) subject to:
+  $ sum_(i=1)^n cal(I)_("fair")(z_i, epsilon_i) >= -f_("fair")(cal(T) ; hat(theta)), quad sum_(i=1)^n cal(I)_("util")(z_i, epsilon_i) <= 0 $
+]
+
+#slide(title: "Main issues")[
+  #set text(size: 25pt)
+  - We assume to know $hat(theta)$ so that $H_(hat(theta))$ is PD, thus invertible. In practice we only have an approximation;
+
+  - Computing the inverse of the hessian is expensive. We must use approximations;
+
+  - Such approximations don't work well for neural networks. 
+]
+
+#slide(title: "Bad approximation")[
+#figure( image("images/IFvsLOO.png", width: 80%) ) #set align(center) 
+#set text(size: 15pt)
+["If Influence Functions are the Answer, Then What is the Question?",  J. Bae, N. Ng, A. Lo, M. Ghassemi, R. Grosse, 2022]
+]
+
+#slide(title: "A solution")[
+  1. Add a regularization term to the loss function. This way, $H_(hat(theta))$ is guaranteed to be PD.
+
+  2. Approximate the hessian with $sigma I$. This way, we have:
+  $ hat(theta)(z_j, epsilon_j^star) - hat(theta) approx epsilon_j^star sigma/n nabla_theta ell(z_j, hat(theta)). $
+  If we see $sigma / n$ as a learning rate, we can index it by time and use also others unlearning algorithms instead of IFs to do the update in an iterative fashion(?).
 
 ]
 
-#slide(title: "Computational issues")[
-
-]
-
-#slide(title: "Generalization")[
-  
-]
-
-#slide(title: "Numerical Evidence", outlined: true)[
+#slide(title: "Numerical evidence", outlined: true)[
   #figure(
   image("images/soft experiments.png", width: 70%)
   )
   #set align(center)
 ]
 
-#slide(title: "Conclusions")[
-  #framed(title: "Take-away")[ciao]
+#slide(title: "Numerical evidence", outlined: true)[
+  #figure(
+  image("images/soft experiments 2.png", width: 110%)
+  )
+  #set align(center)
+]
+
+#slide(title: "Conclusion")[
+  #framed(title: "Take-away")[
+  Using some smart approximations, we can adapt all the existing unlearning algorithms to the soft weighted setting. \
+  This family of methods performs better than the HW version for non-privacy applications and can also improve the performance of the model on the remaining data. 
+  ]
   
   #set text(size: 15pt)
   ["Soft Weighted Machine Unlearning",  X. Qiao, N. Ding, Y. Cheng, M. Zhang, 2025]\
