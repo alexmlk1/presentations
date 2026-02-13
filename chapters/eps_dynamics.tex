@@ -171,7 +171,6 @@ The above derivative is always positive unless both norms annihilate, which is a
 In such case, $\mathcal{E}(\tau)$ is constant because removing the $j$-th datapoint does not change the learning trajectory.\\
 We can thus conclude that the function $\mathcal{E}(\tau)$ attains its minimum on the interval $[s,T]$ on $s$, making $\eps_s$ the best candidate among the step functions.
 \end{proof}
-{\color{RoyalBlue}
 \begin{remark}
   If we do not assume $H=\mathrm{I}$, the derivative of $g(\tau)$ has the following form:
   $$\frac{d}{d\,t} g(\tau) = e^{-(T-\tau) H_{-j}}\left( [H_{-j}-H]e^{-\tau H}(\theta_0-\theta^\star) + H_{-j}(\theta^\star - \theta^\star_{-j}) \right),$$
@@ -184,14 +183,25 @@ We can thus conclude that the function $\mathcal{E}(\tau)$ attains its minimum o
     & \big\langle H_{-j}(\theta^\star - \theta^\star_{-j}), \theta^\star - \theta^\star_{-j} \big\rangle_{e^{-(T-\tau) H_{-j}}} .
   \end{aligned}
   \end{equation*}
-  In general, we have to be careful also because $H$ and $H_{-j}$ do not commute. 
-  In fact, we can rewrite $H=\sum_{i=1}^n x_j x_j^\top$ and $H_{-j}=H-x_j x_j^\top$ and observe that the commutator is:
+  {\color{RoyalBlue}
+  Since both $H _{-j}$ and $e^{-(T-\tau) H_{-j}}$ are positive semidefinite, the second term is always positive.
+  In fact, we can express it as a Mahalanobis distance between $\theta^\star$ and $\theta^\star_{-j}$, where the metric is given by $X_{-j} e^{-(T-\tau) H_{-j}}$.
+
+  The first term is more delicate. 
+  If $H_{-j}$ and $H$ commute, also the first term is a Mahalanobis distance with the associated matrix being $x_j^\top e^{-T H_{-j}+\tau(H_{-j}-H)}$, but with a negative sign, thus it is always negative.
+  
+  In general, however, $H$ and $H_{-j}$ do not commute. 
+  Indeed, we can rewrite $H=\sum_{i=1}^n x_j x_j^\top$ and $H_{-j}=H-x_j x_j^\top$ and observe that the commutator is:
   $$[x_i x_i^\top, x_j x_j^\top]= (x_i^\top x_j) (x_i x_j^\top - x_j x_i^\top).$$
-  Thus, $H$ and $H_{-j}$ commute only when $x_i \bot x_j$ or $x_i=x_j$ for each $i \neq j$.
+  Thus, $H$ and $H_{-j}$ commute only when $x_i \perp x_j$ or $x_i \parallel x_j$ for each $i \neq j$.
+  
+  We would still have a chance to get a simple formula if $[[A,B],A]=[[A,B],B]=0$.
+  But this is not the case:
+  $$[[x_i x_i^\top, x_j x_j^\top], x_i x_i^\top] = 2(x_i^\top x_j) (\|x_i\|^2 (x_i x_j^\top+ x_j^\top x_i) - (x_j^\top x_i)x_i x_i^\top) \neq 0.$$
+}
 \end{remark}
 Note that usually in practice $n>d$ and both $H$ and $H_{-j}$ are full rank. \\
 It can also happen that $H_{-j} = H$, for example when $x_j$ is a linear combination of the other $x_i$'s, but in that case, $\theta^\star_{-j}=\theta^\star$ and the derivative is $0$.
-}
 
 \begin{figure}[hbt]
   \centering
@@ -348,7 +358,6 @@ Let's discuss more in detail some choices for $d(\eps)=d(\eps,0)$ and what does 
 \end{itemize} 
 As far as proofs are concerned, in the stepwise case, Lemma \ref{le:step_eps} works for all 3 of the above cases, since we never utilize any property of $\theta^\star_{-j}$.
 
-{\color{RoyalBlue}
 \section*{What is the problem?}
 We are given a training set $D=\{(x_i,y_i)\}_{i=1}^n$ and an index $j\in [n]$ of a data point in the training set. We are also given a learning algorithm $\mathcal{A}(D)$, which, for simplicity, we will assume to be gradient flow on the empirical risk.
 Our goal is to find a modification function $\mathcal{M}$ for the algorithm $\mathcal{A}$ that will approximate the effect of retraining the model from scratch on $D\setminus{(x_j,y_j)}$.
@@ -379,9 +388,15 @@ For the sake of clarity, I will rewrite this condition in the notation we have b
 \begin{definition*}
     We say that $\eps(t)$ induces a good unlearning algorithm $\mathcal{M}$ if, for each $\theta_0\in\Theta_0\subseteq\Theta$, 
     for each $\beta>0$ there exist (at least) a feasible initial condition $\theta\in\Theta_0$ and $t<T$ such that:
-    $$ \P[\xi(0,T,\eps(t);\theta_0)\in B_\beta (\xi(0,t,0;\theta))]=1 .$$
+    $$ \xi(0,T,\eps(t);\theta_0)\in B_\beta (\xi(0,t,0;\theta)) .$$
 \end{definition*}
-This definition makes sense because by the ``continuous dependency from initial condi\-tions'' theorem, the flux of those two differential equations will stay arbitrarily close from $T$ on.
+{\color{RoyalBlue}
+This definition makes sense because by the ``continuous dependency from initial condi\-tions'' theorem, the flux of those two differential equations will stay arbitrarily close from $T$ on. \\
+Additionally, this theorem gives us an explicit bound on the distance between the two trajectories after a time $t_1$ from the meeting point, if they have minimum distance $\beta$:
+\begin{equation*}
+  \|\xi(0,\cdot,0;\xi(0,T,\eps(t);\theta_0)) - \xi(0,\cdot,0;\xi(0,t,0;\theta))\|_{\infty,[0,t_1]} \leq e^{L t_1} \beta,
+\end{equation*}
+where $L$ is the Lipschitz constant of the $-\nabla_\theta R_j$.
 \begin{remark}
   If we can approximate exactly $\theta^\star_{-j}$, then all the definitions are satisfied.
   Name\-ly, in the case of Linear Regression with the squared loss, the Newton method (IF estimation) is exact and therefore it's a good unlearning algorithm.
