@@ -397,6 +397,26 @@ Additionally, this theorem gives us an explicit bound on the distance between th
   \|\xi(0,\cdot,0;\xi(0,T,\eps(t);\theta_0)) - \xi(0,\cdot,0;\xi(0,t,0;\theta))\|_{\infty,[0,t_1]} \leq e^{L t_1} \beta,
 \end{equation*}
 where $L$ is the Lipschitz constant of the $-\nabla_\theta R_j$.
+
+\begin{lemma}
+  Call $\tilde{\theta}(s) = \xi(0,s,0;\xi(0,T,\eps(t);\theta_0))$ and $\theta(s) = \xi(0,s,0;\xi(0,t,0;\theta))$.
+  Assuming that the data points are normalized, i.e. $\|x_i\|_2=1$ for $i=1,\dots,n$, it holds true that for any $s\in[0,t_1]$:
+  \begin{equation*}
+    \| \nabla L(\tilde{\theta}(s)) - \nabla L(\theta(s)) \|_2 \leq n e^{L t_1} \beta.
+  \end{equation*}
+\end{lemma}
+
+\begin{proof}
+  Assume $\Theta\subseteq \R^d$ with the Euclidean norm.
+  Let's compute the difference between the two gradients:
+  \begin{equation*}
+    \begin{aligned}
+      \| \nabla L(\tilde{\theta}(s)) - \nabla L(\theta(s)) \|_2 &= \| \sum_{i=1}^n x_i (x_i^\top \tilde{\theta}(s) - y_i) - \sum_{i=1}^n x_i (x_i^\top \theta(s) - y_i) \|_2 = \\
+      & = \| \sum_{i=1}^n x_i x_i^\top (\tilde{\theta}(s) - \theta(s)) \|_2 \leq \sum_{i=1}^n \|x_i\|_2^2 \|\tilde{\theta}(s) - \theta(s)\|_2 \leq n e^{L t_1} \beta.
+    \end{aligned}
+  \end{equation*}
+\end{proof}
+
 \begin{remark}
   If we can approximate exactly $\theta^\star_{-j}$, then all the definitions are satisfied.
   Name\-ly, in the case of Linear Regression with the squared loss, the Newton method (IF estimation) is exact and therefore it's a good unlearning algorithm.
