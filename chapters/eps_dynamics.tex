@@ -159,7 +159,7 @@ Consequently, differentiating $\mathcal{E}$, yields:
     & = e^{-(T-\tau)}
     \big\langle H_{-j}(\theta^\star-\theta^\star_{-j}),
     e^{-(T-\tau)} H_{-j}(\theta^\star-\theta^\star_{-j})\big\rangle \\[0.2cm]
-    & \quad
+    &
     + \big\langle (I_d-H_{-j})(-e^{-\tau}\theta_0 + e^{-\tau}\theta^\star),
     e^{-\tau}(I_d-H_{-j})(\theta^\star-\theta_0)\big\rangle \\[0.2cm]
     & = e^{-2(T-\tau)}\|H_{-j}(\theta^\star-\theta^\star_{-j})\|^2
@@ -179,8 +179,8 @@ We can thus conclude that the function $\mathcal{E}(\tau)$ attains its minimum o
     \begin{aligned}
     \frac{d}{d\,t}\mathcal{E}(\eps_\tau) & = \langle g'(\tau), g(\tau) \rangle \\
     & = \big\langle g'(\tau), e^{-(T-\tau) H_{-j}} (e^{-\tau H} \theta_0 +(\mathrm{Id}_d-e^{- \tau H})\theta^\star-\theta^\star_{-j}) \big\rangle \\
-    & = \big\langle [H_{-j}-H]e^{-\tau H}(\theta_0-\theta^\star) , e^{-\tau H}(\theta_0-\theta^\star) \big\rangle_{e^{-(T-\tau) H_{-j}}} + \\
-    & \big\langle H_{-j}(\theta^\star - \theta^\star_{-j}), \theta^\star - \theta^\star_{-j} \big\rangle_{e^{-(T-\tau) H_{-j}}} .
+    & = \big\langle [H_{-j}-H]e^{-\tau H}(\theta_0-\theta^\star) , e^{-\tau H}(\theta_0-\theta^\star) \big\rangle_{e^{-(T-\tau) H_{-j}}} \\
+    & + \big\langle H_{-j}(\theta^\star - \theta^\star_{-j}), \theta^\star - \theta^\star_{-j} \big\rangle_{e^{-(T-\tau) H_{-j}}} .
   \end{aligned}
   \end{equation*}
   {\color{RoyalBlue}
@@ -197,8 +197,8 @@ We can thus conclude that the function $\mathcal{E}(\tau)$ attains its minimum o
   
   We would still have a chance to get a simple formula if $[[A,B],A]=[[A,B],B]=0$.
   But this is not the case:
-  $$[[x_i x_i^\top, x_j x_j^\top], x_i x_i^\top] = 2(x_i^\top x_j) (\|x_i\|^2 (x_i x_j^\top+ x_j^\top x_i) - (x_j^\top x_i)x_i x_i^\top) \neq 0.$$
-}
+  $$[[x_i x_i^\top, x_j x_j^\top], x_i x_i^\top] = 2(x_i^\top x_j) (\|x_i\|^2 (x_i x_j^\top+ x_j x_i^\top) - (x_j^\top x_i)x_i x_i^\top) \neq 0.$$
+  }
 \end{remark}
 Note that usually in practice $n>d$ and both $H$ and $H_{-j}$ are full rank. \\
 It can also happen that $H_{-j} = H$, for example when $x_j$ is a linear combination of the other $x_i$'s, but in that case, $\theta^\star_{-j}=\theta^\star$ and the derivative is $0$.

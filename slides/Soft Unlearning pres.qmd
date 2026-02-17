@@ -91,9 +91,9 @@ format: typst
 #slide(title: "Metrics", outlined: true)[
   We will consider the influence on these 3 metrics (negative influence is better):
   #v(0.4cm)
-  - *Utility:* $cal(I)_("util")(z_j,-1) = sum_(z in cal(T)) nabla_theta ell(z, hat(theta))^top H_(hat(theta))^(-1) nabla_theta ell(z, hat(theta))$, where $cal(T)$ is the validation set; 
-  - *Fairness:* $cal(I)_("fair")(z_j,-1) = nabla_theta f_("fair")(cal(T), hat(theta))^top H_(hat(theta))^(-1) nabla_theta ell(z, hat(theta))$, with $f_("fair")$ a fairness metric (e.g., demographic parity);
-  - *Robustness:* $cal(I)_("robust")(z_j,-1) = sum_(tilde(z) in cal(tilde(T))) nabla_theta ell(tilde(z), hat(theta))^top H_(hat(theta))^(-1) nabla_theta ell(z, hat(theta))$, for a perturbed dataset $cal(tilde(T))$.
+  - *Utility:* $cal(I)_("util")(z_j,-1) = sum_(z in cal(T)) nabla_theta ell(z, hat(theta))^top H_(hat(theta))^(-1) nabla_theta ell(z_j, hat(theta))$, where $cal(T)$ is the validation set; 
+  - *Fairness:* $cal(I)_("fair")(z_j,-1) = nabla_theta f_("fair")(cal(T), hat(theta))^top H_(hat(theta))^(-1) nabla_theta ell(z_j, hat(theta))$, with $f_("fair")$ a fairness metric (e.g., demographic parity);
+  - *Robustness:* $cal(I)_("robust")(z_j,-1) = sum_(tilde(z) in cal(tilde(T))) nabla_theta ell(tilde(z), hat(theta))^top H_(hat(theta))^(-1) nabla_theta ell(z_j, hat(theta))$, for a perturbed dataset $cal(tilde(T))$.
 ]
 
 #slide(title: "Algorithm")[
