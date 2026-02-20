@@ -1,8 +1,9 @@
 *.aux
-weekly.bbl
-weekly.fdb_latexmk
-weekly.fls
-weekly.log
-weekly.synctex.gz
-weekly.blg
-weekly.out
+*.bbl
+*.fdb_latexmk
+*.fls
+*.log
+*.synctex.gz
+*.blg
+*.out
+quick_observations.pdf

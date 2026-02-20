@@ -1,0 +1,44 @@
+\documentclass{paper}
+
+\usepackage{definitions}
+
+\sloppy
+%\title{Some thoughts}
+%\author{}
+
+\begin{document}
+\begin{center}
+  \textbf{\LARGE Some thoughts}
+\end{center}
+\noindent
+To better understand the new definition you propose, I wanted to compare it with the definitions in the weekly file.\\
+The first unclear thing to me is the meaning of $f:\mathcal{X}\to\mathcal{Y}$ (your file).
+After some time thinking, I settled down on thinking about it as $f(\cdot;\mathcal{A}(\mathcal{D}))$ (my file) for some $\mathcal{D}$ given a priori, that contains informations from any user $s\in \mathcal{S}$.\\
+Let me call $X_s:=\mathrm{ran}(X|S=s)$ the data coming from the user $s$.
+If we assume that data can only come from one user at a time, one can express $\mathcal{M}_f(s)(X)$ as $f(X;\mathcal{M}(\mathcal{A},\mathcal{D},X_s))$, assuming $\mathcal{A}$ is deterministic.
+Therefore, I noticed that this new definition is very different from the one of $\epsilon$-Certified Removal.
+
+In fact, $\epsilon$-CR implies for any dataset $\mathcal{D}$, $\forall X\in\mathcal{X},s\in\mathcal{S}$:
+$$ \P_\mathcal{A}[f(X;\mathcal{M}(\mathcal{A},\mathcal{D},X_s))] \approx \P_\mathcal{A}[f(X;\mathcal{A}(\mathcal{D}\setminus X_s))],$$
+which is different from the new requirement $\forall s\in\mathcal{S}$:
+$$ \P_X[f(X;\mathcal{M}(\mathcal{A},\mathcal{D},X_s))|X\notin X_s] = \P_X[f(X;\mathcal{M}(\mathcal{A},\mathcal{D},X_s))]. $$
+For me, it is even more clear to write the above as follows:
+$$\forall y\in\mathcal{Y},\quad \P[X\in \mathcal{M}_f(s)^{-1}(y)|X\notin X_s] = \P[X\in \mathcal{M}_f(s)^{-1}(y)], $$
+which means: ``considering $X_s$ or not in the domain of the probability measure, does not change the distribution of the output of $\mathcal{M}_f(s)$''.
+Observe that in this setting, $\mathcal{A}(\mathcal{D}\setminus X_s)$ is NOT an unlearning algorithm for every $\mathcal{A}$ !
+In fact, consider the following example:
+we have only 2 users and we forget about the first one. If the algorithm is the empirical risk minimizer and we have can achieve perfect data fit, 
+we are not guaranteed to have the same distribution of $y$'s over $X_1$ than we have on $X_2$ (which is the exact distribution of $X_2$), since overfitted methods don't generalize well.
+
+As far as differential privacy is concerned, it seems to me that a 0-DP algorithm satisfies also this notion of unlearning. \\
+I couldn't find any other example except from this and a constant function of $\mathcal{M}_f(s)$ that satisfies the requirements.
+
+I see the link between this definition and fairness, but it seems to me a too strong definition, at least as far as I have understood it.
+
+Indeed, I was trying to relax the $\epsilon$-CR definition, while in this case I think we are adding more constraints.
+
+\vspace{0.4cm}
+My reasoning behind the will to have a less strict definition of unlearning is that when we want to unlearn data about plants, 
+such data are not sensible information most of the time, so I would like to have a definition that captures the unlearning without giving too much weight
+to privacy issues.
+\end{document}
