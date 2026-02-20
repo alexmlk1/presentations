@@ -24,8 +24,11 @@ which is different from the new requirement $\forall s\in\mathcal{S}$:
 $$ \P_X[f(X;\mathcal{M}(\mathcal{A},\mathcal{D},X_s))|X\notin X_s] = \P_X[f(X;\mathcal{M}(\mathcal{A},\mathcal{D},X_s))]. $$
 For me, it is even more clear to write the above as follows:
 $$\forall y\in\mathcal{Y},\quad \P[X\in \mathcal{M}_f(s)^{-1}(y)|X\notin X_s] = \P[X\in \mathcal{M}_f(s)^{-1}(y)], $$
-which means: ``considering $X_s$ or not in the domain of the probability measure, does not change the distribution of the output of $\mathcal{M}_f(s)$''.
-Observe that in this setting, $\mathcal{A}(\mathcal{D}\setminus X_s)$ is NOT an unlearning algorithm for every $\mathcal{A}$ !
+which means: 
+\begin{center}  
+``considering $X_s$ or not in the domain of the probability measure, does not change the distribution of the output of $\mathcal{M}_f(s)$''.
+\end{center}
+Another observation is that, in this setting, $\mathcal{A}(\mathcal{D}\setminus X_s)$ is NOT an unlearning algorithm for every $\mathcal{A}$ !
 In fact, consider the following example:
 we have only 2 users and we forget about the first one. If the algorithm is the empirical risk minimizer and we have can achieve perfect data fit, 
 we are not guaranteed to have the same distribution of $y$'s over $X_1$ than we have on $X_2$ (which is the exact distribution of $X_2$), since overfitted methods don't generalize well.
