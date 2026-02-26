@@ -1,0 +1,93 @@
+\section*{What is the problem? Measure selection}
+We are given a training set $D=\{(x_i,y_i)\}_{i=1}^n$ and an index $j\in [n]$ of a data point in the training set. We are also given a learning algorithm $\mathcal{A}(D)$, which, for simplicity, we will assume to be gradient flow on the empirical risk.
+Our goal is to find a modification function $\mathcal{M}$ for the algorithm $\mathcal{A}$ that will approximate the effect of retraining the model from scratch on $D\setminus{(x_j,y_j)}$.
+To do so, we want to choose $\eps(t)$ from \ref{eq:eps_t} among a class of functions $E_s$ that will allow us to forget the $j$-th data point as much as possible before time $T$, while achieving a good performance as a predictor.
+
+For this problem to be well posed, we first need a proper definition for ``forgetting a data point".
+In the literature, I could find two different definitions for this concept, which are the following:
+\begin{itemize}
+  \item \emph{Certified Removal} \cite{guo_certified_2023}: given $\alpha>0$, we say that $\mathcal{M}$ is an $\alpha$-certified removal algorithm if:
+  \begin{equation*}
+    e^{-\alpha} \leq \frac{\P(\mathcal{M}(\mathcal{A}(D),j)\in S)}{\P(\mathcal{A}(D\setminus\{(x_j,y_j)\})\in S)} \leq e^{\alpha} \quad \forall S\subseteq\Theta.
+  \end{equation*}
+  \item Same distribution \cite{papernot_unlearning_2020}: let $\mathbb{D}_\mathcal{M}$ denote the distribution of models learned using mechanism $\mathcal{M}$ on D trying to unlearn the $j$-th data point.
+   Let $\mathbb{D}_\text{real}$ be the distribution of models learned using $\mathcal{A}$ on $D\setminus\{(x_j,y_j)\}$.
+   $\mathcal{M}$ is a good unlearning algorithm if $\mathbb{D}_\mathcal{M}=\mathbb{D}_\text{real}$.
+   This definition is equivalent to $0$-CR.
+\end{itemize}
+However, I don't think either of these definitions is what I am looking for.
+In fact, I am convinced that as long as $\mathcal{M}(\mathcal{A}(D),j)$ ends in a point that can be reached by $\mathcal{A}(D\setminus\{(x_j,y_j)\})$, then we can say that $\mathcal{M}$ is a good unlearning algorithm.
+The reason for this is that the gradients only depend on the spatial position of $\theta$ and not on time. 
+Thus, I'm expecting that there is no way to extract information about the forgotten data point from a gradient that can be computed without using such data. \\
+The main advantage of this definition is that if $\mathcal{M}$ was the oracle algorithm, it would be considered a good unlearning algorithm, whereas for the previous definitions it is not.
+
+Written more formally, I would like to say that $\mathcal{M}$ is a good unlearning algorithm if $\P(\mathcal{M}(\mathcal{A}(D),j)\in B_\beta(\mathcal{A}(D\setminus\{(x_j,y_j)\})))=1$ for any $\beta>0$,
+where $B_\beta(\mathcal{A}(D\setminus\{(x_j,y_j)\}))$ is the ball of radius $\beta$ around $\mathcal{A}(D\setminus\{(x_j,y_j)\})$.
+Note that if the algorithm $\mathcal{A}$ starts from a random initial condition, then $\mathcal{A}(D)$ is a random variable.\\
+For the sake of clarity, I will rewrite this condition in the notation we have been adopting so far.
+\begin{definition*}
+    We say that $\eps(t)$ induces a good unlearning algorithm $\mathcal{M}$ if, for each $\theta_0\in\Theta_0\subseteq\Theta$, 
+    for each $\beta>0$ there exist (at least) a feasible initial condition $\theta\in\Theta_0$ and $t<T$ such that:
+    $$ \xi(0,T,\eps(t);\theta_0)\in B_\beta (\xi(0,t,0;\theta)) .$$
+\end{definition*}
+
+This definition makes sense because by the ``continuous dependency from initial condi\-tions'' theorem\footnote{see: \url{https://poisson.phc.dm.unipi.it/~sgubin/study_res/year2/anal2.pdf} for the proof}, the flux of those two differential equations will stay arbitrarily close from $T$ on. \\
+Additionally, this theorem gives us an explicit bound on the distance between the two trajectories after a time $t_1$ from the meeting point, if they have minimum distance $\beta$:
+\begin{equation*}
+  \|\xi(0,\cdot,0;\xi(0,T,\eps(t);\theta_0)) - \xi(0,\cdot,0;\xi(0,t,0;\theta))\|_{\infty,[0,t_1]} \leq e^{L t_1} \beta,
+\end{equation*}
+where $L$ is the Lipschitz constant of the $-\nabla_\theta R_j$.
+
+\begin{lemma}
+  Call $\tilde{\theta}(s) = \xi(0,s,0;\xi(0,T,\eps(t);\theta_0))$ and $\theta(s) = \xi(0,s,0;\xi(0,t,0;\theta))$.
+  Assuming that the data points are normalized, i.e. $\|x_i\|_2=1$ for $i=1,\dots,n$, it holds true that for any $s\in[0,t_1]$:
+  \begin{equation*}
+    \| \nabla L(\tilde{\theta}(s)) - \nabla L(\theta(s)) \|_2 \leq n e^{L t_1} \beta.
+  \end{equation*}
+\end{lemma}
+
+\begin{proof}
+  Assume $\Theta\subseteq \R^d$ with the Euclidean norm.
+  Let's compute the difference between the two gradients:
+  \begin{equation*}
+    \begin{aligned}
+      \| \nabla L(\tilde{\theta}(s)) - \nabla L(\theta(s)) \|_2 &= \| \sum_{i=1}^n x_i (x_i^\top \tilde{\theta}(s) - y_i) - \sum_{i=1}^n x_i (x_i^\top \theta(s) - y_i) \|_2 = \\
+      & = \| \sum_{i=1}^n x_i x_i^\top (\tilde{\theta}(s) - \theta(s)) \|_2 \leq \sum_{i=1}^n \|x_i\|_2^2 \|\tilde{\theta}(s) - \theta(s)\|_2 \leq n e^{L t_1} \beta.
+    \end{aligned}
+  \end{equation*}
+\end{proof}
+
+\begin{remark}
+  If we can approximate exactly $\theta^\star_{-j}$, then all the definitions are satisfied.
+  Name\-ly, in the case of Linear Regression with the squared loss, the Newton method (IF estimation) is exact and therefore it's a good unlearning algorithm.
+\end{remark}
+
+Some applications of the influence functions I would eventually like to investigate include:
+\begin{itemize}
+  \item recognition of informative images in a set;
+  \item variation of weights for mislabeled samples (in this case, it is useful to study what is the $\eps(t)$ that minimizes the distance from optimum at the end of the training).
+\end{itemize}
+
+{\color{RoyalBlue}
+\subsection*{Critique and new proposal}
+The previous definition I proposed doesn't actually take into consideration the pro\-babili\-ty of our end point being close to a feasible trajectory.
+Therefore, if the set of initial conditions is the whole space, the former definition is empty.\\
+To address this problem, I would like to modify the definition, taking into account the following family of probablity measures.
+
+Let $\left(\P_t\right)_{t\in [0,+\infty]}$ be a family of probabilty measures on $\Theta$ and define $\mathrm{supp}\P_0=\Theta_0\subseteq\Theta$ as the set of possible initial conditions.
+Each probability $\P_t$ is then defined as: 
+$$\P_t[B] = \P_0[\xi_t^{-1}(B)] \quad \forall B\in\mathcal{B}(\Theta),$$
+where $\xi_t(\theta_0) = \xi(0,t,0;\theta_0)$ is the flux of the gradient flow at time $t$ and $\mathcal{B}(\Theta)$ is the Borel sigma algebra over $\Theta$.
+Note that, since $\xi_t:\Theta\to\Theta$ is continuous, $\xi_t^{-1}(B)\in\mathcal{B}(\Theta)$ for any $B\in\mathcal{B}(\Theta)$ and thus $\P_t$ is well defined.
+\begin{remark}
+    From the definition of $\P_t$ we can observe that $\mathrm{supp}\P_\infty=\{\theta \in \Theta \mid \nabla_\theta R_j = 0\}$, i.e., $\P_\infty$ is supported only on the set of critical points for the LOO loss function.
+    By my previous paper, if $\P_0<<\mathscr{L}$, then $\P_\infty = \delta_{\mathcal{O}_m}$. :)
+\end{remark}
+\begin{definition*}
+    We say that $\eps(t)$ induces an $(\alpha,\delta)$-good unlearning algorithm at time $T$ if, for all $\theta_0\in\Theta_0$:
+    $$ \frac{\P_T[B_\delta(\xi(0,T,\eps;\theta_0))]}{\P_T[B_\delta(\xi(0,T,0;\theta_0))]} \geq \alpha,$$
+    where $\theta\in\Theta$ is a feasible initial condition such that $\xi(0,t,0;\theta)\in B_\beta(\xi(0,T,\eps(t);\theta_0))$.
+\end{definition*}
+add remark on what happens for T=0, infty, what alpha and delta mean.
+\subsection*{MIA and overfitting}  
+}
