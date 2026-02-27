@@ -28,18 +28,18 @@ For the sake of clarity, I will rewrite this condition in the notation we have b
 \begin{definition*}
     We say that $\eps(t)$ induces a good unlearning algorithm $\mathcal{M}$ if, for each $\theta_0\in\Theta_0\subseteq\Theta$, 
     for each $\beta>0$ there exist (at least) a feasible initial condition $\theta\in\Theta_0$ and $t<T$ such that:
-    $$ \xi(0,T,\eps(t);\theta_0)\in B_\beta (\xi(0,t,0;\theta)) .$$
+    $$ \xi(0,T,\eps(t);\theta_0)\in B_\beta (\xi(0,t,\boldsymbol{0};\theta)) .$$
 \end{definition*}
 
 This definition makes sense because by the ``continuous dependency from initial condi\-tions'' theorem\footnote{see: \url{https://poisson.phc.dm.unipi.it/~sgubin/study_res/year2/anal2.pdf} for the proof}, the flux of those two differential equations will stay arbitrarily close from $T$ on. \\
 Additionally, this theorem gives us an explicit bound on the distance between the two trajectories after a time $t_1$ from the meeting point, if they have minimum distance $\beta$:
 \begin{equation*}
-  \|\xi(0,\cdot,0;\xi(0,T,\eps(t);\theta_0)) - \xi(0,\cdot,0;\xi(0,t,0;\theta))\|_{\infty,[0,t_1]} \leq e^{L t_1} \beta,
+  \|\xi(0,\cdot,\boldsymbol{0};\xi(0,T,\eps(t);\theta_0)) - \xi(0,\cdot,\boldsymbol{0};\xi(0,t,\boldsymbol{0};\theta))\|_{\infty,[0,t_1]} \leq e^{L t_1} \beta,
 \end{equation*}
 where $L$ is the Lipschitz constant of the $-\nabla_\theta R_j$.
 
 \begin{lemma}
-  Call $\tilde{\theta}(s) = \xi(0,s,0;\xi(0,T,\eps(t);\theta_0))$ and $\theta(s) = \xi(0,s,0;\xi(0,t,0;\theta))$.
+  Call $\tilde{\theta}(s) = \xi(0,s,\boldsymbol{0};\xi(0,T,\eps(t);\theta_0))$ and $\theta(s) = \xi(0,s,\boldsymbol{0};\xi(0,t,\boldsymbol{0};\theta))$.
   Assuming that the data points are normalized, i.e. $\|x_i\|_2=1$ for $i=1,\dots,n$, it holds true that for any $s\in[0,t_1]$:
   \begin{equation*}
     \| \nabla L(\tilde{\theta}(s)) - \nabla L(\theta(s)) \|_2 \leq n e^{L t_1} \beta.
@@ -77,17 +77,51 @@ To address this problem, I would like to modify the definition, taking into acco
 Let $\left(\P_t\right)_{t\in [0,+\infty]}$ be a family of probabilty measures on $\Theta$ and define $\mathrm{supp}\P_0=\Theta_0\subseteq\Theta$ as the set of possible initial conditions.
 Each probability $\P_t$ is then defined as: 
 $$\P_t[B] = \P_0[\xi_t^{-1}(B)] \quad \forall B\in\mathcal{B}(\Theta),$$
-where $\xi_t(\theta_0) = \xi(0,t,0;\theta_0)$ is the flux of the gradient flow at time $t$ and $\mathcal{B}(\Theta)$ is the Borel sigma algebra over $\Theta$.
+where $\xi_t(\theta_0) = \xi(0,t,\boldsymbol{0};\theta_0)$ is the flux of the gradient flow at time $t$ and $\mathcal{B}(\Theta)$ is the Borel sigma algebra over $\Theta$.
 Note that, since $\xi_t:\Theta\to\Theta$ is continuous, $\xi_t^{-1}(B)\in\mathcal{B}(\Theta)$ for any $B\in\mathcal{B}(\Theta)$ and thus $\P_t$ is well defined.
 \begin{remark}
     From the definition of $\P_t$ we can observe that $\mathrm{supp}\P_\infty=\{\theta \in \Theta \mid \nabla_\theta R_j = 0\}$, i.e., $\P_\infty$ is supported only on the set of critical points for the LOO loss function.
-    By my previous paper, if $\P_0<<\mathscr{L}$, then $\P_\infty = \delta_{\mathcal{O}_m}$. :)
 \end{remark}
 \begin{definition*}
-    We say that $\eps(t)$ induces an $(\alpha,\delta)$-good unlearning algorithm at time $T$ if, for all $\theta_0\in\Theta_0$:
-    $$ \frac{\P_T[B_\delta(\xi(0,T,\eps;\theta_0))]}{\P_T[B_\delta(\xi(0,T,0;\theta_0))]} \geq \alpha,$$
-    where $\theta\in\Theta$ is a feasible initial condition such that $\xi(0,t,0;\theta)\in B_\beta(\xi(0,T,\eps(t);\theta_0))$.
+    We say that $\eps(t)$ induces an $(\alpha,\delta)$-good unlearning algorithm at time $s$ if, for all $\theta_0\in\Theta_0$:
+    $$ \frac{\P_s[B_\delta(\xi(0,s,\eps;\theta_0))]}{\P_s[B_\delta(\xi(0,s,\boldsymbol{0};\theta_0))]} \ge 1-\alpha.$$
 \end{definition*}
-add remark on what happens for T=0, infty, what alpha and delta mean.
-\subsection*{MIA and overfitting}  
+\noindent
+Let's see what this definition implies for extreme values of the parameters:
+\begin{itemize}
+  \item if $s=0$, then every algorithm is a good unlearning algorithm (it makes sense since in both LOO and modification we can start from any point in $\Theta_0$ so we don't need to modify anything);
+  \item if $s=+\infty$, then also every algorithm works, since $\eps\in E_s$ and therefore it is constantly $0$ after $T$.
+  \item for $\delta\to\infty$ then $\alpha\to 0$, and, for $\delta\to0$, $\alpha\to 1$.
+  \item if $\Theta_0=\{\theta_0\}$, call $\bar{\delta}=\sup_{t>0}\|\xi(0,t,\eps;\theta_0)-\xi(0,t,\boldsymbol{0};\theta_0)\|$. 
+  Then we can express $\alpha(\delta)$ explicitly as $\alpha=\mathbbm{1}_{[\bar{\delta},+\infty]}(\delta)$;
+\end{itemize}
+To make the definition even less strict, we may take the mean value over $\theta_0$ instead of requiring the condition to hold for each $\theta_0\in\Theta_0$.
+
+Figure \ref{fig:def2} reports a visual representation of the previous definition.
+The idea here is that we want the attracting regions to be the same for both the learning dynamics.\\
+Namely, if we take two gradient flows initialized on the same point relative to two different datasets, the further the training goes, the more distinguishable the distribution of parameters become.
+In fact, the estimators generated by the neural nets learn the characteristics of the data in a sequential way \cite{simplicity_bias_2023}, causing the observational noise to be learnt at the end of training.
+This means that the longer the training goes, the more specialised the model becomes, leading to its parameters to converge further away from each others.
+\begin{figure}
+  \centering
+  \includegraphics[width=.6\linewidth]{definition.pdf}
+  \caption{Example representation of the meaning of $\P_s$ when $\Theta_0\subset\R^2$.}
+  \label{fig:def2}
+\end{figure}
+\subsection*{MIA and overfitting} 
+From the previous discussion, it seems like algorithms that overfit are bad then tested on our measure. \\
+Does it makes sense from a privacy point of view?\\
+The answer is yes. In fact, let's consider the following very naive example of Membership Inference Attack:
+in a white-box setting (the attacker has full access to the model), if our algorithm completely overfits, it means that it will have $0$ loss on the training set.
+Therefore, the attacker can check if a point $z$ has been used in the training by just checking if the loss of the model on $z$ is $0$ or not.
+
+Even in the less extreme setting of \cite{aubinais_MIA_2025}, the quantity that the authors consider (pp.8,9) increases if we choose an overfitting algorithm.
+On the other hand, if we could have an oracle procedure that could give us the generating function of the dataset (to which observational noise is added),
+that algorithm would be independent of initial dataset and therefore be a private algorithm.
+However, this concept may be more similar to differential privacy rather than unlearning.
+
+Indeed, if $\mathcal{A}$ is such an algorithm, we could write $\mathcal{A}(\mathcal{D})=\mathcal{A}(\mathcal{D}')$ for any two dataset whose elements are drawn from the same distribution.
+This means that $\mathcal{A}$ is a $0$-DP algorithm.
+Maybe, to address this problem could be interesting to use the Vicinal Risk Minimization algorithm \cite{vapnis_VRM_2000}, instead of the ERM one, as it looks to me that may get closer to the optimal distribution rather than the overfitting one.
+
 }
