@@ -183,7 +183,6 @@ We can thus conclude that the function $\mathcal{E}(\tau)$ attains its minimum o
     & + \big\langle H_{-j}(\theta^\star - \theta^\star_{-j}), \theta^\star - \theta^\star_{-j} \big\rangle_{e^{-(T-\tau) H_{-j}}} .
   \end{aligned}
   \end{equation*}
-  {\color{RoyalBlue}
   Since both $H _{-j}$ and $e^{-(T-\tau) H_{-j}}$ are positive semidefinite, the second term is always positive.
   In fact, we can express it as a Mahalanobis distance between $\theta^\star$ and $\theta^\star_{-j}$, where the metric is given by $X_{-j} e^{-(T-\tau) H_{-j}}$.
 
@@ -198,7 +197,6 @@ We can thus conclude that the function $\mathcal{E}(\tau)$ attains its minimum o
   We would still have a chance to get a simple formula if $[[A,B],A]=[[A,B],B]=0$.
   But this is not the case:
   $$[[x_i x_i^\top, x_j x_j^\top], x_i x_i^\top] = 2(x_i^\top x_j) (\|x_i\|^2 (x_i x_j^\top+ x_j x_i^\top) - (x_j^\top x_i)x_i x_i^\top) \neq 0.$$
-  }
 \end{remark}
 Note that usually in practice $n>d$ and both $H$ and $H_{-j}$ are full rank. \\
 It can also happen that $H_{-j} = H$, for example when $x_j$ is a linear combination of the other $x_i$'s, but in that case, $\theta^\star_{-j}=\theta^\star$ and the derivative is $0$.
