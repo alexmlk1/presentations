@@ -1,0 +1,17 @@
+/* For main slide titles */
+.reveal h1 {
+  font-family: "IBM Plex Serif", sans-serif;
+  color: #0b8622ff; /* Your color */
+}
+
+/* For section/subsection titles */
+.reveal h2 {
+  font-family: "IBM Plex Serif", sans-serif;
+  color: #0b8622ff; /* Your color */
+}
+
+/* For sub-subsection titles */
+.reveal h3 {
+  font-family: "IBM Plex Serif", sans-serif;
+  color: #0b8622ff; /* Your color */
+}
