@@ -11,7 +11,7 @@
 
   <meta name="author" content="Alex Alì Maleknia">
   <meta name="dcterms.date" content="2026-03-12">
-  <title>quarto-inputb3fae345fc46489a</title>
+  <title>quarto-inputc3d2e683907087c</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -143,18 +143,110 @@ Alex Alì Maleknia
 
   <p class="date">12 Mar 2026</p>
 </section>
-<section id="formation" class="slide level2">
+<section id="formation" class="slide level2" data-transition="fade-in none-out">
 <h2>Formation</h2>
 <div style="display:flex;gap:1rem;align-items:flex-start;flex-wrap:nowrap;">
-  <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d45211.603388780066!2d8.556058368287887!3d44.90858568307192!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47877431ed416505%3A0xd647f5990f0c62d9!2sAlessandria%2C%20Province%20of%20Alessandria%2C%20Italy!5e0!3m2!1sen!2sfr!4v1772632563726!5m2!1sen!2sfr" style="border:0;flex:0 0 48%;min-width:360px;height:450px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-  <img src="images/alessandria.jpg" alt="Alessandria" style="flex:0 0 48%;min-width:300px;height:450px;object-fit:cover;border:1px solid #ccc;">
+  <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d45211.603388780066!2d8.556058368287887!3d44.90858568307192!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47877431ed416505%3A0xd647f5990f0c62d9!2sAlessandria%2C%20Province%20of%20Alessandria%2C%20Italy!5e0!3m2!1sen!2sfr!4v1772632563726!5m2!1sen!2sfr" style="border:0;flex:0 0 48%;min-width:260px;height:360px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+</div>
+<img data-src="images/alessandria.jpg" class="absolute" style="top: 77px; left: 520px; height: 360px; ">
+<div style="text-align:center;">
+<p>Born (2001)</p>
+<p>High school diploma in scientific subjects</p>
 </div>
 </section>
-<section id="influence-functions" class="slide level2">
-<h2>Influence Functions</h2>
+<section id="formation-1" class="slide level2" data-transition="none">
+<h2>Formation</h2>
+<div style="display:flex;gap:1rem;align-items:flex-start;flex-wrap:nowrap;">
+  <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d45211.603388780066!2d8.556058368287887!3d44.90858568307192!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47877431ed416505%3A0xd647f5990f0c62d9!2sAlessandria%2C%20Province%20of%20Alessandria%2C%20Italy!5e0!3m2!1sen!2sfr!4v1772632563726!5m2!1sen!2sfr" style="border:0;flex:0 0 48%;min-width:260px;height:360px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+</div>
+<img data-src="images/pisa.jpg" class="absolute" style="top: 77px; left: 520px; height: 360px; ">
+<div style="text-align:center;">
+<p>University of Pisa</p>
+<p>Bachelor’s and Master’s degree in Mathematics</p>
+<p>(supervisor: Prof.&nbsp;Andrea Agazzi)</p>
+</div>
+</section>
+<section id="formation-2" class="slide level2" data-transition="none">
+<h2>Formation</h2>
+<div style="display:flex;gap:1rem;align-items:flex-start;flex-wrap:nowrap;">
+  <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d45211.603388780066!2d8.556058368287887!3d44.90858568307192!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47877431ed416505%3A0xd647f5990f0c62d9!2sAlessandria%2C%20Province%20of%20Alessandria%2C%20Italy!5e0!3m2!1sen!2sfr!4v1772632563726!5m2!1sen!2sfr" style="border:0;flex:0 0 48%;min-width:260px;height:360px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+</div>
+<img data-src="images/sapporo.jpg" class="absolute" style="top: 77px; left: 520px; height: 360px; ">
+<div style="text-align:center;">
+<p>Hokkaido University</p>
+<p>Master’s degree in Mathematics</p>
+<p>(supervisor: Prof.&nbsp;Yuzuru Sato)</p>
+</div>
+</section>
+<section id="influence-functions-setting" class="slide level2">
+<h2>Influence Functions: Setting</h2>
+<p>Consider a generic machine learning framework:</p>
+<ul>
+<li><strong>training dataset</strong>: <span class="math inline">\(D = \{z_i=(x_i,y_i)\}_{i=1}^n \subset (\mathcal{X}\times\mathcal{Y})^n\)</span> ;</li>
+<li><strong>model parameters</strong>: <span class="math inline">\(\theta \in \Theta \subseteq \mathbb{R}^d\)</span> ;</li>
+<li><strong>model</strong>: <span class="math inline">\(f: \mathcal{X} \times \Theta \to \mathcal{Y}\)</span> (e.g.&nbsp;a neural network) ;</li>
+<li><strong>loss function</strong>: <span class="math inline">\(\ell(z, \theta)\)</span> (e.g.&nbsp;<span class="math inline">\(\ell(z, \theta) = (f(x;\theta) - y)^2\)</span> for regression) ;</li>
+<li><strong>empirical risk</strong>: <span class="math inline">\(L(\theta) = \frac{1}{n} \sum_{i=1}^n \ell(z_i, \theta)\)</span> ;</li>
+</ul>
+</section>
+<section id="influence-functions-definition" class="slide level2">
+<h2>Influence Functions: Definition</h2>
+<div style="height:30px;">
+
+</div>
+<div class="centered-slide">
+<p>Define: <span class="math display">\[
+\hat{\theta}(\varepsilon, j) = \arg\min_\theta \sum_{i\neq j}^n \ell(z_i, \theta) + \varepsilon \ell(z_j, \theta);
+\]</span> I will denote <span class="math inline">\(\hat{\theta}(1, j)= \hat{\theta}\)</span> and <span class="math inline">\(\hat{\theta}(0, j) = \hat{\theta}_{-j}\)</span>.</p>
+<p>Given an index <span class="math inline">\(j\)</span>, the influence function (IF) for the <span class="math inline">\(j\)</span>-th training point is: <span class="math display">\[ \mathcal{I}(z_j) = \left.\frac{d}{d \,\varepsilon}{\hat{\theta}(\varepsilon, j)}\right|_{\varepsilon=0}.
+\]</span></p>
+</div>
+</section>
+<section id="influence-functions-discussion" class="slide level2">
+<h2>Influence Functions: Discussion</h2>
+<div style="height:30px;">
+
+</div>
+<div class="centered-slide">
+<div class="frame">
+<p><strong>Interpretation:</strong> <span class="math inline">\(\mathcal{I}(z_j)\)</span> measures the impact of <span class="math inline">\(z_j\)</span> on the position of the optimal parameter.</p>
+</div>
+<p>If <span class="math inline">\(\ell\in C^2\)</span>, we can compute <span class="math inline">\(\mathcal{I}(z_j)\)</span> using the formula: <span class="math display">\[ \mathcal{I}(z_j) = - H_{\hat{\theta}}^{-1} \nabla_\theta \ell(z_j, \hat{\theta})
+\]</span> where <span class="math inline">\(H_{\hat{\theta}}\)</span> is the Hessian of <span class="math inline">\(L\)</span> at <span class="math inline">\(\hat{\theta}\)</span>.</p>
+<p><span style="color:red;"><strong>Drawback:</strong></span> Computing <span class="math inline">\(H_{\hat{\theta}}^{-1}\)</span> is very expensive.</p>
+</div>
 </section>
 <section id="machine-unlearning" class="slide level2">
 <h2>Machine Unlearning</h2>
+<div class="centered-slide">
+<p>Another use of IFs is to approximate the unlearning of the training point <span class="math inline">\(z_j\)</span>. In fact, by Taylor expansion, we have: <span class="math display">\[ \hat{\theta}(1, j) = \hat{\theta}(0, j) + \mathcal{I}(z_j) + O(\varepsilon^2) \implies \hat{\theta}_{-j} \approx \hat{\theta} - \mathcal{I}(z_j)
+\]</span></p>
+<div style="text-align: center;">
+<p><span style="font-size: 58px;"> <strong>How good is this approximation?</strong> </span></p>
+</div>
+</div>
+</section>
+<section id="unlearning-approximation" class="slide level2">
+<h2>Unlearning Approximation</h2>
+
+<img data-src="images/IFvsLOO.png" class="r-stretch"></section>
+<section id="is-it-really-bad" class="title-slide slide level1 center" style="text-align: center;">
+<h1>Is it really bad?</h1>
+
+</section>
+
+<section id="definition-of-unlearning" class="slide level2">
+<h2>Definition of Unlearning</h2>
+<p>Maybe it’s with PBRFs?</p>
+</section>
+<section id="propositions" class="slide level2">
+<h2>Propositions</h2>
+</section>
+<section id="example-linear-regression" class="slide level2">
+<h2>Example: Linear Regression</h2>
+<div style="text-align: center;">
+<p><img data-src="images/1.svg" height="500"> <img data-src="images/2.svg" height="500"></p>
+</div>
 </section>
 <section id="possible-applications-to-plantnet" class="slide level2">
 <h2>Possible Applications to Plantnet</h2>
@@ -219,7 +311,7 @@ Alex Alì Maleknia
         progress: true,
 
         // Display the page number of the current slide
-        slideNumber: false,
+        slideNumber: 'c/t',
 
         // 'all', 'print', or 'speaker'
         showSlideNumber: 'all',
