@@ -137,4 +137,11 @@ where $\sharp_\mathcal{D}$ is the empirical distribution of the dataset $\mathca
 On the other hand, the idea behind VRM is to extend the empirical distribution by choosing a continuous probability for $x$, while keeping $y$ constant, i.e.:
 $$\min_{\theta\in\Theta} \sum_{i=1}^n\int_{\X} (f(x;\theta)-y_i)^2 d\,P_i(x),$$
 with $P_i$ being a probability distribution that is concentrated around $x_i$ (for example, the normal distribution centered in $x_i$: $P_i = \mathcal{N}_\sigma(x-x_i)$).
+
+\qst Let's go back to the first article we reviewed.
+What does it mean for the unlearning that we are approximating PBRF with IFs?
+
+\noindent
+\textbf{Observation on fairness definition:} If we don't have any data, every algorithm looks secure to me, as it doesn't incorporate any sensible information of the user.
+In fact, if we do ERM on distributions instead of data, we will end up with a differentially private algorithm I think. Therefore, I'm not sure we can talk about privacy without modeling data. (think more)
 }
