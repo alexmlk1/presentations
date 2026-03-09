@@ -13,10 +13,12 @@ author: "Alex Alì Maleknia"
 date: "03/12/2026"
 format: 
   revealjs:
+    self-contained: true
     css: custom.css
     transition: slide
-    slide-number: true
+    #slide-number: true
     date-format: "DD MMM YYYY"
+    autoAnimate: true
 editor:
   render-on-save: true
 ---
@@ -84,11 +86,15 @@ editor:
 
 Consider a generic machine learning framework:
 
+::: {.incremental}
+
 - **training dataset**: $D = \{z_i=(x_i,y_i)\}_{i=1}^n \subset (\mathcal{X}\times\mathcal{Y})^n$ ;
 - **model parameters**: $\theta \in \Theta \subseteq \mathbb{R}^d$ ;
 - **model**: $f: \mathcal{X} \times \Theta \to \mathcal{Y}$ (e.g. a neural network) ;
 - **loss function**: $\ell(z, \theta)$ (e.g. $\ell(z, \theta) = (f(x;\theta) - y)^2$ for regression) ;
 - **empirical risk**: $L(\theta) = \frac{1}{n} \sum_{i=1}^n \ell(z_i, \theta)$ ;
+
+:::
 
 ## Influence Functions: Definition
 <div style="height:30px;"></div>
@@ -134,7 +140,19 @@ However, we can also compute them on metrics:
 
 ## Machine Unlearning
 ::: {.centered-slide}
-Influence functions approximate the unlearning of the training point $z_j$.
+We want to remove the impact of $z_j$ from $\theta$ (neural network's parameter).
+
+We can **unlearn** $z_j$ by Leave One Out (LOO) retraining, i.e. (fix a learning step $\eta>0$):
+
+$$\begin{cases}
+\theta(t) = \theta(t-1) -\frac{\eta}{n}\sum_{i\neq j}\nabla_\theta \ell(z_i,\theta(t-1)) \\
+\theta(0)=\theta_0
+\end{cases}$$
+:::
+
+## Unlearning by Influence Functions
+::: {.centered-slide}
+Influence functions approximate the unlearning of the training point $z_j$ **from the optimal parameter** $\hat \theta$.
 By Taylor expansion, we have:
 $$ \hat{\theta}(1, j) = \hat{\theta}(0, j) + \mathcal{I}(z_j) + O(\varepsilon^2) 
 $$
@@ -149,7 +167,6 @@ $$
 
 :::
 :::
-
 :::
 
 ## Unlearning Approximation
@@ -167,8 +184,8 @@ $$
 
 :::{.fragment}
 <span style="font-size: 61px;">
-Depends on the definition!
-</span>
+Depends on the definition!</span>
+
 :::
 :::
 
@@ -179,6 +196,7 @@ What do we want to minimize?
 
 ::: {.fragment}
 Call $\theta(t)$ the flow of the LOO solution and $\tilde{\theta}(t)$ the flow of the unlearning procedure, both starting from $\theta_0\in\Theta$.
+
 We can have 3 distances:
 
 - $\frac12 \|\tilde{\theta}(T)-\hat\theta\|^2_\Theta$
@@ -188,7 +206,7 @@ We can have 3 distances:
 :::
 
 
-## Certified Removal
+## Certified Removal{transition="slide-in none-out" transition-speed="default-in fast-out"}
 ::: {.centered-slide}
 Consider a predictor $\mathcal{A}:(\mathcal{X}\times\mathcal{Y})^n\to\Theta$ and an unlearning procedure $\mathcal{M}(\mathcal{A}(D), D, j)\approx \hat{\theta}_{-j}$.
 
@@ -200,9 +218,18 @@ $$
 
 :::
 
-## Certified Removal
+## Certified Removal{transition="fade"}
+:::{.centered-slide}
+:::{.frame}
+**Idea:** We want the unlearning algorithm to be as close as possible to the LOO trajectory.
+:::
+**Note:** both algorithms $\mathcal{A}$ and $\mathcal{M}$ can be random!
 
-The reason for the probability to be there
+Usually, to achieve $\epsilon$-CR gaussian noise is added.
+
+$$ e^{-\epsilon} \leq \frac{P(\mathcal{M}(\mathcal{A}(D), D, j) \in S)}{P(\mathcal{A}(D\setminus\{z_j\}) \in S)} \leq e^{\epsilon}.
+$$
+:::
 
 
 ## Descend to Delete 
@@ -215,9 +242,110 @@ The reason for the probability to be there
 
 ## Future Directions
 
+- Unlearning via Fairness (assume data is distributed differently for each user $s\in S$, i.e., $(X_s,Y_s)\sim P_s$):
+<span style="font-size: 32px;">
+  $$ \mathbb{P}_X[f(X;\mathcal{M}(\mathcal{A},\mathcal{D},X_s))|X\notin X_s] = \mathbb{P}_X[f(X;\mathcal{M}(\mathcal{A},\mathcal{D},X_s))]. $$
+</span>
+
+- Distributional Unlearning:
+<div style="display: flex; align-items: center; gap: 20px;">
+  <div style="flex: 1; text-align: center; font-size: 35px;">
+    $$
+    \frac{\mathbb{P}_s[B_\delta(\tilde\theta(s))]}{\mathbb{P}_s[B_\delta(\theta(s))]} \ge 1-\alpha.
+    $$
+  </div>
+  <div style="flex: 1; text-align: left;">
+    <img src="images/distr_unlearn.svg" alt="Distributional Unlearning Diagram" style="max-width: 55%; height: auto;"/>
+  </div>
+</div>
+
 # Possible Applications to Plantnet
 
-## Better Image Proposals
+## Better Image Proposals{transition="slide-in fade-out" transition-speed="default-in slow-out"}
+<div style="display: flex; align-items: center; justify-content: space-between;">
+
+  <div style="flex: 1; text-align: center;">
+
+  <img src="images/plant_testt.png" style="max-width: 65%;">
+
+  </div>
+
+  <div style="flex: 0 0 100px; text-align: center; margin-top: -50pt; margin-right: 50pt;">
+
+  <div style="font-size: 2em;">
+  
+  $\xrightarrow{\text{Prediction}}$
+
+  </div>
+
+  </div>
+
+  <div style="flex: 1;">
+
+  <div style="margin-bottom: 10px;">
+
+  <img src="images/plant1_1.png" style="max-width: 65%;">
+
+  </div>
+  <div>
+
+  <img src="images/plant2_1.png" style="max-width: 65%;">
+  
+  </div>
+
+  </div>
+
+</div>
+
+<span style="font-size: 21px;color:gray;">
+[www.inaturalist.org]
+</span>
+
+## Better Image Proposals{transition="fade-in slide-out" transition-speed="slow-in default-out"}
+<div style="display: flex; align-items: center; justify-content: space-between;">
+
+  <div style="flex: 1; text-align: center;">
+
+  <img src="images/plant_testt.png" style="max-width: 65%;">
+  <figcaption style="text-align: center; font-size: 0.6em;">
+    Common Cowparsnip
+  </figcaption>
+
+  </div>
+
+  <div style="text-align: center; margin-top: -60pt; margin-right: 50pt;">
+
+  <div style="font-size: 2em;">
+  
+  $\xrightarrow{\text{Prediction}}$
+
+  </div>
+
+  </div>
+
+  <div style="flex: 1;">
+
+  <div style="margin-bottom: 10px;">
+
+  <img src="images/plant1_2.png" style="max-width: 65%;">
+  <figcaption style="text-align: left; font-size: 0.6em; color: red;">
+    Poison Hemlock
+  </figcaption>
+
+  </div>
+  <div>
+
+  <img src="images/plant2_2.png" style="max-width: 65%;">
+  <figcaption style="text-align: left; font-size: 0.6em; color: green;">
+    Common Cowparsnip
+  </figcaption>
+  
+  </div>
+
+  </div>
+
+</div>
+
 
 ## Data Poisoning
 
