@@ -13,7 +13,7 @@ author: "Alex Alì Maleknia"
 date: "03/12/2026"
 format: 
   revealjs:
-    self-contained: true
+    #self-contained: true
     css: custom.css
     transition: slide
     #slide-number: true
@@ -77,10 +77,24 @@ editor:
 <div style="text-align:center;">
   IROKO - IMAG
 
-  PhD in Mathematics (since November 2025)
+  PhD in Mathematics (Funding: ANR VITE)
   
-  supervisors: Prof. Joseph Salmon and Prof. Evgenii Chzhen
+  Supervisors: Joseph Salmon and Evgenii Chzhen
 </div>
+
+## Presentation Outline
+::: {.centered-slide}
+
+1. Introduction and use cases for **influence functions**.
+
+<div style="height:20px;"></div>
+
+2. Formal definition and discussion about **machine unlearning**.
+
+<div style="height:20px;"></div>
+
+3. Possible applications to Pl@ntNet.
+:::
 
 ## Influence Functions: Setting
 
@@ -298,7 +312,7 @@ $$
 </div>
 
 <span style="font-size: 21px;color:gray;">
-[www.inaturalist.org]
+[Pl@ntNet; pics by: Barbara MAI − Tela Botanica, Tuspring]
 </span>
 
 ## Better Image Proposals{transition="fade-in slide-out" transition-speed="slow-in default-out"}
@@ -307,7 +321,7 @@ $$
   <div style="flex: 1; text-align: center;">
 
   <img src="images/plant_testt.png" style="max-width: 65%;">
-  <figcaption style="text-align: center; font-size: 0.6em;">
+  <figcaption style="text-align: center; font-size: 0.6em; margin-top: -15pt;">
     Common Cowparsnip
   </figcaption>
 
@@ -328,7 +342,7 @@ $$
   <div style="margin-bottom: 10px;">
 
   <img src="images/plant1_2.png" style="max-width: 65%;">
-  <figcaption style="text-align: left; font-size: 0.6em; color: red;">
+  <figcaption style="text-align: left; font-size: 0.6em; color: #af1818ff; margin-top: -15pt;">
     Poison Hemlock
   </figcaption>
 
@@ -336,7 +350,8 @@ $$
   <div>
 
   <img src="images/plant2_2.png" style="max-width: 65%;">
-  <figcaption style="text-align: left; font-size: 0.6em; color: green;">
+  <figcaption style="text-align: left; font-size: 0.6em; color: green;
+  margin-top: -15pt;">
     Common Cowparsnip
   </figcaption>
   
@@ -345,6 +360,9 @@ $$
   </div>
 
 </div>
+<span style="font-size: 21px;color:gray;">
+[Pl@ntNet; pics by: Philippe CATHERINE, Andrea Ang101]
+</span>
 
 
 ## Data Poisoning
