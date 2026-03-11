@@ -11,7 +11,7 @@
 
   <meta name="author" content="Alex Alì Maleknia">
   <meta name="dcterms.date" content="2026-03-12">
-  <title>quarto-inputf04ed91c9d1e80da</title>
+  <title>quarto-inpute50348b8851f973a</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -276,28 +276,26 @@ Alex Alì Maleknia
 <p>Influence functions approximate the unlearning of the training point <span class="math inline">\(z_j\)</span> <strong>from the optimal parameter</strong> <span class="math inline">\(\hat \theta\)</span>. By Taylor expansion, we have: <span class="math display">\[ \hat{\theta}(1, j) = \hat{\theta}(0, j) + \mathcal{I}(z_j) + O(\varepsilon^2)
 \]</span> <span class="math display">\[\implies \hat{\theta}_{-j} \approx \hat{\theta} - \mathcal{I}(z_j)
 \]</span></p>
-<div class="fragment">
+<!-- ::: {.fragment}
+::: {style="text-align: center;"}
+<span style="font-size: 58px;">
+**How good is this approximation?**
+</span> 
+
+:::
+::: -->
+</div>
+</section>
+
+
+
+<section id="descend-to-delete" class="slide level2">
+<h2>Descend to Delete</h2>
 <div style="text-align: center;">
-<p><span style="font-size: 58px;"> <strong>How good is this approximation?</strong> </span></p>
+<p><img data-src="images/1.svg" height="500"> <img data-src="images/2.svg" height="500"></p>
 </div>
-</div>
-</div>
+<p><span style="font-size: 21px;color:gray;"> [“Rewind-to-Delete: Certified Machine Unlearning for Nonconvex Functions”, S. Mu, D. Klabjan, 2025]</span></p>
 </section>
-<section id="unlearning-approximation" class="slide level2">
-<h2>Unlearning Approximation</h2>
-
-<img data-src="images/IFvsLOO.png" class="r-stretch"><p><span style="font-size: 21px;color:gray;"> [“If Influence Functions are the Answer, Then What is the Question?”, J. Bae, N. Ng, A. Lo, M. Ghassemi, R. Grosse, 2022] </span></p>
-</section>
-<section id="is-it-really-bad" class="title-slide slide level1 center" style="text-align: center;">
-<h1>Is it really bad?</h1>
-<div style="height:30px;">
-
-</div>
-<div class="fragment">
-<p><span style="font-size: 61px;"> Depends on the definition!</span></p>
-</div>
-</section>
-
 <section id="definition-of-unlearning" class="slide level2">
 <h2>Definition of Unlearning</h2>
 <div style="height:20px;">
@@ -317,33 +315,8 @@ What do we want to minimize?
 </ul>
 </div>
 </section>
-<section id="certified-removal" class="slide level2" data-transition="slide-in none-out" data-transition-speed="default-in fast-out">
-<h2>Certified Removal</h2>
-<div class="centered-slide">
-<p>Consider a predictor <span class="math inline">\(\mathcal{A}:(\mathcal{X}\times\mathcal{Y})^n\to\Theta\)</span> and an unlearning procedure <span class="math inline">\(\mathcal{M}(\mathcal{A}(D), D, j)\approx \hat{\theta}_{-j}\)</span>.</p>
-<p>In the literature, they ask <span class="math inline">\(\mathcal{M}\)</span> to achieve <strong><span class="math inline">\(\epsilon\)</span>-Certified Removal</strong>, i.e., for all <span class="math inline">\(S\in\mathcal{B}(\Theta)\)</span>, <span class="math inline">\(j\in\{1,...,n\}\)</span>, and <span class="math inline">\(D\in(\mathcal{X}\times\mathcal{Y})^n\)</span>: <span class="math display">\[ e^{-\epsilon} \leq \frac{P(\mathcal{M}(\mathcal{A}(D), D, j) \in S)}{P(\mathcal{A}(D\setminus\{z_j\}) \in S)} \leq e^{\epsilon}.
-\]</span> <span style="font-size: 21px;color:gray;"> [“Certified Data Removal from Machine Learning Models”, Guo, C., Zhang, L., Vorobeychik, Y., &amp; Li, B., 2020]</span></p>
-</div>
-</section>
-<section id="certified-removal-1" class="slide level2" data-transition="fade">
-<h2>Certified Removal</h2>
-<div class="centered-slide">
-<div class="frame">
-<p><strong>Idea:</strong> We want the unlearning algorithm to be as close as possible to the LOO trajectory.</p>
-</div>
-<p><strong>Note:</strong> both algorithms <span class="math inline">\(\mathcal{A}\)</span> and <span class="math inline">\(\mathcal{M}\)</span> can be random!</p>
-<p>Usually, to achieve <span class="math inline">\(\epsilon\)</span>-CR gaussian noise is added.</p>
-<p><span class="math display">\[ e^{-\epsilon} \leq \frac{P(\mathcal{M}(\mathcal{A}(D), D, j) \in S)}{P(\mathcal{A}(D\setminus\{z_j\}) \in S)} \leq e^{\epsilon}.
-\]</span></p>
-</div>
-</section>
-<section id="descend-to-delete" class="slide level2">
-<h2>Descend to Delete</h2>
-<div style="text-align: center;">
-<p><img data-src="images/1.svg" height="500"> <img data-src="images/2.svg" height="500"></p>
-</div>
-<p><span style="font-size: 21px;color:gray;"> [“Rewind-to-Delete: Certified Machine Unlearning for Nonconvex Functions”, S. Mu, D. Klabjan, 2025]</span></p>
-</section>
+
+
 <section id="future-directions" class="slide level2">
 <h2>Future Directions</h2>
 <ul>
@@ -422,14 +395,41 @@ Common Cowparsnip
 </section>
 <section id="data-poisoning" class="slide level2">
 <h2>Data Poisoning</h2>
+<div style="height:60px;">
+
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between;">
+<div style="flex: 1; text-align: center;">
+<img src="images/plant1_1.png" style="max-width: 65%;">
+<figcaption style="text-align: center; font-size: 0.6em; margin-top: -15pt; color: #af1818ff;">
+<p>Common Cowparsnip</p>
+<p><span style="font-size: 21px;color:green; text-decoration: line-through;"> Poison Hemlock </span></p>
+</figcaption>
+</div>
+<div style="text-align: center; margin-top: -60pt; margin-right: 50pt;">
+<div style="font-size: 2em;">
+<p><span class="math inline">\(\xrightarrow{\text{Bad Prediction}}\)</span></p>
+</div>
+</div>
+<div style="flex: 1;margin-top: -50pt;">
+<p><img src="images/plant2_2.png" style="max-width: 65%;"></p>
+<figcaption style="text-align: left; font-size: 0.6em; color: green;
+  margin-top: -15pt; margin-left: -10pt;">
+Common Cowparsnip
+</figcaption>
+</div>
+</div>
+<div style="text-align: center;margin-top: -15pt;">
+<p><img src="images/poison.png" style="max-width: 35%;"></p>
+</div>
 </section>
 <section id="summary" class="slide level2">
 <h2>Summary</h2>
 <div class="centered-slide">
-<p>I expect my work to revolve around:</p>
+<p>My research aims to:</p>
 <ul>
-<li><p>Theoretical analysis of influence functions and their approximation properties;</p></li>
-<li><p>Development of efficient algorithms for machine unlearning based on influence functions;</p></li>
+<li><p>Apply influence functions to machine unlearning and data poisoning;</p></li>
+<li><p>Explore different theoretical frameworks for generic unlearning;</p></li>
 </ul>
 <div style="height:20px;">
 

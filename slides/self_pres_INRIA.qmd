@@ -173,17 +173,17 @@ $$
 $$\implies \hat{\theta}_{-j} \approx \hat{\theta} - \mathcal{I}(z_j)
 $$
 
-::: {.fragment}
+<!-- ::: {.fragment}
 ::: {style="text-align: center;"}
 <span style="font-size: 58px;">
 **How good is this approximation?**
-</span>
+</span> 
 
 :::
-:::
+::: -->
 :::
 
-## Unlearning Approximation
+## Unlearning Approximation{visibility="hidden"}
 
 ![](images/IFvsLOO.png)
 
@@ -192,7 +192,7 @@ $$
 </span>
 
 ::: {style="text-align: center;"}
-# Is it really bad?
+# Is it really bad?{visibility="hidden"}
 
 <div style="height:30px;"></div>
 
@@ -202,6 +202,14 @@ Depends on the definition!</span>
 
 :::
 :::
+
+## Descend to Delete 
+::: {style="text-align: center;"}
+![](images/1.svg){height=500}
+![](images/2.svg){height=500}
+:::
+<span style="font-size: 21px;color:gray;">
+["Rewind-to-Delete: Certified Machine Unlearning for Nonconvex Functions", S. Mu, D. Klabjan, 2025]</span>
 
 ## Definition of Unlearning
 <div style="height:20px;"></div>
@@ -220,7 +228,7 @@ We can have 3 distances:
 :::
 
 
-## Certified Removal{transition="slide-in none-out" transition-speed="default-in fast-out"}
+## Certified Removal{transition="slide-in none-out" transition-speed="default-in fast-out" visibility="hidden"}
 ::: {.centered-slide}
 Consider a predictor $\mathcal{A}:(\mathcal{X}\times\mathcal{Y})^n\to\Theta$ and an unlearning procedure $\mathcal{M}(\mathcal{A}(D), D, j)\approx \hat{\theta}_{-j}$.
 
@@ -232,7 +240,7 @@ $$
 
 :::
 
-## Certified Removal{transition="fade"}
+## Certified Removal{transition="fade" visibility="hidden"}
 :::{.centered-slide}
 :::{.frame}
 **Idea:** We want the unlearning algorithm to be as close as possible to the LOO trajectory.
@@ -244,15 +252,6 @@ Usually, to achieve $\epsilon$-CR gaussian noise is added.
 $$ e^{-\epsilon} \leq \frac{P(\mathcal{M}(\mathcal{A}(D), D, j) \in S)}{P(\mathcal{A}(D\setminus\{z_j\}) \in S)} \leq e^{\epsilon}.
 $$
 :::
-
-
-## Descend to Delete 
-::: {style="text-align: center;"}
-![](images/1.svg){height=500}
-![](images/2.svg){height=500}
-:::
-<span style="font-size: 21px;color:gray;">
-["Rewind-to-Delete: Certified Machine Unlearning for Nonconvex Functions", S. Mu, D. Klabjan, 2025]</span>
 
 ## Future Directions
 
@@ -366,14 +365,58 @@ $$
 
 
 ## Data Poisoning
+<div style="height:60px;"></div>
+<div style="display: flex; align-items: center; justify-content: space-between;">
+
+  <div style="flex: 1; text-align: center;">
+
+  <img src="images/plant1_1.png" style="max-width: 65%;">
+  <figcaption style="text-align: center; font-size: 0.6em; margin-top: -15pt; color: #af1818ff;">
+    Common Cowparsnip 
+
+  <span style="font-size: 21px;color:green; text-decoration: line-through;">
+    Poison Hemlock
+  </span>
+
+  </figcaption>
+
+  </div>
+
+  <div style="text-align: center; margin-top: -60pt; margin-right: 50pt;">
+
+  <div style="font-size: 2em;">
+  
+  $\xrightarrow{\text{Bad Prediction}}$
+
+  </div>
+
+  </div>
+
+  <div style="flex: 1;margin-top: -50pt;">
+
+  <img src="images/plant2_2.png" style="max-width: 65%;">
+
+  <figcaption style="text-align: left; font-size: 0.6em; color: green;
+  margin-top: -15pt; margin-left: -10pt;">
+    Common Cowparsnip
+  </figcaption>
+
+  </div>
+
+</div>
+
+<div style="text-align: center;margin-top: -15pt;">
+<img src="images/poison.png" style="max-width: 35%;">
+</div>
+
 
 ## Summary
 ::: {.centered-slide}
-I expect my work to revolve around:
+My research aims to:
 
-- Theoretical analysis of influence functions and their approximation properties;
+- Apply influence functions to machine unlearning and data poisoning;
 
-- Development of efficient algorithms for machine unlearning based on influence functions;
+- Explore different theoretical frameworks for generic unlearning;
 
 <div style="height:20px;"></div> 
 <span style="font-size: 21px;color:gray;">
