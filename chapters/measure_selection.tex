@@ -136,10 +136,27 @@ $$\min_{\theta\in\Theta} \int_{\X\times\Y} (f(x;\theta)-y)^2 d\,\sharp_\mathcal{
 where $\sharp_\mathcal{D}$ is the empirical distribution of the dataset $\mathcal{D}$.
 On the other hand, the idea behind VRM is to extend the empirical distribution by choosing a continuous probability for $x$, while keeping $y$ constant, i.e.:
 $$\min_{\theta\in\Theta} \sum_{i=1}^n\int_{\X} (f(x;\theta)-y_i)^2 d\,P_i(x),$$
-with $P_i$ being a probability distribution that is concentrated around $x_i$ (for example, the normal distribution centered in $x_i$: $P_i = \mathcal{N}_\sigma(x-x_i)$).
+with $P_i$ being a probability distribution that is concentrated around $x_i$ (for example, the normal distribution centered in $x_i$: $P_i = \mathcal{N}_\sigma(x-x_i)$).\\
 
+This framework allows us to model a larger class of risks and I think it's suited particularily well for our case study:
+\begin{definition}
+  Given a probability distribution $\rho$ on $\mathcal{Z}=\mathcal{X}\times\mathcal{Y}$ and a loss function $\ell:\mathcal{Z}\times\Theta\to\R$, I define the risk as:
+  $$ R(\rho,\theta) = \mathbb{E}_{z\sim\rho}[\ell(z,\theta)].
+  $$
+\end{definition}
+With this definition, we can model the theoretical risk as $R(\mathcal{D},\theta)$ where $\mathcal{D}$ is the true data distribution and the empirical risk as $R(\sum_{i=1}^n \delta_{x_i}\delta_{y_i},\theta)$.
+
+With this setting in mind, the fairness definition conveys a risk that is represented by the measure $\rho_{\text{fair}}=\frac{1}{|S|} \sum P_s$ where $(x_{s_i}, y_{s_i})\sim P_s$ for all $s\in S$.
+
+In concrete, I am not sure how this is different from the empirical risk.\\
+An interesting observation, though, is that this definition tells us that there exist two types of information leaks: one that is data-related (overfitting) and one that is distribution-related!
+In fact, knowing each $P_s$, I think we can create a test to check if data is coming from user $s$ or not just by knowing $\rho_{\text{fair}}$.
+
+
+\vspace{0.3cm}
 \qst Let's go back to the first article we reviewed.
 What does it mean for the unlearning that we are approximating PBRF with IFs?
+\vspace{0.3cm}
 
 \noindent
 \textbf{Observation on fairness definition:} If we don't have any data, every algorithm looks secure to me, as it doesn't incorporate any sensible information of the user.
