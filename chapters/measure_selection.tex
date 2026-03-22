@@ -68,7 +68,6 @@ Some applications of the influence functions I would eventually like to investig
   \item variation of weights for mislabeled samples (in this case, it is useful to study what is the $\eps(t)$ that minimizes the distance from optimum at the end of the training).
 \end{itemize}
 
-{\color{RoyalBlue}
 \subsection*{Critique and new proposal}
 The previous definition I proposed doesn't actually take into consideration the pro\-babili\-ty of our end point being close to a feasible trajectory.
 Therefore, if the set of initial conditions is the whole space, the former definition is empty.\\
@@ -113,6 +112,14 @@ As a side note, note that $\delta$ carries the meaning of time incertitude, as $
   \label{fig:def2}
 \end{figure}
 
+\begin{figure}
+  \centering
+  \includegraphics[width=.5\linewidth]{test.png}
+  \caption{Experiments depicting Definition \ref{def:2} when $\Theta_0\subset\R^2$. Blue points represent the initial distribution, green points the LOO retraining and orange points the influence function unlearning.}
+  \label{fig:def2exp}
+\end{figure}
+
+{\color{RoyalBlue}
 \subsection*{MIA and overfitting} 
 From the previous discussion, it seems like algorithms that overfit are bad when tested with the new measure. \\
 Does it makes sense from a privacy point of view?\\
@@ -136,9 +143,10 @@ $$\min_{\theta\in\Theta} \int_{\X\times\Y} (f(x;\theta)-y)^2 d\,\sharp_\mathcal{
 where $\sharp_\mathcal{D}$ is the empirical distribution of the dataset $\mathcal{D}$.
 On the other hand, the idea behind VRM is to extend the empirical distribution by choosing a continuous probability for $x$, while keeping $y$ constant, i.e.:
 $$\min_{\theta\in\Theta} \sum_{i=1}^n\int_{\X} (f(x;\theta)-y_i)^2 d\,P_i(x),$$
-with $P_i$ being a probability distribution that is concentrated around $x_i$ (for example, the normal distribution centered in $x_i$: $P_i = \mathcal{N}_\sigma(x-x_i)$).\\
+with $P_i$ being a probability distribution that is concentrated around $x_i$ (for example, the normal distribution centered in $x_i$: $P_i = \mathcal{N}_\sigma(x-x_i)$. Computations in this case lead to the $L_2$ regularization!).\\
 
-This framework allows us to model a larger class of risks and I think it's suited particularily well for our case study:
+\paragraph{Observations on fairness definition:}
+The previous framework allows us to model a larger class of risks and I think it's suited particularily well for our case study:
 \begin{definition}
   Given a probability distribution $\rho$ on $\mathcal{Z}=\mathcal{X}\times\mathcal{Y}$ and a loss function $\ell:\mathcal{Z}\times\Theta\to\R$, I define the risk as:
   $$ R(\rho,\theta) = \mathbb{E}_{z\sim\rho}[\ell(z,\theta)].
@@ -148,17 +156,17 @@ With this definition, we can model the theoretical risk as $R(\mathcal{D},\theta
 
 With this setting in mind, the fairness definition conveys a risk that is represented by the measure $\rho_{\text{fair}}=\frac{1}{|S|} \sum P_s$ where $(x_{s_i}, y_{s_i})\sim P_s$ for all $s\in S$.
 
-In concrete, I am not sure how this is different from the empirical risk.\\
-An interesting observation, though, is that this definition tells us that there exist two types of information leaks: one that is data-related (overfitting) and one that is distribution-related!
-In fact, knowing each $P_s$, I think we can create a test to check if data is coming from user $s$ or not just by knowing $\rho_{\text{fair}}$.
+Observe that this definition tells us that there exist two types of information leaks (overfitting): one that is data-related and one that is distribution-related!
+In fact, overfitting is the phenomenon where the model achieves low training score but high generalization error; this can happen both when we use the empirical risk to train and when we use $\rho_{\text{fair}}$.
+I think that knowing each $P_s$, we can create a test to check if data is coming from user $s$ or not just by knowing $\rho_{\text{fair}}$.
 
+Interesting point: the previous attack is not the same as the MIA where you check for overfitting evaluating the loss on a specific point.
+
+\textbf{Idea:} the sequential learning described above may be restated in a distributional way: at first, we start from a generic distribution over $\mathcal{Z}$, then we specialize on the different $P_s$'s and finally the distribution dynamics converges to the sum of delta functions on the training data.
 
 \vspace{0.3cm}
 \qst Let's go back to the first article we reviewed.
-What does it mean for the unlearning that we are approximating PBRF with IFs?
-\vspace{0.3cm}
-
-\noindent
-\textbf{Observation on fairness definition:} If we don't have any data, every algorithm looks secure to me, as it doesn't incorporate any sensible information of the user.
-In fact, if we do ERM on distributions instead of data, we will end up with a differentially private algorithm I think. Therefore, I'm not sure we can talk about privacy without modeling data. (think more)
+What does it mean for the unlearning that we are approximating PBRF with IFs?\\
+\textbf{Answer:} It means that if we use the PBOM (Proximal Bregman Objective Minimization) algorithm, then the influence functions approximate well the unlearning.
+Maybe we can analyze with our definitions how good the unlearning is and how different is the accuracy compared to ERM training.
 }
