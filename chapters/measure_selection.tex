@@ -115,11 +115,15 @@ As a side note, note that $\delta$ carries the meaning of time incertitude, as $
 \begin{figure}
   \centering
   \includegraphics[width=.5\linewidth]{test.png}
-  \caption{Experiments depicting Definition \ref{def:2} when $\Theta_0\subset\R^2$. Blue points represent the initial distribution, green points the LOO retraining and orange points the influence function unlearning.}
+  \caption{Experiments depicting Definition \ref{def:2} when $\Theta_0\subset\R^2$. Blue points represent the $10^4$ initial conditions; green points and orange points respectively the LOO retraining and the influence function unlearning after $100$ iterations.}
   \label{fig:def2exp}
 \end{figure}
-
 {\color{RoyalBlue}
+From Figure \ref{fig:def2exp}, I think there is something wring with definition \ref{def:2}. In fact, it looks like it makes more sense to compare two different measures of the same set, rather than two sets with the same measure.
+In other words, taken the $\delta$-ball around the end point of the modified algorithm, it may be better to consider the ratio between its $\P_t$ measure and $\tilde{\P}$ measure, where $\tilde{\P}$ is the push-forward measure by the modified algorithm.\\
+In this way, we also fix another problem: in the previous case, applying a permutation of neuron parameters before retraining would lead to a bad unlearning algorithm, while in practice it is the same as LOO. 
+
+
 \subsection*{MIA and overfitting} 
 From the previous discussion, it seems like algorithms that overfit are bad when tested with the new measure. \\
 Does it makes sense from a privacy point of view?\\
