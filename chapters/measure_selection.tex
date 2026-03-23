@@ -120,9 +120,13 @@ As a side note, note that $\delta$ carries the meaning of time incertitude, as $
 \end{figure}
 {\color{RoyalBlue}
 From Figure \ref{fig:def2exp}, I think there is something wring with definition \ref{def:2}. In fact, it looks like it makes more sense to compare two different measures of the same set, rather than two sets with the same measure.
-In other words, taken the $\delta$-ball around the end point of the modified algorithm, it may be better to consider the ratio between its $\P_t$ measure and $\tilde{\P}$ measure, where $\tilde{\P}$ is the push-forward measure by the modified algorithm.\\
+In other words, taken the $\delta$-ball around the end point of the modified algorithm, it may be better to consider the ratio between its $\P_t$ measure and $\P'_t$ measure, where $\P'_t$ is the push-forward measure by the modified algorithm.\\
 In this way, we also fix another problem: in the previous case, applying a permutation of neuron parameters before retraining would lead to a bad unlearning algorithm, while in practice it is the same as LOO. 
-
+\begin{definition*}\label{def:3}
+    Given two training algorithms $\mathcal{A}$ and $\mathcal{A}'$, we say that they are $(\alpha,\delta)$-indistinguishable at time $s$ if, for all $\theta_0\in\Theta_0$:
+    $$ \exp(-\alpha)\leq \frac{\P_s[B_\delta(\mathcal{A}(s,\theta_0))]}{\P_s'[B_\delta(\mathcal{A}(s,\theta_0))]} \le \exp(\alpha), $$
+    where $\P_s$ is the push-forward measure by $\mathcal{A}(s,\cdot)$ and $\P_s'$ is the push-forward measure by $\mathcal{A}'(s,\cdot)$.
+\end{definition*}
 
 \subsection*{MIA and overfitting} 
 From the previous discussion, it seems like algorithms that overfit are bad when tested with the new measure. \\
