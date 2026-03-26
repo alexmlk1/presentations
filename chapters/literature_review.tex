@@ -28,4 +28,9 @@ In particular, in addition to all previous observations, they highlight that D2D
   Moreover, instead of training from scratch the model with the updated weights, the authors propose to correct the result of the usual training with influence functions.
   \item Something I had not seen yet in machine unlearning, but I have seen for example in plateau explanation \cite{Berthier_2024}: it can make more sense to consider influence functions in certain epochs of the training, not only at the end \cite{lee_timescales_2025}. 
   Indeed, the importance of a certain data point may change throughout the training.
+  {\color{RoyalBlue}
+    \item One of the reasons why we are analyzing unlearning is that it's kind of the dual problem of finiding influencial samples.
+    However, the authors of \cite{pan_misalignment_2026} state that in general this correlation is not high. 
+    Therefore, they propose a new training method for neural nets that increases this alignment while keeping about the same performances of the usual algorithms in terms of training time and accuracy.
+  } 
 \end{itemize}

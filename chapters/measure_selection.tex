@@ -118,14 +118,39 @@ As a side note, note that $\delta$ carries the meaning of time incertitude, as $
   \caption{Experiments depicting Definition \ref{def:2} when $\Theta_0\subset\R^2$. Blue points represent the $10^4$ initial conditions; green points and orange points respectively the LOO retraining and the influence function unlearning after $100$ iterations.}
   \label{fig:def2exp}
 \end{figure}
-{\color{RoyalBlue}
+
 From Figure \ref{fig:def2exp}, I think there is something wring with definition \ref{def:2}. In fact, it looks like it makes more sense to compare two different measures of the same set, rather than two sets with the same measure.
 In other words, taken the $\delta$-ball around the end point of the modified algorithm, it may be better to consider the ratio between its $\P_t$ measure and $\P'_t$ measure, where $\P'_t$ is the push-forward measure by the modified algorithm.\\
 In this way, we also fix another problem: in the previous case, applying a permutation of neuron parameters before retraining would lead to a bad unlearning algorithm, while in practice it is the same as LOO. 
 \begin{definition*}\label{def:3}
-    Given two training algorithms $\mathcal{A}$ and $\mathcal{A}'$, we say that they are $(\alpha,\delta)$-indistinguishable at time $s$ if, for all $\theta_0\in\Theta_0$:
-    $$ \exp(-\alpha)\leq \frac{\P_s[B_\delta(\mathcal{A}(s,\theta_0))]}{\P_s'[B_\delta(\mathcal{A}(s,\theta_0))]} \le \exp(\alpha), $$
+    Given two training algorithms $\mathcal{A}$ and $\mathcal{A}'$, define the $\delta$-distinguishability at time $s$ as:
+    $$ \Delta^\delta_s(\mathcal{A},\mathcal{A'};\theta_0) = \frac{\P_s[B_\delta(\mathcal{A}'(s,\theta_0))]}{\P_s'[B_\delta(\mathcal{A}'(s,\theta_0))]}, $$
     where $\P_s$ is the push-forward measure by $\mathcal{A}(s,\cdot)$ and $\P_s'$ is the push-forward measure by $\mathcal{A}'(s,\cdot)$.
+\end{definition*}
+
+\begin{definition*}
+    Given two training algorithms $\mathcal{A}$ and $\mathcal{A}'$, we say that they are $(\alpha,\delta)$-indistinguishable at time $s$ if:
+    $$ \exp(-\alpha)\leq \mathbb{E}_{\theta_0\sim\P_0}\left[\Delta^\delta_s(\mathcal{A},\mathcal{A'};\theta_0)\right] \le \exp(\alpha). $$
+\end{definition*}
+
+{\color{RoyalBlue}
+\begin{remark}
+  If, in Definition \ref{def:3}, we measure the set $B_\delta(\theta_0)$ instead, then the notion of $(\alpha,\delta)$-indistinguishability is very close do $\epsilon$-certified unlearning!
+  The differences are:
+  \begin{itemize}
+    \item We assume that the only source of randomness is the initialization;
+    \item We take the expectation over $\theta_0$ instead of checking for all the borel sets;
+    \item If we ask the condition for all $\theta_0$, it's still different, since we fixed $\delta$.
+  \end{itemize} 
+  Overall, I think these features are quite marginal and I don't have any reason to prefer our version to theirs.
+\end{remark}
+
+\textbf{Idea:} the longer the training goes, the more the distributions $\P_t$ and $\P'_t$ become specialized, meaning that they concentrate around dynamically important regions.\\
+For this reason, it may be still a good idea to consider the next definition: maybe we can give a lower bound to that quantity, saying that \emph{``given $\delta>0$, either $\Delta_T^\delta(\mathcal{A},\mathcal{A}';\theta_0)=0$, or it is greater than $\beta(T,\delta)$''}.
+
+\begin{definition*}
+  Given a training algorithm $\mathcal{A}_D$ on the dataset $D$ and a minimum number of training steps $T$, an unlearning algorithm $\mathcal{M}$ is valid if for any $\delta>0$ it holds:
+  $$ \Delta_T^\delta(\mathcal{A}_{D\setminus\{z_j\}}, \mathcal{M}(\mathcal{A}_D,\{z_j\});\theta_0) > 0 \quad \forall \theta_0\in\Theta_0. $$ 
 \end{definition*}
 
 \subsection*{MIA and overfitting} 
