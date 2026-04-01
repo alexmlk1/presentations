@@ -1,0 +1,38 @@
+% !TeX TXS-program:compile = txs:///pdflatex/[--shell-escape]
+\documentclass[%
+	a4paper,%							A4 paper
+	oneside,%							oneside (left and right margin are equal)  - twoside if I want to print it as a book
+	%bibliography=totoc,%	add the bibliography to the table of contents
+	%listof=totoc,%				add the list of figures and list of tables to the table of contents
+	numbers=noenddot,%		no dot at the end of heading numbers (see the comment below)
+	%headsepline,%					line after the page head
+	%footsepline,%					line before the page foot
+	%headings=small,%			smaller headings
+	12pt,%								font size
+]{scrreprt}
+
+
+\usepackage{definitions}
+
+
+\begin{document}
+
+\begin{center}
+  \textbf{\LARGE Weekly meetings}
+\end{center}
+
+%\include{chapters/paper_IF}
+
+%\include{chapters/IF_for_LR}
+
+\include{chapters/eps_dynamics}
+
+\include{chapters/measure_selection}
+
+\include{chapters/literature_review}
+
+%\nocite{*}
+\bibliographystyle{plain}
+\bibliography{refs}
+
+\end{document}

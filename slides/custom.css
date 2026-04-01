@@ -1,0 +1,44 @@
+/* For main slide titles */
+.reveal h1 {
+  font-family: "IBM Plex Serif", sans-serif;
+  color: #0b8622ff; /* Your color */
+}
+
+/* For section/subsection titles */
+.reveal h2 {
+  font-family: "IBM Plex Serif", sans-serif;
+  color: #0b8622ff; /* Your color */
+}
+
+/* For sub-subsection titles */
+.reveal h3 {
+  font-family: "IBM Plex Serif", sans-serif;
+  color: #0b8622ff; /* Your color */
+}
+
+/* Make .centered-slide take full slide height and center content vertically */
+.centered-slide {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;  /* vertical centering */
+  height: 80%;
+}
+
+.frame {
+  border: 3px solid #444644ff;
+  padding: 1rem;
+  border-radius: 6px;
+  background-color: #88e7501f;
+  margin: 1rem auto;
+  width: 80%;
+  /*text-align: center;*/
+}
+
+.blank-frame {
+  border: 3px solid #444644ff;
+  padding: 1rem;
+  border-radius: 6px;
+  margin: 1rem auto;
+  width: 80%;
+  text-align: center;
+}

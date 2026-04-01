@@ -1,0 +1,62 @@
+\ProvidesPackage{definitions}
+
+% input encoding
+\usepackage[utf8]{inputenc}
+
+% color in the text
+\usepackage[table,xcdraw,dvipsnames]{xcolor}
+
+% mathematical symbols
+\usepackage{amsmath, amssymb, amsfonts, mathrsfs, bbm}
+
+% hyper reference for links or figures
+\usepackage{hyperref}
+
+% package to modify itemizations and enumerations
+\usepackage{enumitem}
+
+\usepackage{tikz}
+
+% package for better spacing
+\usepackage{xspace}
+
+% package for graphics - the formats png, pdf, jpg are permitted
+\usepackage{graphicx}
+\usepackage{subcaption}
+% default path for figures
+\graphicspath{{images/}}
+% include SVG figures (also need the first line of this document
+% as well as having Inkscape installed
+% \usepackage[inkscapearea=page]{svg}
+
+% Theorems
+\usepackage{amsthm}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{definition*}{Definition}
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+\newtheorem*{obs}{Observation}
+\newtheorem*{ex}{Example}
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}{Proposition}[section]
+\newtheorem{corollary}{Corollary}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\renewcommand\qedsymbol{$\blacksquare$}
+
+% define useful mathematical symbols
+\def\N{\ensuremath{\mathbb{N}}}
+\def\R{\ensuremath{\mathbb{R}}}
+\def\X{\ensuremath{\mathcal{X}}}
+\def\Y{\ensuremath{\mathcal{Y}}}
+\def\G{\ensuremath{\mathcal{G}}}
+\def\C{\ensuremath{\mathbb{C}}}
+\def\P{\ensuremath{\mathbb{P}}}
+\def\Ll{\ensuremath{\mathscr{L}}}
+\newcommand{\Ss}{\mathscr{S}}
+\newcommand{\Pp}{\mathbb{P}}
+\newcommand{\Ee}{\mathbb{E}}
+\newcommand{\iid}{\mathop{\sim}\limits^{\text{i.i.d.}}}
+\newcommand{\qst}{\noindent\textbf{\color{Red} Question: }}
+\def\eps{\ensuremath{\varepsilon}}
