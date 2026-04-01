@@ -117,7 +117,7 @@ As a side note, note that $\delta$ carries the meaning of time incertitude, as $
   \includegraphics[height=.25\linewidth]{initial.png}
   \includegraphics[height=.25\linewidth]{test_100.png}
   \includegraphics[height=.26\linewidth]{test_1000.png}
-  \caption{Experiments depicting Definition \ref{def:2} when $\Theta_0\subset\R^2$. Blue points represent the $10^4$ initial conditions; green points and orange points respectively the LOO retraining and the influence function unlearning after $100$ iterations.}
+  \caption{Experiments depicting Definition \ref{def:2} when $\Theta_0\subset\R^2$. Choosing 5000 initial conditions, I represented the parameter distribution after 100 steps (middle) and 1000 steps (right) of the gradient descent algorithm for LOO (green) and influence functions approximation of unlearning (orange). The arrows follow the LOO flow and their colour represents the intensity.}
   \label{fig:def2exp}
 \end{figure}
 
@@ -138,7 +138,7 @@ In this way, we also fix another problem: in the previous case, applying a permu
 {\color{RoyalBlue}
 \begin{remark}
   In Definition \ref{def:3}, a reason to consider $\P_s[B_\delta(\mathcal{A}'(s,\theta_0))]$ is the meaning: in words, this quantity represents the probability that the training algorithm $\mathcal{A}$ ends in a point that is $\delta$-close to the end point of $\mathcal{A}'$; the denominator is just a sort of normalization factor.
-  If, instead, we measure the set $B_\delta(\theta_0)$, then the notion of $(\alpha,\delta)$-indistinguishability is very close do $\epsilon$-certified unlearning!
+  If, instead, we measure the set $B_\delta(\theta_0)$, then the notion of $(\alpha,\delta)$-indistinguishability is very close do $\alpha$-certified removal!
   The differences are:
   \begin{itemize}
     \item We assume that the only source of randomness is the initialization;
@@ -150,7 +150,10 @@ In this way, we also fix another problem: in the previous case, applying a permu
 
 \textbf{Idea:} the longer the training goes, the more the distributions $\P_t$ and $\P'_t$ become specialized, meaning that they concentrate around dynamically important regions.\\
 For this reason, it may be still a good idea to consider the next definition: maybe we can give a lower bound to that quantity, saying that \emph{``given $\delta>0$, either $\Delta_T^\delta(\mathcal{A},\mathcal{A}';\theta_0)=0$, or it is greater than $\beta(T,\delta)$''}.
-In particular, if $\Theta_0$ is compact and the loss is strongly convex, the dynamic is strictly contracting and if we fix $\delta>0$, there exists a time $\bar{T}$ such that $\beta(T,\delta)=1$ for any $T\ge\bar{T}$ (at least $\bar{T}=\infty$ works).
+
+In addition, I think it can be shown that if the following definition holds, we can prove that there is no attack that can extract information about the removed sample. This would indeed be a good catch phrase. 
+But, \emph{unlearning} = \emph{impossibility to extract informations} ?
+%In particular, if $\Theta_0$ is compact and the loss is strongly convex, the dynamic is strictly contracting and if we fix $\delta>0$, there exists a time $\bar{T}$ such that $\beta(T,\delta)=1$ for any $T\ge\bar{T}$ (at least $\bar{T}=\infty$ works).
 
 \begin{definition*}
   Given a training algorithm $\mathcal{A}_D$ on the dataset $D$ and a minimum number of training steps $T$, an unlearning algorithm $\mathcal{M}$ is valid if for any $\delta>0$ it holds:
@@ -189,11 +192,19 @@ The previous framework allows us to model a larger class of risks and I think it
   $$ R(\rho,\theta) = \mathbb{E}_{z\sim\rho}[\ell(z,\theta)].
   $$
 \end{definition}
-With this definition, we can model the theoretical risk as $R(\mathcal{D},\theta)$ where $\mathcal{D}$ is the true data distribution and the empirical risk as $R(\sum_{i=1}^n \delta_{x_i}\delta_{y_i},\theta)$.
+By the means of the above definition, we can model the theoretical risk as $R(\rho_{\mathrm{truth}},\theta)$ where $\rho_{\mathrm{truth}}$ is the true data distribution and the empirical risk as $R(\rho_{\mathrm{emp}},\theta)$, where $\rho_{\mathrm{emp}}=\frac{1}{n} \sum_{i=1}^n \delta_{x_i}\delta_{y_i}$.
 
-With this setting in mind, the fairness definition conveys a risk that is represented by the measure $\rho_{\text{fair}}=\frac{1}{|S|} \sum P_s$ where $(x_{s_i}, y_{s_i})\sim P_s$ for all $s\in S$.
+With this setting in mind, the fairness definition conveys a risk that is represented by the measure $\rho_{\text{fair}}=\frac{1}{|S|} \sum P_s$ where $(x_{s_i}, y_{s_i})\sim P_s$ for all $s\in S$.\\
+We can see this fact as follows: the true distribution $\rho_{\mathrm{truth}}$ is on the space of all possible covariates $\R^\mathfrak{D}$. 
+However, we consider only $d$ of them to do regression. 
+Consequently, we will choose $|S|$ instances of the latent covariates and therefore the distribution $\rho_{\mathrm{truth}}$ specializes into $P_s$. 
+From $P_s$ we can then sample some data points and we get $\rho_{\mathrm{emp}}$.
 
-Observe that this definition tells us that there exist two types of information leaks (overfitting): one that is data-related and one that is distribution-related!
+In terms of random variables, we can see the process as:
+$$ Z \xrightarrow{s\in\mathcal{S}} Z_s \xrightarrow{\omega_i\in\Omega} z_{s_i}$$
+where $Z\sim\rho_{\mathrm{truth}}$ is a r.v. in $\R^\mathfrak{D}$, $\mathcal{S}$ is the space of latent covariates of dimension $\mathfrak{D}-d$, $Z_s:\Omega\to\R^d$ is a r.v. and $z_{s_i}$ is an evaluation of $Z_s$.
+
+We can deduce that there exist two types of information leaks (overfitting): one that is data-related and one that is distribution-related!
 In fact, overfitting is the phenomenon where the model achieves low training score but high generalization error; this can happen both when we use the empirical risk to train and when we use $\rho_{\text{fair}}$.
 I think that knowing each $P_s$, we can create a test to check if data is coming from user $s$ or not just by knowing $\rho_{\text{fair}}$.
 
