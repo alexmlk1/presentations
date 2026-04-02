@@ -32,5 +32,9 @@ In particular, in addition to all previous observations, they highlight that D2D
     \item One of the reasons why we are analyzing unlearning is that it's kind of the dual problem of finiding influencial samples.
     However, the authors of \cite{pan_misalignment_2026} state that in general this correlation is not high. 
     Therefore, they propose a new training method for neural nets that increases this alignment while keeping about the same performances of the usual algorithms in terms of training time and accuracy.
+    \item The way we have studied influence functions for unlearning so far is to estimate a step of the Newton algorithm to approximate the effect of LOO retraining.
+    In \cite{bui2026batch}, they propose an iterative algorithm using the influence function approximation step by step. The main issue they managed to solve is the computational cost for such algorithm:
+    computing only hessian-vector products instead of the whole hessian and using stochastic hessians as proxies for the full-batch hessian.
+    
   } 
 \end{itemize}
