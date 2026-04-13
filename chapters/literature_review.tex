@@ -28,13 +28,14 @@ In particular, in addition to all previous observations, they highlight that D2D
   Moreover, instead of training from scratch the model with the updated weights, the authors propose to correct the result of the usual training with influence functions.
   \item Something I had not seen yet in machine unlearning, but I have seen for example in plateau explanation \cite{Berthier_2024}: it can make more sense to consider influence functions in certain epochs of the training, not only at the end \cite{lee_timescales_2025}. 
   Indeed, the importance of a certain data point may change throughout the training.
-  {\color{RoyalBlue}
-    \item One of the reasons why we are analyzing unlearning is that it's kind of the dual problem of finiding influencial samples.
-    However, the authors of \cite{pan_misalignment_2026} state that in general this correlation is not high. 
-    Therefore, they propose a new training method for neural nets that increases this alignment while keeping about the same performances of the usual algorithms in terms of training time and accuracy.
-    \item The way we have studied influence functions for unlearning so far is to estimate a step of the Newton algorithm to approximate the effect of LOO retraining.
-    In \cite{bui2026batch}, they propose an iterative algorithm using the influence function approximation step by step. The main issue they managed to solve is the computational cost for such algorithm:
-    computing only hessian-vector products instead of the whole hessian and using stochastic hessians as proxies for the full-batch hessian.
+  \item One of the reasons why we are analyzing unlearning is that it's kind of the dual problem of finiding influencial samples.    However, the authors of \cite{pan_misalignment_2026} state that in general this correlation is not high. 
+  Therefore, they propose a new training method for neural nets that increases this alignment while keeping about the same performances of the usual algorithms in terms of training time and accuracy.
     
+  {\color{RoyalBlue}
+    \item The way we have studied influence functions for unlearning so far is to estimate a step of the Newton algorithm to approximate the effect of LOO retraining.
+    In \cite{bui2026batch}, they propose an iterative algorithm using the influence function approximation step by step. The main issue they managed to solve is the computa-tional cost for such algorithm:
+    computing only hessian-vector products instead of the whole hessian and using stochastic hessians as proxies for the full-batch hessian.
+    \item Lately, in the psychology area, I have seen an advancement concerning also machine learning, where they state that forgetting (unlearning) is not due to time, but more to interference of new information that is very close to the old one.
+    The study from \cite{barman_geometry_2026} compares human forgetting and ML forgetting and shows that competition is the main source of forgetting, both in machines and humans alike. 
   } 
 \end{itemize}

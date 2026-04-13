@@ -144,7 +144,7 @@ In this way, we also fix another problem: in the previous case, applying a permu
     $$ \exp(-\alpha)\leq \mathbb{E}_{\theta_0\sim\P_0}\left[\Delta^\delta_s(\mathcal{A},\mathcal{A'};\theta_0)\right] \le \exp(\alpha). $$
 \end{definition*}
 
-{\color{RoyalBlue}
+
 \begin{remark}
   In Definition \ref{def:3}, a reason to consider $\P_s[B_\delta(\mathcal{A}'(s,\theta_0))]$ is the meaning: in words, this quantity represents the probability that the training algorithm $\mathcal{A}$ ends in a point that is $\delta$-close to the end point of $\mathcal{A}'$; the denominator is just a sort of normalization factor.
   If, instead, we measure the set $B_\delta(\theta_0)$, then the notion of $(\alpha,\delta)$-indistinguishability is very close do $\alpha$-certified removal!
@@ -157,17 +157,19 @@ In this way, we also fix another problem: in the previous case, applying a permu
   Overall, I think these features are quite marginal and I don't have any reason to prefer our version to theirs.
 \end{remark}
 
-\textbf{Idea:} the longer the training goes, the more the distributions $\P_t$ and $\P'_t$ become specialized, meaning that they concentrate around dynamically important regions.\\
-For this reason, it may be still a good idea to consider the next definition: maybe we can give a lower bound to that quantity, saying that \emph{``given $\delta>0$, either $\Delta_T^\delta(\mathcal{A},\mathcal{A}';\theta_0)=0$, or it is greater than $\beta(T,\delta)$''}.
+% {\color{RoyalBlue}
+% \textbf{Idea:} the longer the training goes, the more the distributions $\P_t$ and $\P'_t$ become specialized, meaning that they concentrate around dynamically important regions.\\
+% For this reason, it may be still a good idea to consider the next definition: maybe we can give a lower bound to that quantity, saying that \emph{``given $\delta>0$, either $\Delta_T^\delta(\mathcal{A},\mathcal{A}';\theta_0)=0$, or it is greater than $\beta(T,\delta)$''}.
 
-In addition, I think it can be shown that if the following definition holds, we can prove that there is no attack that can extract information about the removed sample. This would indeed be a good catch phrase. 
-But, \emph{unlearning} = \emph{impossibility to extract informations} ?
-%In particular, if $\Theta_0$ is compact and the loss is strongly convex, the dynamic is strictly contracting and if we fix $\delta>0$, there exists a time $\bar{T}$ such that $\beta(T,\delta)=1$ for any $T\ge\bar{T}$ (at least $\bar{T}=\infty$ works).
+% In addition, I think it can be shown that if the following definition holds, we can prove that there is no attack that can extract information about the removed sample. This would indeed be a good catch phrase. 
+% But, \emph{unlearning} = \emph{impossibility to extract informations} ?
+% %In particular, if $\Theta_0$ is compact and the loss is strongly convex, the dynamic is strictly contracting and if we fix $\delta>0$, there exists a time $\bar{T}$ such that $\beta(T,\delta)=1$ for any $T\ge\bar{T}$ (at least $\bar{T}=\infty$ works).
 
-\begin{definition*}
-  Given a training algorithm $\mathcal{A}_D$ on the dataset $D$ and a minimum number of training steps $T$, an unlearning algorithm $\mathcal{M}$ is valid if for any $\delta>0$ it holds:
-  $$ \Delta_T^\delta(\mathcal{A}_{D\setminus\{z_j\}}, \mathcal{M}(\mathcal{A}_D,\{z_j\});\theta_0) > 0 \quad \forall \theta_0\in\Theta_0. $$ 
-\end{definition*}
+% \begin{definition*}
+%   Given a training algorithm $\mathcal{A}_D$ on the dataset $D$ and a minimum number of training steps $T$, an unlearning algorithm $\mathcal{M}$ is valid if for any $\delta>0$ it holds:
+%   $$ \Delta_T^\delta(\mathcal{A}_{D\setminus\{z_j\}}, \mathcal{M}(\mathcal{A}_D,\{z_j\});\theta_0) > 0 \quad \forall \theta_0\in\Theta_0. $$ 
+% \end{definition*}
+% }
 
 \subsection*{MIA and overfitting} 
 From the previous discussion, it seems like algorithms that overfit are bad when tested with the new measure. \\
@@ -221,9 +223,44 @@ Interesting point: the previous attack is not the same as the MIA where you chec
 
 \textbf{Idea:} the sequential learning described above may be restated in a distributional way: at first, we start from a generic distribution over $\mathcal{Z}$, then we specialize on the different $P_s$'s and finally the distribution dynamics converges to the sum of delta functions on the training data.
 
+{\color{RoyalBlue}
 \vspace{0.3cm}
 \qst Let's go back to the first article we reviewed.
 What does it mean for the unlearning that we are approximating PBRF with IFs?\\
 \textbf{Answer:} It means that if we use the PBOM (Proximal Bregman Objective Minimization) algorithm, then the influence functions approximate well the unlearning.
 Maybe we can analyze with our definitions how good the unlearning is and how different is the accuracy compared to ERM training.
+
+\subsection*{Discussion with Nicolas Papernot}
+In order to discuss whether the actual definition is a good definition or not for unlearning, first it's best to acknowedge that there are different motivations for unlearning.
+
+Namely, we may want to forget datapoints for privacy reasons, which is the classical need for the unlearning scheme, or for copyright and ethical reasons (e.g., we don't want an LLM to produce a copyrighted book neither to give us precise instructions on how to build a bomb).\\
+What N.P. thinks is that the privacy definition is not a good one for the last two cases.
+In fact, the substantial difference between the former and the latter reasons is that for privacy we care about how we train the network and, in some sense, how the result is produced; for the legal scenario, what matters more is the final output.
+
+The discussion was polarized more towards looking for better ways to unlearn, even if I tried to redirect it towards a more abstract field.
+Some interesting point that emerged, though, is the result from Anvith Thudi, who wrote a paper about recognizing the points we cannot fully unlearn without retraining the model.
+
+Addressing the multiple copies issue, his approach was more realistic and he said that most likely it's not possible to recognize identical pictures, also because of the file compression methods or other noise in the process.
+On the other hand, he admitted that it would be interesting to see if you can actually retrieve such similar images by doing clustering in the embed space (for example by Locality-Sensitive Hashing algorithm).
+
+Later on, he made clear that many of the issues we discussed about are good points, but there is no way to address all of them: you will never have a strong enough guarantee that convinces a party that has complete distrust in what you are doing.
+
+\paragraph{Are DP algorithms even good?} In N.P.'s opinion, the fact that differential privacy affects negatively the model performance is due to the excessive focus of the comunity on memorization rather than generalization.
+In fact, it is possible that we may not want to have good accuracy on points that are bad (e.g., is mislabeling very badly written digits in MNIST a real problem?).
+As borught up by Moritz Hardt, absolute scale on benchmarks doesn't really matter. We should analyze more in detail the results we get after training NNs.
+
+From this point of view, it makes also more sense to say that the main cause of privacy issues is overfitting. 
+Inspired by his words, I made an experiment to check if indeed training with a DP algorithm would get the parameters closer to the theoretical optimal rather than the overfitting point or not.
+However, as you can see in Figure \ref{fig:DPexp}, this was not the case (at least in my naive setting of 1 neuron networks), even after some DP-hyperparameters fine-tuning.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=.5\linewidth]{DP_traj.png}
+  \caption{Trajectories of parameters of a 1-layer tanh network starting from the same point and trained for 10000 iterations respectively with gradient descent and DP-SGD. The 40 datapoints are generated by adding noise to the evaluation of a teacher network with the same architecture.  Even after some hyperparameter tuning, I could not observe any instance where the DP algorithm gets closer to the theoretical optimum than GD.}
+  \label{fig:DPexp}
+\end{figure}
+
+Lastly, I asked him some questions about his paper \cite{papernot_unlearning_2020} and what was the difference from Federated Learning.
+The main difference is that since gradients leak as much information as the datapoints themselves, using a FL setting does not favour privacy, unless you use DP training algorithms (like DP-SGD) to train each locus.
+Conversely, the PATE setting is more promising because you can train the smaller models with any algorithm and the DP guarantee would still apply, as it stems from the aggregation procedure, where they add noises to the decisional histograms in the "voting" phase. 
 }
