@@ -13,7 +13,8 @@
 
 
 \usepackage{definitions}
-
+\newcommand\indep{\protect\mathpalette{\protect\independenT}{\perp}}
+\def\independenT#1#2{\mathrel{\rlap{$#1#2$}\mkern2mu{#1#2}}}
 
 \begin{document}
 
@@ -30,6 +31,9 @@
 \include{chapters/measure_selection}
 
 \include{chapters/literature_review}
+
+
+\include{chapters/thoughts}
 
 %\nocite{*}
 \bibliographystyle{plainnat}
