@@ -9,7 +9,8 @@
 	%footsepline,%					line before the page foot
 	%headings=small,%			smaller headings
 	12pt,%								font size
-]{scrreprt}
+	%draft,%								draft mode (comment for the final version)
+]{article}
 
 
 \usepackage{definitions}
@@ -30,10 +31,10 @@
 
 \include{chapters/measure_selection}
 
+\include{chapters/thoughts}
+
 \include{chapters/literature_review}
 
-
-\include{chapters/thoughts}
 
 %\nocite{*}
 \bibliographystyle{plainnat}
