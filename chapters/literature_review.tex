@@ -27,7 +27,11 @@ This can be done by saying that UNLEARNING "aims to approximate a model that was
 
 An implication of the previously expressed discrepancies is that successful untraining does not imply misclassifying the examples in the forget set (because if someone else took a picture of the tour eiffel, then removing you has no effect on the prediction), nor the necessity of changning the model parameters, whereas the unlearning implies both.\\
 If we want to give a definition similar of unlearning in terms of certified removal, we could proceed in the following way.\\
+<<<<<<< HEAD
 >>>>>>> 5bdb3bc (added unlearning or untraining paper; masked images for faster compilation, set class article)
+=======
+>>>>>>> 463b877 (added unlearning or untraining paper; masked images for faster compilation, set class article)
+>>>>>>> 8bcee1b (added unlearning or untraining paper; masked images for faster compilation, set class article)
 Given a concept $\mathcal{B}$ we want to unlearn, let $\mathcal{S}^{\mathrm{full}}$ be the complete set of examples that capture the behaviour $\mathcal{B}$.
 Unlearning $\mathcal{S}\sim\mathcal{B}$ is equivalent to untraining on $\mathcal{S}^{\mathrm{full}}$.
 Remarkably, if $\mathcal{S}=\mathcal{S}^{\mathrm{full}}$, then untraining $\mathcal{S}$ and unlearning $\mathcal{B}$ are the same.
@@ -55,7 +59,11 @@ This formulation is very clear to me, but I'm not sure if the independence condi
 If they are, assuming that the concept of behaviour coincide with the distribution of a user, the definition given from attempt 2 is close to their definition of un\-learning.
 Note, however, that I would like the predictor to not be able to see what user the data comes from. 
 If that's not the case, one can keep some information about the unlearnt class that can give room to attacks that try to recognize if an element was part of the class to forget or not.
+<<<<<<< HEAD
 >>>>>>> 5bdb3bc (added unlearning or untraining paper; masked images for faster compilation, set class article)
+=======
+>>>>>>> 463b877 (added unlearning or untraining paper; masked images for faster compilation, set class article)
+>>>>>>> 8bcee1b (added unlearning or untraining paper; masked images for faster compilation, set class article)
 
 Althought they clearly say that their aim is not to discuss the feasibility of unlearning, I think that there are some examples in the literature of unlearning algorithms in this new sense, such as SurgUN \cite{competition_forgetting_2026} or DIET \cite{diet_2026} (as well as the one by Li et al. discussed in the paper).
 The first one unlearns concepts by changing the model parameters after training on concurrent images, while the second one moves the embedding of the concept towards the boundary of the elliptic space of embeddings, making its influence on the prediction negligible.
@@ -108,7 +116,11 @@ In particular, in addition to all previous observations, they highlight that D2D
     Exploiting this phenomenon, in \cite{competition_forgetting_2026}, the authors pro\-pose a new method for unlearning concepts, that relies on unlearning concepts in Vision Language Models by changing a surgically chosen set of parameters, that is responsible for the prediction of the concept we want to unlearn, by updating them with gradients given by competing concepts.
 =======
     Exploiting this phenomenon, in \cite{competition_forgetting_2026}, the authors pro\-pose a new method for unlearning data points that relies on unlearning concepts in Vision Language Models by changing a surgically chosen set of parameters, that is responsible for the prediction of the concept we want to unlearn, by updating them with gradients given by competing concepts.
+<<<<<<< HEAD
 >>>>>>> 5bdb3bc (added unlearning or untraining paper; masked images for faster compilation, set class article)
+=======
+>>>>>>> 463b877 (added unlearning or untraining paper; masked images for faster compilation, set class article)
+>>>>>>> 8bcee1b (added unlearning or untraining paper; masked images for faster compilation, set class article)
     \item Maybe it's better to use continual learning for Pl@ntNet instead of retraining the model every 3 months, now that results improving perfor\-mances \cite{catastrophic_forgetting_2026} are available.  
   } 
 \end{itemize}
