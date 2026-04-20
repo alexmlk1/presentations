@@ -1,7 +1,6 @@
 {\color{RoyalBlue}
 \section*{Unlearning or Untraining?}
 The goal of this section is to compare the discussion above with the thoughts expressed in \cite{untraining_2026}.\\
-<<<<<<< HEAD
 In the introduction, the authors make a remark that was in common with N.P.: there are a lot of different tasks that, in the literature, are referred to as "unlearning", but, conceptually, are different from merely "deleting data from the model". 
 Some examples are: removing dangerous knowledge, eliminating backdoor or poisoning attacks, unlearn copyrighted content or specific art styles.\\
 The main point they rise in their work is that this class of problems is too broad to be faced in the same way, and thus the need to break down the "unlearning" concept into two different ones: UNTRAINING and UNLEARNING.\\
@@ -13,30 +12,10 @@ A general idea that arises from the paper is the fact that untraining is a point
 Therefore, to compare the two concepts, we need to get them at the same level in the first place.
 This can be done by saying that UNLEARNING "aims to approximate a model that was never trained on any instance of that distribution".
 So, if we want to give a definition similar of unlearning in terms of certified removal, we could proceed in the following way.\\
-=======
-In the introduction, the authors makes a remark that was common with N.P.: there is a lot of different tasks that the literature refers to as "unlearning", which, conceptually, are different from merely "deleting data from the model". 
-Some examples are: removing dangerous knowledge, eliminating backdoor or poisoning attacks, unlearn copyrighted content or specific art styles, etc.\\
-The main point they rise is that this class of problems is too broad to be faced in the same way, and thus the need to break down the "unlearning" concept into two different ones: UNTRAINING and UNLEARNING.\\
-UNTRAINING is the task of removing the influence of a certain data point from the model, without changing its behaviour on the rest of the dataset (the gold-standard in this case is retraining).\\
-On the other hand, UNLEARNING aims at "removing the influence of the underlying distribution from which those examples are sampled".
-
-As far as the measures are concerned, in the former case, the $(\varepsilon,\delta)$-certified removal is the reference measure, but it does not capture the desired effect in the latter case.
-A general idea that arises from the paper is the fact that untraining is a point-wise concept, while unlearning is at distribution level. 
-Therefore, to compare the two concepts, we need to get them at the same level in the first place.
-This can be done by saying that UNLEARNING "aims to approximate a model that was never trained on any instance of that distribution".
-
-An implication of the previously expressed discrepancies is that successful untraining does not imply misclassifying the examples in the forget set (because if someone else took a picture of the tour eiffel, then removing you has no effect on the prediction), nor the necessity of changning the model parameters, whereas the unlearning implies both.\\
-If we want to give a definition similar of unlearning in terms of certified removal, we could proceed in the following way.\\
-<<<<<<< HEAD
->>>>>>> 5bdb3bc (added unlearning or untraining paper; masked images for faster compilation, set class article)
-=======
->>>>>>> 463b877 (added unlearning or untraining paper; masked images for faster compilation, set class article)
->>>>>>> 8bcee1b (added unlearning or untraining paper; masked images for faster compilation, set class article)
 Given a concept $\mathcal{B}$ we want to unlearn, let $\mathcal{S}^{\mathrm{full}}$ be the complete set of examples that capture the behaviour $\mathcal{B}$.
 Unlearning $\mathcal{S}\sim\mathcal{B}$ is equivalent to untraining on $\mathcal{S}^{\mathrm{full}}$.
 Remarkably, if $\mathcal{S}=\mathcal{S}^{\mathrm{full}}$, then untraining $\mathcal{S}$ and unlearning $\mathcal{B}$ are the same.
 
-<<<<<<< HEAD
 An implication of the previously expressed discrepancies is that successful untraining does not imply misclassifying the examples in the forget set (be\-cause if someone else took a picture of the Tour Eiffel, then removing you has no effect on the prediction), nor the necessity of changning the model parameters, whereas unlearning implies both.
 
 This formulation is very clear to me, but I'm not sure if the independence condition previously stated in Attempt 2 would be equivalent.
@@ -54,16 +33,6 @@ If $f=f(X,u)$, then the following example is an optimal unlearner (from our defi
     0 & \text{otherwise}
   \end{cases}.
 \end{equation*}
-=======
-This formulation is very clear to me, but I'm not sure if the independence condition previously stated in Attempt 2 would be equivalent.
-If they are, assuming that the concept of behaviour coincide with the distribution of a user, the definition given from attempt 2 is close to their definition of un\-learning.
-Note, however, that I would like the predictor to not be able to see what user the data comes from. 
-If that's not the case, one can keep some information about the unlearnt class that can give room to attacks that try to recognize if an element was part of the class to forget or not.
-<<<<<<< HEAD
->>>>>>> 5bdb3bc (added unlearning or untraining paper; masked images for faster compilation, set class article)
-=======
->>>>>>> 463b877 (added unlearning or untraining paper; masked images for faster compilation, set class article)
->>>>>>> 8bcee1b (added unlearning or untraining paper; masked images for faster compilation, set class article)
 
 Althought they clearly say that their aim is not to discuss the feasibility of unlearning, I think that there are some examples in the literature of unlearning algorithms in this new sense, such as SurgUN \cite{competition_forgetting_2026} or DIET \cite{diet_2026} (as well as the one by Li et al. discussed in the paper).
 The first one unlearns concepts by changing the model parameters after training on concurrent images, while the second one moves the embedding of the concept towards the boundary of the elliptic space of embeddings, making its influence on the prediction negligible.
@@ -112,15 +81,7 @@ In particular, in addition to all previous observations, they highlight that D2D
     computing only hessian-vector products instead of the whole hessian and using stochastic hessians as proxies for the full-batch hessian.
     \item Lately, in the psychology area, I have seen an advancement concerning also machine learning, where they state that forgetting (unlearning) is not due to time, but more to interference of new information that is very close to the old one.
     The study from \cite{barman_geometry_2026} compares human forgetting and ML forgetting and shows that competition is the main source of forgetting, both in machines and humans alike.\\
-<<<<<<< HEAD
     Exploiting this phenomenon, in \cite{competition_forgetting_2026}, the authors pro\-pose a new method for unlearning concepts, that relies on unlearning concepts in Vision Language Models by changing a surgically chosen set of parameters, that is responsible for the prediction of the concept we want to unlearn, by updating them with gradients given by competing concepts.
-=======
-    Exploiting this phenomenon, in \cite{competition_forgetting_2026}, the authors pro\-pose a new method for unlearning data points that relies on unlearning concepts in Vision Language Models by changing a surgically chosen set of parameters, that is responsible for the prediction of the concept we want to unlearn, by updating them with gradients given by competing concepts.
-<<<<<<< HEAD
->>>>>>> 5bdb3bc (added unlearning or untraining paper; masked images for faster compilation, set class article)
-=======
->>>>>>> 463b877 (added unlearning or untraining paper; masked images for faster compilation, set class article)
->>>>>>> 8bcee1b (added unlearning or untraining paper; masked images for faster compilation, set class article)
     \item Maybe it's better to use continual learning for Pl@ntNet instead of retraining the model every 3 months, now that results improving perfor\-mances \cite{catastrophic_forgetting_2026} are available.  
   } 
 \end{itemize}
