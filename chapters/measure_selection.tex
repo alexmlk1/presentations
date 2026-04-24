@@ -229,7 +229,7 @@ Interesting point: the previous attack is not the same as the MIA where you chec
 What does it mean for the unlearning that we are approximating PBRF with IFs?\\
 \textbf{Answer:} It means that if we use the PBOM (Proximal Bregman Objective Minimization) algorithm, then the influence functions approximate well the unlearning.
 Maybe we can analyze with our definitions how good the unlearning is and how different is the accuracy compared to ERM training.
-
+}
 \subsection*{Discussion with Nicolas Papernot}
 In order to discuss whether the actual definition is a good definition or not for unlearning, first it's best to acknowedge that there are different motivations for unlearning.
 
@@ -263,4 +263,3 @@ However, as you can see in Figure \ref{fig:DPexp}, this was not the case (at lea
 Lastly, I asked him some questions about his paper \cite{papernot_unlearning_2020} and what was the difference from Federated Learning.
 The main difference is that since gradients leak as much information as the datapoints themselves, using a FL setting does not favour privacy, unless you use DP training algorithms (like DP-SGD) to train each locus.
 Conversely, the PATE setting is more promising because you can train the smaller models with any algorithm and the DP guarantee would still apply, as it stems from the aggregation procedure, where they add noises to the decisional histograms in the "voting" phase. 
-}
