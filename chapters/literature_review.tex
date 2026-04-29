@@ -18,6 +18,12 @@ Remarkably, if $\mathcal{S}=\mathcal{S}^{\mathrm{full}}$, then untraining $\math
 An implication of the previously expressed discrepancies is that successful untraining does not imply misclassifying the examples in the forget set (be\-cause if someone else took a picture of the Tour Eiffel, then removing you has no effect on the prediction), nor the necessity of changning the model parameters, whereas unlearning implies both.
 
 {\color{RoyalBlue}
+\textbf{Remark!!} The main novelty of our approach compared to the literature in view of this paper, is that $\mathcal{B}$ in general is likely to be an element of $\mathcal{Y}$.
+Indeed, a ``concept'' in Pl@ntNet, as an example, is a plant species. Thus, the goal of unlearning would be to forget all the data with the same label, when you ask for a concept to be unlearnt.\\
+In our case, however, we are formalizing the fact that a behaviour is a distribution that depends on the user, and we want to unlearn it for privacy issues.
+\vspace{0.2cm}
+
+\noindent
 This formulation is very clear to me, but I'm not sure if the independence condition previously stated in Attempt 2 would be equivalent.
 If they are, assuming that the concept of behaviour coincide with the distribution of a user, the definition given from Attempt 2 is close to their definition of un\-learning.
 

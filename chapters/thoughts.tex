@@ -56,4 +56,53 @@ It (might be) is unreasonable to forget what is present in everyone else ($\math
 
 I am not sure if it is fully polished, maybe modelling should be along the line of the covariate shift or something like that, to meditate.
 
+{\color{RoyalBlue}
+\subsection{Bayes unlearning classifier}
+Inspired by the file sent by Evgenii, I will try to explicitly write the Bayes classifier for unlearning in the case of binary classification.
+\paragraph{Attempt 0.} We say that the classifier $f$ has unlearned $\bar{u}$ if $$\P[f(X)=Y \mid U=\bar{u}]=\P[f(X)=Y \mid U\neq \bar{u}]. $$ 
 
+    Call $\eta(x,u) = \mathbb{E}[Y|X=x,U=u]$.
+    In this case, from the notes we already know that, if $|\mathcal{U}|=2$ and $t\mapsto\P[\eta(X,U)\leq t \mid U=u]$ is continuous, by \emph{Theorem 2.1.1} the optimal classifier is:
+    \begin{equation}
+        f^*(x,u)=\mathbbm{1}\left[\eta(x,u) \ge \frac{1}{2}+\frac{u\lambda^*}{2\pi_u}\right] ,
+    \end{equation} 
+    where
+    $$ \lambda^* \in \arg\min_{\lambda\in\R} \sum_{u\in\mathcal{U}}\mathbb{E}[\max\left((2\eta(x,u)-1)\pi_u-u\lambda,0\right) \mid U=u] .$$
+
+\paragraph{Attempt 2.} In this case, the definition of unlearning is the following:
+$$(f(X,U)\indep Y) \mid U=\bar{u} .$$
+Let's rewrite the proof as if it was the previous case and see where it takes us:
+\begin{proof}
+    We want to find $f^*:\mathcal{X}\times\mathcal{U}\to\mathcal{Y}$ that minimizes
+    $$ \min_{f} \P[f(X,U)\neq Y : (f(X,U)\indep Y) \mid U=\bar{u}] .$$
+    In order to use Lagrange multipliers' method, we have to rewrite the constraint (by using the definition of independence) in the form:
+    \begin{equation}
+    \P[f(X,U)=y_1 \mid U=\bar{u}]\P[Y=y_2 \mid U=\bar{u}] - \P[f(X,U)=y_1, Y=y_2 \mid U=\bar{u}] = 0
+    \end{equation}
+    or alternatively:
+    \begin{equation}
+    \sum_{y\in\mathcal{Y}}\P[f(X,U)=y \mid U=\bar{u}]\P[Y=y \mid U=\bar{u}] - \P[f(X,U)=Y \mid U=\bar{u}] = 0
+    \end{equation}
+    or even:
+    \begin{equation}
+        \mathrm{Cov}(f(X,U),Y \mid U=\bar{u}) = 0 .
+    \end{equation}
+    or:
+    \begin{equation}
+        \E[f(X,U)]\E[Y] - \E[f(X,U)Y] = 0 .
+    \end{equation}
+    Next, we can write the lagrangian $\mathcal{L}(f,\lambda)$ chosing one of the above forms.
+    This way, our problem becomes:
+    $$ \min_f \max_\lambda \mathcal{L}(f,\lambda) .$$
+    However, we will focus on solving $\max_\lambda \min_f \mathcal{L}(f,\lambda)$ first, and then use the max-min inequality to prove that they have the same set of solutions.
+    Using the covariance formulation and the modeling choice of $\mathcal{Y}=\{+1,-1\}$ and $\mathcal{U}=\{0,1\}$ yield:
+    \begin{equation}
+        \begin{split}
+            \mathcal{L}(f,\lambda) &= \P[f(X,U) \neq Y] + \lambda\sum_{y_1,y_2\in\mathcal{Y}}\mathrm{Cov}(\mathbbm{1}_{f(X,U)=y_1},\mathbbm{1}_{Y=y_2} \mid U=\bar{u}) \\
+            &= \E[Y] +\sum_{u\in\mathcal{U}}\E[f(X,U)(1-2\eta(X,U))] \\
+            &+ use the expected value one plus E(eta) = E(Y) and then you can do it!!
+        \end{split}
+    \end{equation}
+\end{proof} 
+
+}
