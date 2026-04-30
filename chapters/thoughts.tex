@@ -1,0 +1,108 @@
+\section{Some ideas of unlearning}
+
+
+In this section, we will provide a general view point on unlearning, inspired by ideas from fairness. Data in many modern learning problems has the following form
+\begin{align}
+    \label{eq:data_raw}
+    (x_i, y_i, u_i)_{i = 1}^{N}\,,
+\end{align}
+where $x_i \in \mathcal{X}$ is a feature vector, $y_i \in \mathcal{Y}$ a signal to be predicted, and $u_i$ is a \emph{unique} identity of the user. With this vision in mind, we assume the following data-generation process: let $u \in \mathcal{U}$ with $|\mathcal{U}| < \infty$ denote a user and $\mathbb{P}_{u}$ be a probability distribution on $\mathcal{X} \times \mathcal{Y}$, corresponding to the distribution of data point, specific to the user $u$.
+Also assume that there is some prior distribution $(\pi_{u})_{u \in \mathcal{U}}$. Thus, we model data in~\eqref{eq:data_raw} via a random tuple $(X, Y, U) \sim \mathbb{P}$, described by the above process.
+
+A prediction function $f$ is any (measurable) mapping from either $\mathcal{X}$ to $\mathcal{Y}$ or from $\mathcal{X} \times \mathcal{U}$ to $\mathcal{Y}$. The first setup corresponds to individualized predictions, while the second case corresponds to the individualized predictions. To accommodate both cases, let us introduce a random variable $Z$, which either equal to $X$ or to $(X, U)$, depending on the considered setup. By analogy, we introduce $\mathcal{Z}$.
+
+
+\paragraph{Question.} What does it mean for a fixed prediction function $f$ to be oblivious to the distribution of user $u$?
+
+\textbf{Attempt 1. (non-personalized case + what does the claim ``$f$ was not aware of $u$'' means? )}
+In a way, looking from a reversed perspective, if $f$ was build with the knowledge of $\mathbb{P}_u$, one would expect that the performance of $f$ for the user $u$ is way better than one could have obtained by gathering all the information about user $u$ from every other user.
+
+I will try to formalize the above idea below. I will create 2 additional prediction functions $f_{u}$ and $f_{\neq u}$, defined as
+\begin{align*}
+    \arg\min \mathbb{E}[\ell(f(X), Y) \mid U = u] \quad\text{and}\quad \mathbb{E}[\ell(f(X), Y) \mid U \neq u]\,,
+\end{align*}
+respectively. Now, we define
+\begin{align*}
+    \mathcal{R}_u(f) = \mathbb{E}[\ell(f(X), Y) \mid U = u]\quad\text{and}\quad\mathcal{R}_{\neq u}(f) = \mathbb{E}[\ell(f(X), Y) \mid U \neq u]
+\end{align*}
+{\color{red}Evg: there is an issue in the personalized case of how we extend $f_u$ and $f_{\neq u}$ to predict on other users. This issue disappears in the non-personalized case}
+By definition, it holds that
+\begin{align*}
+    \mathcal{R}_u(f_u) \leq \mathcal{R}_u(f_{\neq u})\quad\text{and}\quad \mathcal{R}_{\neq u}(f_{\neq u}) \leq \mathcal{R}_{\neq u}(f_u)\,.
+\end{align*}
+These are, in some sense, the bounds ``where the risk of $f$ can live''. The promise of $f$ not using the knowledge of user $u$, might mean that all the risks of $f$ are much closer to the risks of $f_{\neq u}$ than to the risks of $f_{u}$.
+
+This is in a way plausible, especially in the context of two similar users. If we have only two users $u$ and $u'$, then, in the case $\mathbb{P}_u \approx \mathbb{P}_{u'}$ we cannot expect to reliably ``forget'' a user $u$. On the other hand, if $\mathbb{P}_u, \mathbb{P}_{u'}$ are very different, and we observe a too good of a performance of $f$ on $u$, it is fishy and could be reliably tested.
+
+
+\textbf{Attempt 2. (unlearnerning from fairness perspective)}
+
+A way to unlearn knowledge of $u$ from $f$ could be the following: I claim that I have performed a post-processing $T$ on top of $f$ so that upon querying the resulting predictor on $(X, Y) \sim \mathbb{P}_u$ you see no statistical dependency between $f(X)$ and $Y$. It might be formalized as
+
+\begin{align*}
+    \min \left\{\mathbb{E}[(T(f(X)) - Y)^2 \mid U \neq u] \,:\, (T(f(X)) \indep Y) \mid U = u\right\}
+\end{align*}
+Loss can be anything, and we could start with classification if we go this road. The fact that we minimize the risk corresponds to the idea that we want to find the most-performing post-processing on the rest of the users. The condition formalizes the idea of not being able to find any statistically significant relation between the output of the prediction and the true label for the user $u$.
+
+Now, the question is: does it make sense? If I was a user and I would get access to querying only $T \circ f$ without knowing any training process (which is a trade secret in most of the cases), upon observing no ``correlation'' between the output and my signal, I think I would be satisfied.
+
+Note that, with this definition in mind, if $\mathbb{P}_u$ looks like most of the other distributions of other users, I am essentially forced to forget everyone else along the user $u$. This I think could be bypassed using extra modeling choice of the type
+\begin{align*}
+    \mathbb{P}_u = \alpha_u\mathbb{Q} + (1 - \alpha_u) \mathbb{Q}_u\,,
+\end{align*}
+and we only force $(T(f(X_u)) \indep Y_u)$ for $(X_u, Y_u) \sim \mathbb{Q}_u$. This modeling choice corresponds to the idea that all users share one common component and one user-specific component.
+
+It (might be) is unreasonable to forget what is present in everyone else ($\mathbb{Q}$), while forgeting the use specific component $\mathbb{Q}_u$ is a must.
+
+I am not sure if it is fully polished, maybe modelling should be along the line of the covariate shift or something like that, to meditate.
+
+{\color{RoyalBlue}
+\subsection{Bayes unlearning classifier}
+Inspired by the file sent by Evgenii, I will try to explicitly write the Bayes classifier for unlearning in the case of binary classification.
+\paragraph{Attempt 0.} We say that the classifier $f$ has unlearned $\bar{u}$ if $$\P[f(X)=Y \mid U=\bar{u}]=\P[f(X)=Y \mid U\neq \bar{u}]. $$ 
+
+    Call $\eta(x,u) = \mathbb{E}[Y|X=x,U=u]$.
+    In this case, from the notes we already know that, if $|\mathcal{U}|=2$ and $t\mapsto\P[\eta(X,U)\leq t \mid U=u]$ is continuous, by \emph{Theorem 2.1.1} the optimal classifier is:
+    \begin{equation}
+        f^*(x,u)=\mathbbm{1}\left[\eta(x,u) \ge \frac{1}{2}+\frac{u\lambda^*}{2\pi_u}\right] ,
+    \end{equation} 
+    where
+    $$ \lambda^* \in \arg\min_{\lambda\in\R} \sum_{u\in\mathcal{U}}\mathbb{E}[\max\left((2\eta(x,u)-1)\pi_u-u\lambda,0\right) \mid U=u] .$$
+
+\paragraph{Attempt 2.} In this case, the definition of unlearning is the following:
+$$(f(X,U)\indep Y) \mid U=\bar{u} .$$
+Let's rewrite the proof as if it was the previous case and see where it takes us:
+\begin{proof}
+    We want to find $f^*:\mathcal{X}\times\mathcal{U}\to\mathcal{Y}$ that minimizes
+    $$ \min_{f} \P[f(X,U)\neq Y : (f(X,U)\indep Y) \mid U=\bar{u}] .$$
+    In order to use Lagrange multipliers' method, we have to rewrite the constraint (by using the definition of independence) in the form:
+    \begin{equation}
+    \P[f(X,U)=y_1 \mid U=\bar{u}]\P[Y=y_2 \mid U=\bar{u}] - \P[f(X,U)=y_1, Y=y_2 \mid U=\bar{u}] = 0
+    \end{equation}
+    or alternatively:
+    \begin{equation}
+    \sum_{y\in\mathcal{Y}}\P[f(X,U)=y \mid U=\bar{u}]\P[Y=y \mid U=\bar{u}] - \P[f(X,U)=Y \mid U=\bar{u}] = 0
+    \end{equation}
+    or even:
+    \begin{equation}
+        \mathrm{Cov}(f(X,U),Y \mid U=\bar{u}) = 0 .
+    \end{equation}
+    or:
+    \begin{equation}
+        \E[f(X,U)]\E[Y] - \E[f(X,U)Y] = 0 .
+    \end{equation}
+    Next, we can write the lagrangian $\mathcal{L}(f,\lambda)$ chosing one of the above forms.
+    This way, our problem becomes:
+    $$ \min_f \max_\lambda \mathcal{L}(f,\lambda) .$$
+    However, we will focus on solving $\max_\lambda \min_f \mathcal{L}(f,\lambda)$ first, and then use the max-min inequality to prove that they have the same set of solutions.
+    Using the covariance formulation and the modeling choice of $\mathcal{Y}=\{+1,-1\}$ and $\mathcal{U}=\{0,1\}$ yield:
+    \begin{equation}
+        \begin{split}
+            \mathcal{L}(f,\lambda) &= \P[f(X,U) \neq Y] + \lambda\sum_{y_1,y_2\in\mathcal{Y}}\mathrm{Cov}(\mathbbm{1}_{f(X,U)=y_1},\mathbbm{1}_{Y=y_2} \mid U=\bar{u}) \\
+            &= \E[Y] +\sum_{u\in\mathcal{U}}\E[f(X,U)(1-2\eta(X,U))] \\
+            &+ use the expected value one plus E(eta) = E(Y) and then you can do it!!
+        \end{split}
+    \end{equation}
+\end{proof} 
+
+}

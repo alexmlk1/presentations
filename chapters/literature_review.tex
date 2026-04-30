@@ -1,3 +1,95 @@
+\section*{Unlearning or Untraining?}
+The goal of this section is to compare the discussion above with the thoughts expressed in \cite{untraining_2026}.\\
+In the introduction, the authors make a remark that was in common with N.P.: there are a lot of different tasks that, in the literature, are referred to as "unlearning", but, conceptually, are different from merely "deleting data from the model". 
+Some examples are: removing dangerous knowledge, eliminating backdoor or poisoning attacks, unlearn copyrighted content or specific art styles.\\
+The main point they rise in their work is that this class of problems is too broad to be faced in the same way, and thus the need to break down the "unlearning" concept into two different ones: UNTRAINING and UNLEARNING.\\
+UNTRAINING is the task of removing the influence of a certain data point from the model, without changing its behaviour on the rest of the dataset (the gold-standard in this case is retraining).\\
+On the other hand, UNLEARNING aims at "removing the influence of the underlying distribution from which those examples are sampled".
+
+As far as the metrics are concerned, in the former case, the $(\varepsilon,\delta)$-certified removal is the reference metric, but it does not capture the desired effect in the latter case.\\
+A general idea that arises from the paper is the fact that untraining is a point-wise concept, while unlearning is at distribution level. 
+Therefore, to compare the two concepts, we need to get them at the same level in the first place.
+This can be done by saying that UNLEARNING "aims to approximate a model that was never trained on any instance of that distribution".
+So, if we want to give a definition similar of unlearning in terms of certified removal, we could proceed in the following way.\\
+Given a concept $\mathcal{B}$ we want to unlearn, let $\mathcal{S}^{\mathrm{full}}$ be the complete set of examples that capture the behaviour $\mathcal{B}$.
+Unlearning $\mathcal{S}\sim\mathcal{B}$ is equivalent to untraining on $\mathcal{S}^{\mathrm{full}}$.
+Remarkably, if $\mathcal{S}=\mathcal{S}^{\mathrm{full}}$, then untraining $\mathcal{S}$ and unlearning $\mathcal{B}$ are the same.
+
+An implication of the previously expressed discrepancies is that successful untraining does not imply misclassifying the examples in the forget set (be\-cause if someone else took a picture of the Tour Eiffel, then removing you has no effect on the prediction), nor the necessity of changning the model parameters, whereas unlearning implies both.
+
+{\color{RoyalBlue}
+\textbf{Remark!!} The main novelty of our approach compared to the literature in view of this paper, is that $\mathcal{B}$ in general is likely to be an element of $\mathcal{Y}$.
+Indeed, a ``concept'' in Pl@ntNet, as an example, is a plant species. Thus, the goal of unlearning would be to forget all the data with the same label, when you ask for a concept to be unlearnt.\\
+In our case, however, we are formalizing the fact that a behaviour is a distribution that depends on the user, and we want to unlearn it for privacy issues.
+\vspace{0.2cm}
+
+\noindent
+This formulation is very clear to me, but I'm not sure if the independence condition previously stated in Attempt 2 would be equivalent.
+If they are, assuming that the concept of behaviour coincide with the distribution of a user, the definition given from Attempt 2 is close to their definition of un\-learning.
+
+Note, however, that I would like the predictor to not be able to see what user the data comes from. 
+If that's not the case, one can keep some information about the unlearnt class that can give room to attacks that try to recognize if an element was part of the class to forget or not.\\
+\textbf{Example:}~ $U=\{\text{Inria Teams}\}$, $\mathcal{Y}=\{0,1\}$, $\mathcal{X}=\{\text{members of the teams}\}$, $Y|X$ models if a person eats at the cantine or not.
+Suppose we want to forget about $u=\text{IROKO}$, where everyone but $x=Alex$ goes to the cantine, whereas everyone in the other teams does not go. 
+If $f=f(X,u)$, then the following example is an optimal unlearner (from our definition), but allows to identify who is a member of IROKO team (not which member it is, though):
+\begin{equation*}
+  f(X,u)=
+  \begin{cases}
+    1 & \text{if } u=\text{IROKO}\\
+    0 & \text{otherwise}
+  \end{cases}.
+\end{equation*}
+
+Althought they clearly say that their aim is not to discuss the feasibility of unlearning, I think that there are some examples in the literature of unlearning algorithms in this new sense, such as SurgUN \cite{competition_forgetting_2026} or DIET \cite{diet_2026} (as well as the one by Li et al. discussed in the paper).
+The first one unlearns concepts by changing the model parameters after training on concurrent images, while the second one moves the embedding of the concept towards the boundary of the elliptic space of embeddings, making its influence on the prediction negligible.
+
+\paragraph{Why does this matter?} The lack of clear specification of problem settings can leave us with unclear expectations for when an algorithm should work well.
+  The two problem settings of Untraining and Unlearning are fundamentally distinct, and we may falsely expect an algorithm that performs well for one to also work well for the other, but, since the evaluation metrics are different, this may not be the case.
+  For example, in the case study of unlearning corrupted data, mere untraining on $\mathcal{S}\subset \mathcal{S}^{\mathrm{full}}$ fails catastrophically to heal the model, whereas unlearning the behaviour is what we would need (refer to \cite{schoepf_redirection_2026} to see an attempt of UNLEARNING algorithm in this case).
+
+
+\subsection{UnTraining vs UnLearning in Linear Regression}
+Let's see if analysing the linear case can give us some insights on how things work.\\
+Fix $(X)_{[i,:]}=(x_i)_{i=1}^n\in\mathbb{R}^{n\times d}$ and $y=(y_i)_{i=1}\in\mathbb{R}^n$. 
+We want to solve OLS: $\hat\theta = \arg\min_\theta \|y-X\theta\|^2$.
+It is known that if $X$ is full rank, then $\hat\theta=(X^\top X)^{-1}X^\top y$.
+Assuming $n>d$, we will have linearly dependent rows (data points). What happens if we want to forget them?\\
+Using influence functions (which are exact in this case), we get that untraining one point has no effect only when the point is already perfectly fitted by the model (because the gradient of the loss function on it will be 0).
+\\ \qst I want now to shed light on the complementary problem: given a set of data points $X$, what points can I add in order not to change the predicted parameter?
+
+\paragraph{Idea:} From the paper \cite{untraining_2026}, we had the intuition that these sets $\mathcal{S}^{\text{full}}$ represent a sort of clousure operation given a subset $\mathcal{S}$ of the data points.
+This means that we can partition the data points into different classes that are disjoint. A way to do this, is the way we did it: add a new variable that indicates the user and then model the "behaviour" $\mathcal{B}$ as a different distribution given by each user's profile.\\
+The above question is motivated by the hope of finding how to enlarge $\mathcal{S}$ in order to arrive at $\mathcal{S}^{\text{full}}$.
+
+Note that by adding rows to $X$ and $y$, the problem changes in the following way.
+Consider the extended data:
+\begin{equation*}
+  \tilde{X}=\begin{bmatrix}
+    X\\
+    A
+  \end{bmatrix},\qquad \tilde{y}=\begin{bmatrix}
+    y\\
+    b
+  \end{bmatrix}.
+\end{equation*}
+Requesting that the new estimated parameter is the same as the old one (called $\hat{\theta}_X$), is equivalent to requiring:
+\begin{equation*}
+  \tilde{X}^\top \tilde{X}\hat{\theta}_X=\tilde{X}^\top \tilde{y} \iff (X^\top X + A^\top A)\hat{\theta}_X = X^\top y + A^\top b.
+\end{equation*}
+Since, by definition, $X^\top X\hat{\theta}_X=X^\top y$, we get that the previous condition is equivalent to:
+$$A^\top A\hat{\theta}_X=A^\top b \iff A^\top(A\hat{\theta}_X-b)=0.$$
+This means that, in order to keep the prediction unchanged, we need either the new points to be perfectly interpolated (i.e., $A\hat{\theta}_X=b$), or $A\hat{\theta}_X-b$ orthogonal to the column space of $A$ (meaning also that the cumulative error on the new data is 0).\\
+I expected that adding points that are spanned by the already given ones would yield the same $\hat{\theta}$, but actually it doesn't!
+\\ \qst Would it make sense to say that to UnLearn a point, we have to untrain over the its span?
+
+A simpler case is the following: imagine that our data is generated by $y_i|x_i = \theta_* x$.
+Whatever data we add, UnTraining on it will be useless, as the predicted parameter will already be $\theta_*$ as soon as $X$ has full rank.
+However, what does it mean to UnLearn the newly added data?
+\\ \qst To complicate things, imagine that the data-generating process is as follows: we throw a coin and if it is heads, we sample from $P_1$ and if it is tails, we sample from $P_2$, where $P_1$ and $P_2$ are two different distributions.
+We then get $A,b$ sampled from $P_1$. How do we unlearn it? What does it mean Evgenii's definition in this case?
+If $P_1$ is a delta, it should be easy to identify which points are generated from it. Then, what we want to do is UnTrain on it (as it is the $\mathcal{S}^{\text{full}}$ from the previous paper). The problem here is that we cannot use influence functions for group unlearning, as reported in \cite{koh_accuracy_2019}.
+
+}
 \section*{Algorithm implementations: D2D vs R2D}
 An application for which we may want to use influence functions is unlearning a data point (for example for privacy reasons).
 However, as we have seen, IFs may not work well in the MLP and Deep Learning setting. 
@@ -28,13 +120,18 @@ In particular, in addition to all previous observations, they highlight that D2D
   Moreover, instead of training from scratch the model with the updated weights, the authors propose to correct the result of the usual training with influence functions.
   \item Something I had not seen yet in machine unlearning, but I have seen for example in plateau explanation \cite{Berthier_2024}: it can make more sense to consider influence functions in certain epochs of the training, not only at the end \cite{lee_timescales_2025}. 
   Indeed, the importance of a certain data point may change throughout the training.
+  \item One of the reasons why we are analyzing unlearning is that it's kind of the dual problem of finiding influencial samples.    However, the authors of \cite{pan_misalignment_2026} state that in general this correlation is not high. 
+  Therefore, they propose a new training method for neural nets that increases this alignment while keeping about the same performances of the usual algorithms in terms of training time and accuracy.
+  \item Lately, in the psychology area, I have seen an advancement concerning also machine learning, where they state that forgetting (unlearning) is not due to time, but more to interference of new information that is very close to the old one.
+    The study from \cite{barman_geometry_2026} compares human forgetting and ML forgetting and shows that competition is the main source of forgetting, both in machines and humans alike.\\
+    Exploiting this phenomenon, in \cite{competition_forgetting_2026}, the authors pro\-pose a new method for unlearning concepts, that relies on unlearning concepts in Vision Language Models by changing a surgically chosen set of parameters, that is responsible for the prediction of the concept we want to unlearn, by updating them with gradients given by competing concepts.
+  \item Maybe it's better to use continual learning for Pl@ntNet instead of retraining the model every 3 months, now that results improving perfor\-mances \cite{catastrophic_forgetting_2026} are available.
+  (after discussing, it was not a great idea, because for plantnet is better to have reproducibility and versioning rather than continual learning at this stage. However, it's interesting to see that the unlearning counterpart has implications similar to the results cited above).   
   {\color{RoyalBlue}
-    \item One of the reasons why we are analyzing unlearning is that it's kind of the dual problem of finiding influencial samples.
-    However, the authors of \cite{pan_misalignment_2026} state that in general this correlation is not high. 
-    Therefore, they propose a new training method for neural nets that increases this alignment while keeping about the same performances of the usual algorithms in terms of training time and accuracy.
     \item The way we have studied influence functions for unlearning so far is to estimate a step of the Newton algorithm to approximate the effect of LOO retraining.
-    In \cite{bui2026batch}, they propose an iterative algorithm using the influence function approximation step by step. The main issue they managed to solve is the computational cost for such algorithm:
+    In \cite{bui2026batch}, they propose an iterative algorithm using the influence function approximation step by step. The main issue they managed to solve is the computa\-tional cost for such algorithm:
     computing only hessian-vector products instead of the whole hessian and using stochastic hessians as proxies for the full-batch hessian.
-    
-  } 
+    \item Extention of Woodbury formula for NNs and IF unlearning in \cite{zhao_win-u_2026}. They also cite \cite{bae_if_2022}, saying that using Woodbury is like having a warm start initialization.
+    It's interesting to see that even if vanilla IFs don't achieve good results in unlearning in NNs, going to a second degree approximation with Woodbury achieves SOTA performances.
+    } 
 \end{itemize}

@@ -9,11 +9,13 @@
 	%footsepline,%					line before the page foot
 	%headings=small,%			smaller headings
 	12pt,%								font size
-]{scrreprt}
+	%draft,%								draft mode (comment for the final version)
+]{article}
 
 
 \usepackage{definitions}
-
+\newcommand\indep{\protect\mathpalette{\protect\independenT}{\perp}}
+\def\independenT#1#2{\mathrel{\rlap{$#1#2$}\mkern2mu{#1#2}}}
 
 \begin{document}
 
@@ -25,14 +27,17 @@
 
 %\include{chapters/IF_for_LR}
 
-\include{chapters/eps_dynamics}
+%\include{chapters/eps_dynamics}
 
-\include{chapters/measure_selection}
+%\include{chapters/measure_selection}
+
+\include{chapters/thoughts}
 
 \include{chapters/literature_review}
 
+
 %\nocite{*}
-\bibliographystyle{plain}
+\bibliographystyle{plainnat}
 \bibliography{refs}
 
 \end{document}
